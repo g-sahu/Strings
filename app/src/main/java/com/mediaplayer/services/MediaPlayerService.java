@@ -31,7 +31,7 @@ public class MediaPlayerService extends IntentService {
     private IBinder mBinder = new MyBinder();
 
     public MediaPlayerService() {
-        super("ANewThread");
+        super("MediaPlayerService");
     }
 
     public static MediaPlayer getMp() {
@@ -51,9 +51,7 @@ public class MediaPlayerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(LOG_TAG, "Starting service...");
-
         isServiceRunning = true;
-
         Log.d("isServiceRunning: ", String.valueOf(isServiceRunning));
     }
 
@@ -69,7 +67,6 @@ public class MediaPlayerService extends IntentService {
 
         Log.d("isServiceBound: ", String.valueOf(isServiceBound));
         Log.v(LOG_TAG, "Service bound to activity");
-
         return mBinder;
     }
 
@@ -84,7 +81,6 @@ public class MediaPlayerService extends IntentService {
     public boolean onUnbind(Intent intent) {
         Log.v(LOG_TAG, "Service unbound");
         isServiceBound = false;
-
         return true;
     }
 

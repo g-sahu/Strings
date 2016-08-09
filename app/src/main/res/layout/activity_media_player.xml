@@ -88,7 +88,7 @@
                 android:gravity="start|center_vertical"
                 android:text="0:00"/>
 
-            <TextView android:id="@+id/trackLength"
+            <TextView android:id="@+id/trackDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end|center_vertical"

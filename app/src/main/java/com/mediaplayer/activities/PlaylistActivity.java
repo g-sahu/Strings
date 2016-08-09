@@ -1,84 +1,62 @@
 package com.mediaplayer.activities;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mediaplayer.R;
-import com.mediaplayer.adapters.CustomAdapter;
+import com.mediaplayer.adapters.SongsListAdapter;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.utilities.MediaLibraryManager;
+import com.mediaplayer.dao.MediaplayerDBHelper;
+import com.mediaplayer.utilities.SQLConstants;
 
 import java.util.ArrayList;
 
-public class PlaylistActivity extends Activity {
-    private Intent intent;
-    private static ArrayList<Track> trackInfoList;
-    private Track requestedTrack;
-
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = { Manifest.permission.WRITE_EXTERNAL_STORAGE };
+public class PlaylistActivity extends AppCompatActivity {
+    private ArrayList<Track> playlist = new ArrayList<Track>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
-        checkPermissions();
 
-        trackInfoList = new MediaLibraryManager().getTrackInfo(getResources());
-        ListView listView = (ListView) findViewById(R.id.listView);
-        ListAdapter listAdapter = new CustomAdapter(this, trackInfoList);
-        listView.setAdapter(listAdapter);
-        intent = new Intent(this, MediaPlayerActivity.class);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView adapterView, View view, int position, long id) {
-                requestedTrack = trackInfoList.get(position);
-                intent.putExtra("requestedTrack", requestedTrack);
-                startActivity(intent);
-            }
-        });
-    }
-
-    public void checkPermissions() {
         try {
-            int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            MediaplayerDBHelper mDbHelper = new MediaplayerDBHelper(this);
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            String args[] = {"1"};
+            Cursor playlistsCursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_DETAIL, args);
+            playlistsCursor.moveToFirst();
 
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                // Request for permission from the user
-                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+            while (!playlistsCursor.isAfterLast()) {
+                Track track = new Track();
+                track.setTrackTitle(playlistsCursor.getString(1));
+                track.setTrackDuration(playlistsCursor.getInt(4));
+                track.setAlbumName(playlistsCursor.getString(6));
+                track.setArtistName(playlistsCursor.getString(7));
+                track.setAlbumArt(playlistsCursor.getBlob(8));
+
+                playlist.add(track);
+                playlistsCursor.moveToNext();
+            }
+
+            playlistsCursor.close();
+
+            if(playlist.isEmpty()) {
+                TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
+                textView.setVisibility(View.VISIBLE);
+            } else {
+                ListView listView = (ListView) findViewById(R.id.listView);
+                ListAdapter playlistAdapter = new SongsListAdapter(this, playlist);
+                listView.setAdapter(playlistAdapter);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_EXTERNAL_STORAGE: {
-                // If request is cancelled, the playList arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }

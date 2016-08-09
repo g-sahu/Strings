@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--  Single List Item Design -->
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/albumThumbnail"
@@ -36,5 +35,20 @@
         android:layout_alignBottom="@+id/albumThumbnail"
         android:layout_alignLeft="@+id/trackTitle"
         android:layout_alignStart="@+id/trackTitle" />
+
+    <ImageButton
+        android:id="@+id/moreOptionsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_more_vert_black_18dp"
+        android:contentDescription="More options"
+        android:background="@null"
+        android:adjustViewBounds="false"
+        android:layout_alignBottom="@+id/artistName"
+        android:layout_alignTop="@+id/trackTitle"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:onClick="showSongsPopupMenu"/>
 
 </RelativeLayout>

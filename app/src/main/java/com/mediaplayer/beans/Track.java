@@ -4,14 +4,40 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 public class Track implements Serializable, Comparator<Object> {
-    private byte[] albumArt;
+    private int trackID;
     private String trackTitle;
-    private String artistName;
+    private int trackIndex;
+    private String fileName;
+    private int trackDuration;
+    private long fileSize;
     private String albumName;
-    private String trackLength;
+    private String artistName;
+    private byte[] albumArt;
     private String trackLocation;
 
-    private int trackIndex;
+    public int getTrackID() {
+        return trackID;
+    }
+
+    public void setTrackID(int trackID) {
+        this.trackID = trackID;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
 
     public byte[] getAlbumArt() {
         return albumArt;
@@ -53,12 +79,12 @@ public class Track implements Serializable, Comparator<Object> {
         this.trackLocation = trackLocation;
     }
 
-    public String getTrackLength() {
-        return trackLength;
+    public int getTrackDuration() {
+        return trackDuration;
     }
 
-    public void setTrackLength(String trackLength) {
-        this.trackLength = trackLength;
+    public void setTrackDuration(int trackDuration) {
+        this.trackDuration = trackDuration;
     }
 
     public int getTrackIndex() {

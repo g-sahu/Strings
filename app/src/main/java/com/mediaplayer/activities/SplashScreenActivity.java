@@ -9,17 +9,16 @@ import android.widget.Button;
 import com.mediaplayer.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    Button launchButton;
-    Intent intent;
+    private Button launchButton;
+    private Intent intent;
 
-    // Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
         launchButton = (Button) findViewById(R.id.launch_button);
-        intent = new Intent(this, PlaylistActivity.class);
+        intent = new Intent(this, HomeActivity.class);
 
         launchButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,8 +1,8 @@
 package com.mediaplayer.utilities;
 
-/**
- * Created by gasahu on 26-Jan-16.
- */
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class Utilities {
     /**
      * Function to convert milliseconds time to
@@ -65,5 +65,12 @@ public class Utilities {
 
         // return current duration in milliseconds
         return currentDuration * 1000;
+    }
+
+    public static String getCurrentDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+
+        return df.format(c.getTime());
     }
 }

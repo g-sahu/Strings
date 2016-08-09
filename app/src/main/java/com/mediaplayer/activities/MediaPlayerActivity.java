@@ -36,7 +36,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private static ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
     private static Track requestedTrack;
     private static SeekBar songProgressBar;
-    private static TextView titleBar, artistBar, timeElapsed, trackLength;
+    private static TextView titleBar, artistBar, timeElapsed, trackDuration;
     private static ImageView albumArt;
     private static String songTitle, albumName, artistName, songDuration;
 
@@ -309,13 +309,13 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         titleBar = (TextView) findViewById(R.id.titleBar);
         artistBar = (TextView) findViewById(R.id.artistBar);
         timeElapsed = (TextView) findViewById(R.id.timeElapsed);
-        trackLength = (TextView) findViewById(R.id.trackLength);
+        trackDuration = (TextView) findViewById(R.id.trackDuration);
         albumArt = (ImageView) findViewById(R.id.albumArt);
         albumArtLayout = (LinearLayout) findViewById(R.id.albumArtLayout);
         songTitle = requestedTrack.getTrackTitle();
         albumName = requestedTrack.getAlbumName();
         artistName = requestedTrack.getArtistName();
-        songDuration = requestedTrack.getTrackLength();
+        songDuration = String.valueOf(requestedTrack.getTrackDuration());
         currentIndex = requestedTrack.getTrackIndex();
         data = requestedTrack.getAlbumArt();
         songProgressBar.setProgress(0);
@@ -331,7 +331,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
 
         titleBar.setText(songTitle);
         artistBar.setText(artistName);
-        trackLength.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
+        trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
         albumArt.setImageBitmap(bm);
 
         Log.d(LOG_TAG, "Media Player initialized");

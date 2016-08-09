@@ -7,20 +7,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.activities.PlaylistActivity;
 
 import java.util.ArrayList;
 
-public class CustomAdapter extends BaseAdapter {
+public class SongsListAdapter extends BaseAdapter {
     ArrayList<Track> trackInfoList;
     private static LayoutInflater inflater = null;
 
-    public CustomAdapter(PlaylistActivity context, ArrayList<Track> trackInfoList) {
+    public SongsListAdapter(Context context, ArrayList<Track> trackInfoList) {
         this.trackInfoList = trackInfoList;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -35,6 +35,7 @@ public class CustomAdapter extends BaseAdapter {
         holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
         holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
         holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
+        holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreOptionsButton);
 
         if(data != null) {
             albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -66,5 +67,6 @@ public class CustomAdapter extends BaseAdapter {
         ImageView albumArt;
         TextView trackTitle;
         TextView artistName;
+        ImageButton moreOptions;
     }
 }
