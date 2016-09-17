@@ -17,7 +17,7 @@ import com.mediaplayer.beans.Track;
 import java.util.ArrayList;
 
 public class SongsListAdapter extends BaseAdapter {
-    ArrayList<Track> trackInfoList;
+    private ArrayList<Track> trackInfoList;
     private static LayoutInflater inflater = null;
 
     public SongsListAdapter(Context context, ArrayList<Track> trackInfoList) {
@@ -28,14 +28,14 @@ public class SongsListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
-        View rowView = inflater.inflate(R.layout.track_list, null);
+        View rowView = inflater.inflate(R.layout.item_track, null);
         byte data[] = trackInfoList.get(position).getAlbumArt();
         Bitmap albumArt = null;
 
         holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
         holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
         holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
-        holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreOptionsButton);
+        holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreTrackOptionsButton);
 
         if(data != null) {
             albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);

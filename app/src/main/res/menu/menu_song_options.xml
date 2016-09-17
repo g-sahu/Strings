@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/addToPlaylist"
+        android:title="@string/add_to_playlist"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="1"
+        android:onClick="addToPlaylist"/>
+
+    <item android:id="@+id/addToFavourites"
+        android:title="@string/add_to_favourites"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="2"
+        android:onClick="addRemoveFavourites"/>
+
+    <item android:id="@+id/removeSong"
+        android:title="@string/remove_from_library"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="3"
+        android:onClick="removeFromLibrary"/>
+</menu>

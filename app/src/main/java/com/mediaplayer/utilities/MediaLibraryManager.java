@@ -1,5 +1,6 @@
 package com.mediaplayer.utilities;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,10 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.util.Log;
 
 import com.mediaplayer.R;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
+import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaplayerDBHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,48 +24,35 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class MediaLibraryManager {
+    private static String LOG_TAG_SQL = "Executing query";
+    private static String LOG_TAG_EXCEPTION = "Exception";
     private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
     private static ArrayList<Track> trackInfoList;
-    private static int playlistSize;
+    private static ArrayList<Track> selectedPlaylist;
+    private static ArrayList<Playlist> playlistInfoList;
+    private static int tracklistSize;
 
     public MediaLibraryManager(){}
 
-    public static void init(SQLiteDatabase db) {
-        Cursor tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACKS, null);
-        trackInfoList = new ArrayList<Track>();
-        tracksCursor.moveToFirst();
+    public static void init(Context context) {
+        MediaplayerDAO dao = new MediaplayerDAO(context);
 
-        while (!tracksCursor.isAfterLast()) {
-            Track track = new Track();
+        trackInfoList = dao.getTracks();
+        sortTracklist();
 
-            track.setTrackID(tracksCursor.getInt(0));
-            track.setTrackTitle(tracksCursor.getString(1));
-            track.setFileName(tracksCursor.getString(2));
-            track.setTrackDuration(tracksCursor.getInt(3));
-            track.setFileSize(tracksCursor.getInt(4));
-            track.setAlbumName(tracksCursor.getString(5));
-            track.setArtistName(tracksCursor.getString(6));
-            track.setTrackLocation(tracksCursor.getString(7));
-
-            trackInfoList.add(track);
-            tracksCursor.moveToNext();
-        }
-
-        playlistSize = trackInfoList.size();
-        sortPlaylist(trackInfoList);
-        //tracksCursor.close();
-        //db.close();
+        playlistInfoList = dao.getPlaylists();
+        sortPlaylists();
     }
 
     /**
-     * Function to read all mp3 files from sdcard
+     * Method to read all mp3 files from sd card
      * and store the details in ArrayList
      * */
-    public static ArrayList<HashMap<String, Object>> getPlayList() {
+    private static ArrayList<HashMap<String, Object>> getTracks() {
         File[] fileList = path.listFiles();
         String fileName, filePath;
         long fileSize;
-        ArrayList<HashMap<String, Object>> songsList = new ArrayList<HashMap<String, Object>>();
+        ArrayList<HashMap<String, Object>> tracklist = new ArrayList<HashMap<String, Object>>();
 
         //Iterate through the directory to search for .mp3 files
         for(File file: fileList) {
@@ -76,26 +67,31 @@ public class MediaLibraryManager {
                 song.put(MediaPlayerConstants.FILE_PATH, filePath);
                 song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
 
-                songsList.add(song);
+                tracklist.add(song);
             }
         }
 
-        return songsList;
+        return tracklist;
     }
 
-    public ArrayList<Track> getTrackInfo(Resources resources) {
+    /**
+     * Method to populate trackInfoList from the list of mp3 files read from file memory
+     * @param resources Reference to application's resources
+     * @return The list of songs read from memory
+     */
+    public static ArrayList<Track> populateTrackInfoList(Resources resources) {
         trackInfoList = new ArrayList<Track>();
-        ArrayList<HashMap<String, Object>> playList = getPlayList();
+        ArrayList<HashMap<String, Object>> tracklist = getTracks();
         HashMap<String, Object> songMap;
         String artistName, songTitle, fileName, filePath, albumName, trackLength;
         long fileSize;
         Bitmap albumArt;
         byte data[];
-        Iterator<HashMap<String, Object>> playListIterator = playList.iterator();
+        Iterator<HashMap<String, Object>> tracklistIterator = tracklist.iterator();
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
-        while(playListIterator.hasNext()) {
-            songMap = playListIterator.next();
+        while(tracklistIterator.hasNext()) {
+            songMap = tracklistIterator.next();
             filePath = songMap.get(MediaPlayerConstants.FILE_PATH).toString();
             fileName = songMap.get(MediaPlayerConstants.FILE_NAME).toString();
             fileSize = (Long) songMap.get(MediaPlayerConstants.FILE_SIZE);
@@ -119,11 +115,12 @@ public class MediaLibraryManager {
             Track track = new Track();
             track.setTrackTitle(songTitle);
             track.setFileName(fileName);
+            track.setTrackDuration(Integer.parseInt(trackLength));
+            track.setFileSize(fileSize);
             track.setAlbumName(albumName);
             track.setArtistName(artistName);
             track.setTrackLocation(filePath);
-            track.setTrackDuration(Integer.parseInt(trackLength));
-            track.setFileSize(fileSize);
+            track.setFavouriteSw(SQLConstants.FAV_SW_NO);
 
             if (data != null) {
                 track.setAlbumArt(data);
@@ -138,27 +135,82 @@ public class MediaLibraryManager {
         }
 
         mmr.release();
-        playlistSize = trackInfoList.size();
+        tracklistSize = trackInfoList.size();
 
         //Sort the track list
-        sortPlaylist(trackInfoList);
+        sortTracklist();
         return trackInfoList;
     }
 
-    public static void sortPlaylist(ArrayList<Track> playlist) {
-        Collections.sort(playlist, new Track());
-        Iterator<Track> playlistIterator = playlist.iterator();
+
+
+    /**
+     * Method to sort list of tracks in Media library
+     */
+    public static void sortTracklist() {
+        Collections.sort(trackInfoList, new Track());
+        Iterator<Track> tracklistIterator = trackInfoList.iterator();
         Track track;
         int i = 0;
 
-        while(playlistIterator.hasNext()) {
-            track = playlistIterator.next();
+        while(tracklistIterator.hasNext()) {
+            track = tracklistIterator.next();
             track.setTrackIndex(i);
             i++;
         }
     }
 
-    public static int getPlaylistSize() {
+    /**
+     * Method to sort list of playlists in Media library
+     */
+    public static void sortPlaylists() {
+        //Removing default playlist 'Favourites' from playlistInfoList to prevent it's index from changing
+        Playlist fav =  playlistInfoList.remove(SQLConstants.PLAYLIST_INDEX_FAVOURITES);
+
+        Collections.sort(playlistInfoList, new Playlist());
+        playlistInfoList.add(SQLConstants.PLAYLIST_INDEX_FAVOURITES, fav);
+        Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
+        Playlist playlist;
+        int i = 0;
+
+        while(playlistIterator.hasNext()) {
+            playlist = playlistIterator.next();
+            playlist.setPlaylistIndex(i);
+            i++;
+        }
+    }
+
+    public static void addTrack(Track track) {
+        trackInfoList.add(track);
+    }
+
+    public static ArrayList<Track> getTrackInfoList() {
+        return trackInfoList;
+    }
+
+    public static ArrayList<Playlist> getPlaylistInfoList() {
+        return playlistInfoList;
+    }
+
+    public static Playlist getPlaylistByIndex(int index) {
+        return playlistInfoList.get(index);
+    }
+
+    public static Playlist getPlaylistByTitle(String title) {
+        Playlist playlist = null;
+        Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
+
+        while(playlistIterator.hasNext()) {
+            playlist = playlistIterator.next();
+            if(title.equals(playlist.getPlaylistName())) {
+                break;
+            }
+        }
+
+        return playlist;
+    }
+
+    public static int getTrackInfoListSize() {
         if(trackInfoList != null) {
             return trackInfoList.size();
         } else {
@@ -166,8 +218,25 @@ public class MediaLibraryManager {
         }
     }
 
-    public static Track getTrack(int index) {
-        return trackInfoList.get(index);
+    public static int getPlaylistInfoListSize() {
+        if(playlistInfoList != null) {
+            return playlistInfoList.size();
+        } else {
+            return 0;
+        }
+    }
+
+    public static Track getTrackByIndex(String playlistType, int index) {
+        switch (playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                return trackInfoList.get(index);
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                return selectedPlaylist.get(index);
+
+            default:
+                return null;
+        }
     }
 
     public static Track getFirstTrack() {
@@ -175,7 +244,7 @@ public class MediaLibraryManager {
     }
 
     public static Track getLastTrack() {
-        return trackInfoList.get(playlistSize - 1);
+        return trackInfoList.get(tracklistSize - 1);
     }
 
     public static boolean isFirstTrack(int index) {
@@ -183,10 +252,39 @@ public class MediaLibraryManager {
     }
 
     public static boolean isLastTrack(int index) {
-        return (index == (playlistSize - 1));
+        return (index == (tracklistSize - 1));
     }
 
-    public static boolean validateExtension(File file) {
+    public static void removePlaylist(int index) {
+        playlistInfoList.remove(index);
+    }
+
+    public static void removeTrack(int index) {
+        trackInfoList.remove(index);
+    }
+
+    public static void addPlaylist(Playlist playlist) {
+        playlistInfoList.add(playlist);
+    }
+
+    public static void updateTrackInfoList(int index, Track track) {
+        trackInfoList.set(index, track);
+    }
+
+    public static void updatePlaylistInfoList(int index, Playlist playlist) {
+        playlistInfoList.set(index, playlist);
+    }
+
+    public static ArrayList<Track> getSelectedPlaylist() {
+        return selectedPlaylist;
+    }
+
+    public static void setSelectedPlaylist(ArrayList<Track> selectedPlaylist) {
+        MediaLibraryManager.selectedPlaylist = selectedPlaylist;
+    }
+
+
+    private static boolean validateExtension(File file) {
         boolean isValidFile = false;
         String fileName = file.getName();
         String extension = "";

@@ -25,6 +25,7 @@ import com.mediaplayer.beans.Track;
 import com.mediaplayer.services.MediaPlayerService;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
+import com.mediaplayer.utilities.MessageConstants;
 import com.mediaplayer.utilities.Utilities;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private static String LOG_TAG = "MediaPlayerActivity";
     private static MediaPlayer mp;
     private static ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
-    private static Track requestedTrack;
+    private static Track selectedTrack;
     private static SeekBar songProgressBar;
     private static TextView titleBar, artistBar, timeElapsed, trackDuration;
     private static ImageView albumArt;
@@ -44,7 +45,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
     private boolean isPaused = false, isIdle = true, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
     private int currentIndex;
-    private int playlistSize = MediaLibraryManager.getPlaylistSize();
+    private int playlistSize = MediaLibraryManager.getTrackInfoListSize();
     byte data[];
     private Bitmap bm;
     private LinearLayout albumArtLayout;
@@ -66,8 +67,8 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         Intent intent = getIntent();
         String action = intent.getAction();
 
-        requestedTrack = (Track) intent.getSerializableExtra("requestedTrack");
-        initializePlayer(requestedTrack);
+        selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
+        initializePlayer(selectedTrack);
 
         if(action != null) {
             switch(action) {
@@ -91,9 +92,9 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             return;
         }
 
-        /*requestedTrack = (Track) intent.getSerializableExtra("requestedTrack");
-        initializePlayer(requestedTrack);*/
-        playSong(requestedTrack);
+        /*selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
+        initializePlayer(selectedTrack);*/
+        playSong(selectedTrack);
 
         // Listeners
         //songProgressBar.setOnSeekBarChangeListener(this);
@@ -107,7 +108,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                         mp.reset();
                         isIdle = true;
                         //playSong(currentIndex);
-                        playSong(requestedTrack);
+                        playSong(selectedTrack);
 
                     } else if (currentIndex < playlistSize - 1) {
                         if (isShuffling) {
@@ -149,152 +150,133 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             });
         }*/
 
-        // Click event for Play button
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                mp = MediaPlayerService.getMp();
-
-                if(mp != null) {
-                    if(mp.isPlaying()) {
-                        // If already playing, pause the current track
-                        mp.pause();
-                        isPaused = true;
-                        playButton.setImageResource(R.drawable.play_button);
-                    } else if(!isPaused) {
-                        //Else, if paused, resume current track
-                        playSong(requestedTrack);
-                        isPaused = false;
-                        songProgressBar.setProgress(0);
-                        songProgressBar.setMax(100);
-                        //updateProgressBar();
-                    } else {
-                        //Else, if stopped, start playback
-                        mp.start();
-                        isPaused = false;
-                        playButton.setImageResource(R.drawable.pause_button);
-                    }
-                }
-
-                mService.createNotification(requestedTrack);
-            }
-        });
-
-        // Click event for Next button
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mp = MediaPlayerService.getMp();
-                mp.reset();
-                MediaPlayerService.setMp(mp);
-                isIdle = true;
-
-                if(isShuffling) {
-                    //If shuffling is on, play a random song
-                    requestedTrack = MediaLibraryManager.getTrack(getNextIndex());
-                } else if(isRepeatingCurrent) {
-                    //Else, if repeating current is on, restart the same song
-
-                } else if(MediaLibraryManager.isLastTrack(currentIndex)) {
-                    if(isRepeatingAll) {
-                        // Else, if repeating all is on and is currently playing the last song,
-                        // play next song in the playlist
-                        requestedTrack = MediaLibraryManager.getFirstTrack();
-                    } else {
-                        //Stop playback
-                        playButton.setImageResource(R.drawable.play_button);
-                        return;
-                    }
-                } else {
-                    //Else, play the previous song
-                    requestedTrack = MediaLibraryManager.getTrack(++currentIndex);
-                }
-
-                initializePlayer(requestedTrack);
-                playSong(requestedTrack);
-            }
-        });
-
-        // Click event for Previous button
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mp = MediaPlayerService.getMp();
-                mp.reset();
-                MediaPlayerService.setMp(mp);
-                isIdle = true;
-
-                if(isShuffling) {
-                    //If shuffling is on, play a random song
-                    requestedTrack = MediaLibraryManager.getTrack(getNextIndex());
-                } else if(isRepeatingCurrent) {
-                    //Else, if repeating current is on, restart the same song
-                } else if(MediaLibraryManager.isFirstTrack(currentIndex)) {
-                    if(isRepeatingAll) {
-                        // Else, if repeating all is on and is currently playing the first song,
-                        // play last song in the playlist
-                        requestedTrack = MediaLibraryManager.getLastTrack();
-                    } else {
-                        //Stop playback
-                        playButton.setImageResource(R.drawable.play_button);
-                        return;
-                    }
-                } else {
-                    //Else, play the previous song
-                    requestedTrack = MediaLibraryManager.getTrack(--currentIndex);
-                }
-
-                initializePlayer(requestedTrack);
-                playSong(requestedTrack);
-            }
-        });
-
-        // Click event for Repeat button
-        repeatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!isRepeatingCurrent && !isRepeatingAll) {
-                    isRepeatingCurrent = true;
-                    repeatButton.setImageResource(R.drawable.ic_repeat_one_red_18dp);
-                    toastText = "Looping current track";
-                } else if (isRepeatingCurrent) {
-                    isRepeatingAll = true;
-                    isRepeatingCurrent = false;
-                    repeatButton.setImageResource(R.drawable.ic_repeat_red_18dp);
-                    toastText = "Looping playlist";
-                } else {
-                    isRepeatingCurrent = false;
-                    isRepeatingAll = false;
-                    repeatButton.setImageResource(R.drawable.ic_repeat_black_18dp);
-                    toastText = "Looping off";
-                }
-
-                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-
-        // Click event for Shuffle button
-        shuffleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!isShuffling) {
-                    isShuffling = true;
-                    shuffleButton.setImageResource(R.drawable.ic_shuffle_red_18dp);
-                    toastText = "Shuffling on";
-                } else {
-                    isShuffling = false;
-                    shuffleButton.setImageResource(R.drawable.ic_shuffle_black_18dp);
-                    toastText = "Shuffling off";
-                }
-
-                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-
-        //playSong(requestedTrack);
+        //playSong(selectedTrack);
         Log.d(LOG_TAG, "END: The onCreate() event");
+    }
+
+    public void play(View view) {
+        mp = MediaPlayerService.getMp();
+
+        if(mp != null) {
+            if(mp.isPlaying()) {
+                // If already playing, pause the current track
+                mp.pause();
+                isPaused = true;
+                playButton.setImageResource(R.drawable.play_button);
+            } else if(!isPaused) {
+                //Else, if paused, resume current track
+                playSong(selectedTrack);
+                isPaused = false;
+                songProgressBar.setProgress(0);
+                songProgressBar.setMax(100);
+                //updateProgressBar();
+            } else {
+                //Else, if stopped, start playback
+                mp.start();
+                isPaused = false;
+                playButton.setImageResource(R.drawable.pause_button);
+            }
+        }
+
+        mService.createNotification(selectedTrack);
+    }
+
+    public void next(View view) {
+        mp = MediaPlayerService.getMp();
+        mp.reset();
+        MediaPlayerService.setMp(mp);
+        isIdle = true;
+
+        if(isShuffling) {
+            //If shuffling is on, play a random song
+            selectedTrack = MediaLibraryManager.getTrackByIndex(getNextIndex());
+        } else if(isRepeatingCurrent) {
+            //Else, if repeating current is on, restart the same song
+
+        } else if(MediaLibraryManager.isLastTrack(currentIndex)) {
+            if(isRepeatingAll) {
+                // Else, if repeating all is on and is currently playing the last song,
+                // play next song in the playlist
+                selectedTrack = MediaLibraryManager.getFirstTrack();
+            } else {
+                //Stop playback
+                playButton.setImageResource(R.drawable.play_button);
+                return;
+            }
+        } else {
+            //Else, play the previous song
+            selectedTrack = MediaLibraryManager.getTrackByIndex(++currentIndex);
+        }
+
+        initializePlayer(selectedTrack);
+        playSong(selectedTrack);
+    }
+
+    public void previous(View view) {
+        mp = MediaPlayerService.getMp();
+        mp.reset();
+        MediaPlayerService.setMp(mp);
+        isIdle = true;
+
+        if(isShuffling) {
+            //If shuffling is on, play a random song
+            selectedTrack = MediaLibraryManager.getTrackByIndex(getNextIndex());
+        } else if(isRepeatingCurrent) {
+            //Else, if repeating current is on, restart the same song
+        } else if(MediaLibraryManager.isFirstTrack(currentIndex)) {
+            if(isRepeatingAll) {
+                // Else, if repeating all is on and is currently playing the first song,
+                // play last song in the playlist
+                selectedTrack = MediaLibraryManager.getLastTrack();
+            } else {
+                //Stop playback
+                playButton.setImageResource(R.drawable.play_button);
+                return;
+            }
+        } else {
+            //Else, play the previous song
+            selectedTrack = MediaLibraryManager.getTrackByIndex(--currentIndex);
+        }
+
+        initializePlayer(selectedTrack);
+        playSong(selectedTrack);
+
+    }
+
+    public void shuffle(View view) {
+        if(!isShuffling) {
+            isShuffling = true;
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_red_18dp);
+            toastText = MessageConstants.SHUFFLING_ON;
+        } else {
+            isShuffling = false;
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_black_18dp);
+            toastText = MessageConstants.SHUFFLING_OFF;
+        }
+
+        toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    public void repeat(View view) {
+        if (!isRepeatingCurrent && !isRepeatingAll) {
+            isRepeatingCurrent = true;
+            repeatButton.setImageResource(R.drawable.ic_repeat_one_red_18dp);
+            toastText = MessageConstants.LOOPING_TRACK;
+        } else if (isRepeatingCurrent) {
+            isRepeatingAll = true;
+            isRepeatingCurrent = false;
+            repeatButton.setImageResource(R.drawable.ic_repeat_red_18dp);
+            toastText = MessageConstants.LOOPING_PLAYLIST;
+        } else {
+            isRepeatingCurrent = false;
+            isRepeatingAll = false;
+            repeatButton.setImageResource(R.drawable.ic_repeat_black_18dp);
+            toastText = MessageConstants.LOOPING_OFF;
+        }
+
+        toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void initializePlayer(Track requestedTrack) {
@@ -341,7 +323,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         Log.d(LOG_TAG, "START: The playSong() event");
 
         Intent intent = new Intent(this, MediaPlayerService.class);
-        intent.putExtra("requestedTrack", requestedTrack);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, requestedTrack);
 
         //Bind to the MediaPlayerService
         if(MediaPlayerService.isServiceRunning) {
@@ -456,7 +438,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         super.onNewIntent(intent);
 
         String action = intent.getAction();
-        requestedTrack = (Track) intent.getSerializableExtra("requestedTrack");
+        selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
         setIntent(intent);
         Log.d(LOG_TAG, action);
     }
@@ -469,8 +451,8 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         Intent intent = getIntent();
         String action = intent.getAction();
 
-        requestedTrack = (Track) intent.getSerializableExtra("requestedTrack");
-        initializePlayer(requestedTrack);
+        selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
+        initializePlayer(selectedTrack);
 
         if(action != null) {
             switch(action) {

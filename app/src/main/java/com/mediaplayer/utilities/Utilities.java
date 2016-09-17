@@ -11,12 +11,13 @@ public class Utilities {
      * */
     public static String milliSecondsToTimer(long milliseconds){
         String finalTimerString = "";
-        String secondsString = "";
+        String secondsString;
 
         // Convert total duration into time
         int hours = (int)( milliseconds / (1000*60*60));
         int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
         int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+
         // Add hours if there
         if(hours > 0){
             finalTimerString = hours + ":";
@@ -36,17 +37,15 @@ public class Utilities {
 
     /**
      * Function to get Progress percentage
-     * @param currentDuration
-     * @param totalDuration
+     * @param currentDuration Elapsed duration of the track
+     * @param totalDuration Total track duration
      * */
     public static int getProgressPercentage(long currentDuration, long totalDuration){
-        Double percentage = (double) 0;
-
         long currentSeconds = (int) (currentDuration / 1000);
         long totalSeconds = (int) (totalDuration / 1000);
 
         // calculating percentage
-        percentage =(((double)currentSeconds)/totalSeconds)*100;
+        Double percentage = (((double) currentSeconds)/totalSeconds) * 100;
 
         // return percentage
         return percentage.intValue();
@@ -59,8 +58,8 @@ public class Utilities {
      * returns current duration in milliseconds
      * */
     public static int progressToTimer(int progress, int totalDuration) {
-        int currentDuration = 0;
-        totalDuration = (int) (totalDuration / 1000);
+        int currentDuration;
+        totalDuration = totalDuration / 1000;
         currentDuration = (int) ((((double)progress) / 100) * totalDuration);
 
         // return current duration in milliseconds
@@ -69,7 +68,7 @@ public class Utilities {
 
     public static String getCurrentDate() {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat(SQLConstants.DD_MM_YYYY);
 
         return df.format(c.getTime());
     }

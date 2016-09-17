@@ -1,11 +1,12 @@
 package com.mediaplayer.activities;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,13 +14,15 @@ import android.widget.TextView;
 import com.mediaplayer.R;
 import com.mediaplayer.adapters.SongsListAdapter;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDBHelper;
-import com.mediaplayer.utilities.SQLConstants;
+import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.fragments.SongsFragment;
+import com.mediaplayer.utilities.MediaLibraryManager;
+import com.mediaplayer.utilities.MediaPlayerConstants;
 
 import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
-    private ArrayList<Track> playlist = new ArrayList<Track>();
+    private ListView listView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,36 +30,30 @@ public class PlaylistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playlist);
 
         try {
-            MediaplayerDBHelper mDbHelper = new MediaplayerDBHelper(this);
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
-            String args[] = {"1"};
-            Cursor playlistsCursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_DETAIL, args);
-            playlistsCursor.moveToFirst();
+            TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
 
-            while (!playlistsCursor.isAfterLast()) {
-                Track track = new Track();
-                track.setTrackTitle(playlistsCursor.getString(1));
-                track.setTrackDuration(playlistsCursor.getInt(4));
-                track.setAlbumName(playlistsCursor.getString(6));
-                track.setArtistName(playlistsCursor.getString(7));
-                track.setAlbumArt(playlistsCursor.getBlob(8));
+            int playlistID = getIntent().getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, 0);
+            MediaplayerDAO dao = new MediaplayerDAO(this);
+            ArrayList<Track> trackList = dao.getTracksForPlaylist(playlistID);
+            MediaLibraryManager.setSelectedPlaylist(trackList);
 
-                playlist.add(track);
-                playlistsCursor.moveToNext();
-            }
-
-            playlistsCursor.close();
-
-            if(playlist.isEmpty()) {
-                TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
+            if(trackList.isEmpty()) {
                 textView.setVisibility(View.VISIBLE);
             } else {
-                ListView listView = (ListView) findViewById(R.id.listView);
-                ListAdapter playlistAdapter = new SongsListAdapter(this, playlist);
+                listView = (ListView) findViewById(R.id.listView);
+                ListAdapter playlistAdapter = new SongsListAdapter(this, trackList);
                 listView.setAdapter(playlistAdapter);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void callMediaplayerActivity(View view) {
+        int position = listView.getPositionForView(view);
+        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_USER, position);
+        Intent intent = new Intent(this, MediaPlayerActivity.class);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+        startActivity(intent);
     }
 }

@@ -14,6 +14,7 @@ public class Track implements Serializable, Comparator<Object> {
     private String artistName;
     private byte[] albumArt;
     private String trackLocation;
+    private int favouriteSw;
 
     public int getTrackID() {
         return trackID;
@@ -93,6 +94,14 @@ public class Track implements Serializable, Comparator<Object> {
 
     public void setTrackIndex(int trackIndex) {
         this.trackIndex = trackIndex;
+    }
+
+    public int isFavouriteSw() {
+        return favouriteSw;
+    }
+
+    public void setFavouriteSw(int favouriteSw) {
+        this.favouriteSw = favouriteSw;
     }
 
     @Override

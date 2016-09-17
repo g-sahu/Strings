@@ -59,7 +59,7 @@ public class MediaPlayerService extends IntentService {
     public IBinder onBind(Intent intent) {
         Log.v(LOG_TAG, "Binding service to activity...");
 
-        Track requestedTrack = (Track) intent.getSerializableExtra("requestedTrack");
+        Track requestedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
         playSong(requestedTrack);
         Notification notification = createNotification(requestedTrack);
         startForeground(1, notification);
@@ -150,10 +150,10 @@ public class MediaPlayerService extends IntentService {
         playIntent.setAction(MediaPlayerConstants.PLAY);
         nextIntent.setAction(MediaPlayerConstants.NEXT);
 
-        prevIntent.putExtra("requestedTrack", requestedTrack);
-        pauseIntent.putExtra("requestedTrack", requestedTrack);
-        playIntent.putExtra("requestedTrack", requestedTrack);
-        nextIntent.putExtra("requestedTrack", requestedTrack);
+        prevIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, requestedTrack);
+        pauseIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, requestedTrack);
+        playIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, requestedTrack);
+        nextIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, requestedTrack);
 
         PendingIntent prevPendingIntent = PendingIntent.getActivity(this, 0, prevIntent, 0);
         PendingIntent pausePendingIntent = PendingIntent.getActivity(this, 0, pauseIntent, 0);

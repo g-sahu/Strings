@@ -7,5 +7,21 @@
     <string name="album_art">Album Art</string>
     <string name="track_title">Track Title</string>
     <string name="artist_name">Artist Name</string>
+    <string name="add_songs">Add Songs</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="more_options">More options</string>
+    <string name="playlist_title">Playlist Title</string>
+    <string name="empty_playlist">There are no songs in this playlist</string>
+    <string name="default_playlist_info">0 songs, 00h 00m 00s</string>
+    <string name="shuffle_button">Shuffle Button</string>
+    <string name="next_button">Next Button</string>
+    <string name="play_button">Play Button</string>
+    <string name="previous_button">Previous Button</string>
+    <string name="repeat_button">Repeat Button</string>
+    <string name="time_zero">0:00</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="add_to_favourites">Add to Favourites</string>
+    <string name="remove_from_library">Remove from Library</string>
 
 </resources>

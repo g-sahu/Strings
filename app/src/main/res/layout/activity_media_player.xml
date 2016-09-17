@@ -14,13 +14,13 @@
         android:orientation="vertical"
         android:layout_weight="0.1"
         android:weightSum="1"
-        android:paddingStart="10dp"
-        android:paddingLeft="10dp">
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp">
 
         <TextView android:id="@+id/titleBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Song Title"
+            android:text="@string/track_title"
             android:textColor="#000000"
             android:textIsSelectable="false"
             android:textSize="18sp"
@@ -30,7 +30,7 @@
         <TextView android:id="@+id/artistBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Artist Name"
+            android:text="@string/artist_name"
             android:textColor="#000000"
             android:textIsSelectable="false"
             android:textSize="12sp"
@@ -48,7 +48,8 @@
 
         <ImageView android:id="@+id/albumArt"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:contentDescription="@string/album_art" />
 
     </LinearLayout>
 
@@ -63,7 +64,8 @@
             android:layout_height="22dp"
             android:orientation="vertical">
 
-            <SeekBar android:id="@+id/songProgressBar"
+            <SeekBar
+                android:id="@+id/songProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:thumb="@drawable/seek_handler"
@@ -74,9 +76,9 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <!--<LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="horizontal"
             android:layout_weight="0.3"
             android:paddingLeft="10dp"
@@ -86,29 +88,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
-                android:text="0:00"/>
+                android:text="@string/time_zero"/>
 
             <TextView android:id="@+id/trackDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end|center_vertical"
-                android:text="5:00"/>
+                android:text="@string/time_zero"/>
 
-        </LinearLayout>
+        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="65dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:paddingBottom="10dp">
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView android:id="@+id/timeElapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/time_zero"/>
 
             <ImageButton android:id="@+id/repeatButton"
                 android:src="@drawable/ic_repeat_black_18dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@string/repeat_button"
+                android:onClick="repeat" />
 
             <ImageButton android:id="@+id/previousButton"
                 android:src="@drawable/previous_button"
@@ -116,7 +126,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|start"
-                android:layout_weight="0.33" />
+                android:layout_weight="0.33"
+                android:contentDescription="@string/previous_button"
+                android:onClick="previous"/>
 
             <ImageButton android:id="@+id/playButton"
                 android:src="@drawable/play_button"
@@ -124,7 +136,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="0.33" />
+                android:layout_weight="0.33"
+                android:contentDescription="@string/play_button"
+                android:onClick="play"/>
 
             <ImageButton android:id="@+id/nextButton"
                 android:src="@drawable/next_button"
@@ -132,14 +146,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|end"
-                android:layout_weight="0.33" />
+                android:layout_weight="0.33"
+                android:contentDescription="@string/next_button"
+                android:onClick="next"/>
 
             <ImageButton android:id="@+id/shuffleButton"
                 android:src="@drawable/ic_shuffle_black_18dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@string/shuffle_button"
+                android:onClick="shuffle"/>
+
+            <TextView android:id="@+id/trackDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end|center_vertical"
+                android:text="@string/time_zero"/>
 
         </LinearLayout>
     </LinearLayout>

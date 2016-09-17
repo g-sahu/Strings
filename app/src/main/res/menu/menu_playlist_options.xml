@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/addTracks"
+        android:title="@string/add_songs"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="1"
+        android:onClick="addTracksToPlaylist"/>
+
+    <item android:id="@+id/renamePlaylist"
+        android:title="@string/rename"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="2"
+        android:onClick="renamePlaylist"/>
+
+    <item android:id="@+id/deletePlaylist"
+        android:title="@string/delete"
+        app:showAsAction="never"
+        android:alphabeticShortcut="string"
+        android:numericShortcut="string"
+        android:checkable="false"
+        android:visible="true"
+        android:enabled="true"
+        android:menuCategory="alternative"
+        android:orderInCategory="3"
+        android:onClick="deletePlaylist"/>
+</menu>
