@@ -36,6 +36,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private static MediaPlayer mp;
     private static ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
     private static Track selectedTrack;
+    private static String selectedPlaylist;
     private static SeekBar songProgressBar;
     private static TextView titleBar, artistBar, timeElapsed, trackDuration;
     private static ImageView albumArt;
@@ -45,7 +46,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
     private boolean isPaused = false, isIdle = true, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
     private int currentIndex;
-    private int playlistSize = MediaLibraryManager.getTrackInfoListSize();
+    private int playlistSize;
     byte data[];
     private Bitmap bm;
     private LinearLayout albumArtLayout;
@@ -68,6 +69,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         String action = intent.getAction();
 
         selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
+        selectedPlaylist = intent.getStringExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
         initializePlayer(selectedTrack);
 
         if(action != null) {
@@ -189,15 +191,15 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
 
         if(isShuffling) {
             //If shuffling is on, play a random song
-            selectedTrack = MediaLibraryManager.getTrackByIndex(getNextIndex());
+            selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, getNextIndex());
         } else if(isRepeatingCurrent) {
             //Else, if repeating current is on, restart the same song
 
-        } else if(MediaLibraryManager.isLastTrack(currentIndex)) {
+        } else if(MediaLibraryManager.isLastTrack(selectedPlaylist, currentIndex)) {
             if(isRepeatingAll) {
                 // Else, if repeating all is on and is currently playing the last song,
                 // play next song in the playlist
-                selectedTrack = MediaLibraryManager.getFirstTrack();
+                selectedTrack = MediaLibraryManager.getFirstTrack(selectedPlaylist);
             } else {
                 //Stop playback
                 playButton.setImageResource(R.drawable.play_button);
@@ -205,7 +207,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             }
         } else {
             //Else, play the previous song
-            selectedTrack = MediaLibraryManager.getTrackByIndex(++currentIndex);
+            selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, ++currentIndex);
         }
 
         initializePlayer(selectedTrack);
@@ -220,14 +222,14 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
 
         if(isShuffling) {
             //If shuffling is on, play a random song
-            selectedTrack = MediaLibraryManager.getTrackByIndex(getNextIndex());
+            selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, getNextIndex());
         } else if(isRepeatingCurrent) {
             //Else, if repeating current is on, restart the same song
         } else if(MediaLibraryManager.isFirstTrack(currentIndex)) {
             if(isRepeatingAll) {
                 // Else, if repeating all is on and is currently playing the first song,
                 // play last song in the playlist
-                selectedTrack = MediaLibraryManager.getLastTrack();
+                selectedTrack = MediaLibraryManager.getLastTrack(selectedPlaylist);
             } else {
                 //Stop playback
                 playButton.setImageResource(R.drawable.play_button);
@@ -235,12 +237,11 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             }
         } else {
             //Else, play the previous song
-            selectedTrack = MediaLibraryManager.getTrackByIndex(--currentIndex);
+            selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, --currentIndex);
         }
 
         initializePlayer(selectedTrack);
         playSong(selectedTrack);
-
     }
 
     public void shuffle(View view) {
@@ -298,7 +299,17 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         albumName = requestedTrack.getAlbumName();
         artistName = requestedTrack.getArtistName();
         songDuration = String.valueOf(requestedTrack.getTrackDuration());
-        currentIndex = requestedTrack.getTrackIndex();
+
+        switch(selectedPlaylist) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                currentIndex = requestedTrack.getTrackIndex();
+                break;
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                currentIndex = requestedTrack.getCurrentTrackIndex();
+                break;
+        }
+
         data = requestedTrack.getAlbumArt();
         songProgressBar.setProgress(0);
         songProgressBar.setMax(100);
@@ -410,6 +421,16 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         boolean isPlayed;
         tracksCompleted.add(currentIndex);
         int nextIndex = 0;
+
+        switch(selectedPlaylist) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                playlistSize = MediaLibraryManager.getTrackInfoListSize();
+                break;
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                playlistSize = MediaLibraryManager.getSelectedPlaylist().size();
+                break;
+        }
 
         if(tracksCompleted.size() != playlistSize) {
             nextIndex = new Random().nextInt(playlistSize);

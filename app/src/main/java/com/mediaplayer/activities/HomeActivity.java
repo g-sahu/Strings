@@ -190,6 +190,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
         startActivity(intent);
     }
 

@@ -28,6 +28,7 @@ public final class SQLConstants {
                     MediaplayerContract.Tracks.TRACK_ID + INTEGER + NOT_NULL + PRIMARY_KEY + AUTOINCREMENT + COMMA_SEP +
                     MediaplayerContract.Tracks.TRACK_TITLE + TEXT + COMMA_SEP +
                     MediaplayerContract.Tracks.TRACK_INDEX + INTEGER + NOT_NULL + UNIQUE + COMMA_SEP +
+                    MediaplayerContract.Tracks.CURRENT_TRACK_INDEX + INTEGER + COMMA_SEP +
                     MediaplayerContract.Tracks.FILE_NAME + TEXT + NOT_NULL + UNIQUE + COMMA_SEP +
                     MediaplayerContract.Tracks.TRACK_DURATION + INTEGER + NOT_NULL + COMMA_SEP +
                     MediaplayerContract.Tracks.FILE_SIZE + INTEGER + NOT_NULL + COMMA_SEP +

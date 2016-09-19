@@ -2,19 +2,15 @@ package com.mediaplayer.utilities;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
-import android.util.Log;
 
 import com.mediaplayer.R;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.dao.MediaplayerDAO;
-import com.mediaplayer.dao.MediaplayerDBHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,6 +27,7 @@ public class MediaLibraryManager {
     private static ArrayList<Track> selectedPlaylist;
     private static ArrayList<Playlist> playlistInfoList;
     private static int tracklistSize;
+    private static int selectedPlaylistSize;
 
     public MediaLibraryManager(){}
 
@@ -38,7 +35,7 @@ public class MediaLibraryManager {
         MediaplayerDAO dao = new MediaplayerDAO(context);
 
         trackInfoList = dao.getTracks();
-        sortTracklist();
+        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
 
         playlistInfoList = dao.getPlaylists();
         sortPlaylists();
@@ -122,7 +119,7 @@ public class MediaLibraryManager {
             track.setTrackLocation(filePath);
             track.setFavouriteSw(SQLConstants.FAV_SW_NO);
 
-            if (data != null) {
+            if(data != null) {
                 track.setAlbumArt(data);
             } else {
                 albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
@@ -138,25 +135,43 @@ public class MediaLibraryManager {
         tracklistSize = trackInfoList.size();
 
         //Sort the track list
-        sortTracklist();
+        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
         return trackInfoList;
     }
-
 
 
     /**
      * Method to sort list of tracks in Media library
      */
-    public static void sortTracklist() {
-        Collections.sort(trackInfoList, new Track());
-        Iterator<Track> tracklistIterator = trackInfoList.iterator();
+    public static void sortTracklist(String playlistType) {
+        Iterator<Track> tracklistIterator;
         Track track;
         int i = 0;
 
-        while(tracklistIterator.hasNext()) {
-            track = tracklistIterator.next();
-            track.setTrackIndex(i);
-            i++;
+        switch(playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                Collections.sort(trackInfoList, new Track());
+                tracklistIterator = trackInfoList.iterator();
+
+                while(tracklistIterator.hasNext()) {
+                    track = tracklistIterator.next();
+                    track.setTrackIndex(i);
+                    i++;
+                }
+
+                break;
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                Collections.sort(selectedPlaylist, new Track());
+                tracklistIterator = selectedPlaylist.iterator();
+
+                while(tracklistIterator.hasNext()) {
+                    track = tracklistIterator.next();
+                    track.setCurrentTrackIndex(i);
+                    i++;
+                }
+
+                break;
         }
     }
 
@@ -214,7 +229,7 @@ public class MediaLibraryManager {
         if(trackInfoList != null) {
             return trackInfoList.size();
         } else {
-            return 0;
+            return SQLConstants.ZERO;
         }
     }
 
@@ -222,7 +237,7 @@ public class MediaLibraryManager {
         if(playlistInfoList != null) {
             return playlistInfoList.size();
         } else {
-            return 0;
+            return SQLConstants.ZERO;
         }
     }
 
@@ -239,20 +254,47 @@ public class MediaLibraryManager {
         }
     }
 
-    public static Track getFirstTrack() {
-        return trackInfoList.get(0);
+    public static Track getFirstTrack(String playlistType) {
+        switch(playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                return trackInfoList.get(0);
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                return selectedPlaylist.get(0);
+
+            default:
+                return null;
+        }
     }
 
-    public static Track getLastTrack() {
-        return trackInfoList.get(tracklistSize - 1);
+    public static Track getLastTrack(String playlistType) {
+        switch(playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                return trackInfoList.get(tracklistSize - 1);
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                return selectedPlaylist.get(selectedPlaylist.size() - 1);
+
+            default:
+                return null;
+        }
     }
 
     public static boolean isFirstTrack(int index) {
         return (index == 0);
     }
 
-    public static boolean isLastTrack(int index) {
-        return (index == (tracklistSize - 1));
+    public static boolean isLastTrack(String playlistType, int index) {
+        switch(playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+                return (index == (tracklistSize - 1));
+
+            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+                return (index == (selectedPlaylist.size() - 1));
+
+            default:
+                return false;
+        }
     }
 
     public static void removePlaylist(int index) {
@@ -282,7 +324,6 @@ public class MediaLibraryManager {
     public static void setSelectedPlaylist(ArrayList<Track> selectedPlaylist) {
         MediaLibraryManager.selectedPlaylist = selectedPlaylist;
     }
-
 
     private static boolean validateExtension(File file) {
         boolean isValidFile = false;

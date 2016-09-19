@@ -7,6 +7,7 @@ public class Track implements Serializable, Comparator<Object> {
     private int trackID;
     private String trackTitle;
     private int trackIndex;
+    private int currentTrackIndex;
     private String fileName;
     private int trackDuration;
     private long fileSize;
@@ -102,6 +103,14 @@ public class Track implements Serializable, Comparator<Object> {
 
     public void setFavouriteSw(int favouriteSw) {
         this.favouriteSw = favouriteSw;
+    }
+
+    public int getCurrentTrackIndex() {
+        return currentTrackIndex;
+    }
+
+    public void setCurrentTrackIndex(int currentTrackIndex) {
+        this.currentTrackIndex = currentTrackIndex;
     }
 
     @Override

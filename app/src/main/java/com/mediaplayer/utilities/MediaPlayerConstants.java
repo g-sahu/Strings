@@ -36,6 +36,7 @@ public class MediaPlayerConstants {
     public static final String KEY_PLAYLIST_DEFAULT = "DEFAULT_PLAYLIST";
     public static final String KEY_PLAYLIST_USER = "USER_PLAYLIST";
     public static final String KEY_SELECTED_TRACK = "SELECTED_TRACK";
+    public static final String KEY_SELECTED_PLAYLIST = "SELECTED_PLAYLIST";
     public static final String KEY_PLAYLIST_ID = "PLAYLIST_ID";
     public static final String KEY_PLAYLIST_TITLE = "PLAYLIST_TITLE";
     public static final String KEY_PLAYLIST_INDEX = "PLAYLIST_INDEX";
