@@ -15,7 +15,6 @@ public final class MediaplayerContract {
         public static final String TRACK_ID = "track_id";
         public static final String TRACK_TITLE = "track_title";
         public static final String TRACK_INDEX = "track_index";
-        public static final String CURRENT_TRACK_INDEX = "current_track_index";
         public static final String FILE_NAME = "file_name";
         public static final String TRACK_DURATION = "track_duration";
         public static final String FILE_SIZE = "file_size";

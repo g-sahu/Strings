@@ -35,7 +35,7 @@ public class MediaLibraryManager {
         MediaplayerDAO dao = new MediaplayerDAO(context);
 
         trackInfoList = dao.getTracks();
-        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
+        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
 
         playlistInfoList = dao.getPlaylists();
         sortPlaylists();
@@ -117,7 +117,7 @@ public class MediaLibraryManager {
             track.setAlbumName(albumName);
             track.setArtistName(artistName);
             track.setTrackLocation(filePath);
-            track.setFavouriteSw(SQLConstants.FAV_SW_NO);
+            track.setFavSw(SQLConstants.FAV_SW_NO);
 
             if(data != null) {
                 track.setAlbumArt(data);
@@ -135,7 +135,7 @@ public class MediaLibraryManager {
         tracklistSize = trackInfoList.size();
 
         //Sort the track list
-        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
+        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
         return trackInfoList;
     }
 
@@ -149,7 +149,7 @@ public class MediaLibraryManager {
         int i = 0;
 
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 Collections.sort(trackInfoList, new Track());
                 tracklistIterator = trackInfoList.iterator();
 
@@ -161,7 +161,7 @@ public class MediaLibraryManager {
 
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 Collections.sort(selectedPlaylist, new Track());
                 tracklistIterator = selectedPlaylist.iterator();
 
@@ -243,10 +243,10 @@ public class MediaLibraryManager {
 
     public static Track getTrackByIndex(String playlistType, int index) {
         switch (playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 return trackInfoList.get(index);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 return selectedPlaylist.get(index);
 
             default:
@@ -256,10 +256,10 @@ public class MediaLibraryManager {
 
     public static Track getFirstTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 return trackInfoList.get(0);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 return selectedPlaylist.get(0);
 
             default:
@@ -269,10 +269,10 @@ public class MediaLibraryManager {
 
     public static Track getLastTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 return trackInfoList.get(tracklistSize - 1);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 return selectedPlaylist.get(selectedPlaylist.size() - 1);
 
             default:
@@ -286,10 +286,10 @@ public class MediaLibraryManager {
 
     public static boolean isLastTrack(String playlistType, int index) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 return (index == (tracklistSize - 1));
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 return (index == (selectedPlaylist.size() - 1));
 
             default:
@@ -301,8 +301,16 @@ public class MediaLibraryManager {
         playlistInfoList.remove(index);
     }
 
-    public static void removeTrack(int index) {
-        trackInfoList.remove(index);
+    public static void removeTrack(String playlistType, int index) {
+        switch(playlistType) {
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+                trackInfoList.remove(index);
+                break;
+
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+                selectedPlaylist.remove(index);
+                break;
+        }
     }
 
     public static void addPlaylist(Playlist playlist) {

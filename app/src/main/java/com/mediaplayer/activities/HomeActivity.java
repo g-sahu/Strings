@@ -1,5 +1,6 @@
 package com.mediaplayer.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -39,11 +40,13 @@ public class HomeActivity extends AppCompatActivity {
     private static Playlist selectedPlaylist;
     private static Playlist favouritesPlaylist;
     private FragmentManager supportFragmentManager;
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        context = this;
 
         supportFragmentManager = getSupportFragmentManager();
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -64,6 +67,10 @@ public class HomeActivity extends AppCompatActivity {
         return selectedPlaylist;
     }
 
+    public static Context getContext() {
+        return context;
+    }
+
     //Show Songs pop-up menu options
     public void showSongsPopupMenu(View view) {
         PopupMenu popup = new PopupMenu(this, view);
@@ -74,10 +81,10 @@ public class HomeActivity extends AppCompatActivity {
 
         ListView listView = SongsFragment.trackListView;
         position = listView.getPositionForView(view);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT, position);
+        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
-        if (selectedTrack.isFavouriteSw() == SQLConstants.FAV_SW_YES) {
+        if(selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
             menuItem.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
         }
 
@@ -116,14 +123,14 @@ public class HomeActivity extends AppCompatActivity {
     //Remove from favourites menu option
     private void removeFromFavourites() {
         MediaplayerDAO dao = new MediaplayerDAO(this);
-        dao.removeFromFavourites(favouritesPlaylist, selectedTrack);
+        dao.removeFromPlaylist(favouritesPlaylist, selectedTrack);
 
         //Updating list view adapter
         updatePlaylistsAdapter();
     }
 
     //Remove from library menu option
-    public void removeFromLibrary(MenuItem menuItem) {
+    public void removeSong(MenuItem menuItem) {
         MediaplayerDAO dao = new MediaplayerDAO(this);
         dao.removeFromLibrary(selectedTrack);
 
@@ -186,11 +193,11 @@ public class HomeActivity extends AppCompatActivity {
     public void callMediaplayerActivity(View view) {
         ListView listView = SongsFragment.trackListView;
         position = listView.getPositionForView(view);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT,  position);
+        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY,  position);
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
         startActivity(intent);
     }
 
@@ -202,6 +209,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, PlaylistActivity.class);
         intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, playlistID);
+        intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, position);
         startActivity(intent);
     }
 

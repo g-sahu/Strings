@@ -50,12 +50,13 @@ public class MediaplayerDAO {
         Playlist playlist;
 
         try {
-            //Retrieving selected track from trackInfoList
-            trackID = selectedTrack.getTrackID();
             insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_PLAYLIST_DETAIL);
 
+            //Retrieving selected track from trackInfoList
+            trackID = selectedTrack.getTrackID();
+
             Iterator<Playlist> selectedPlaylistsIterator = selectedPlaylists.iterator();
-            while (selectedPlaylistsIterator.hasNext()) {
+            while(selectedPlaylistsIterator.hasNext()) {
                 //Fetching current values for the selected playlist
                 playlist = selectedPlaylistsIterator.next();
                 playlistID = playlist.getPlaylistID();
@@ -64,7 +65,7 @@ public class MediaplayerDAO {
                 newPlaylistSize = playlistSize + 1;
                 newPlaylistDuration = playlistDuration + selectedTrack.getTrackDuration();
 
-                //Make an entry in table 'Playlist_Detail' for the selected playlist
+                //Making an entry in table 'Playlist_Detail' for the selected playlist
                 insertStmt.clearBindings();
                 insertStmt.bindLong(1, playlistID);
                 insertStmt.bindLong(2, trackID);
@@ -95,7 +96,7 @@ public class MediaplayerDAO {
                     updateStmt.execute();
 
                     //Setting favSw in trackInfoList
-                    selectedTrack.setFavouriteSw(SQLConstants.FAV_SW_YES);
+                    selectedTrack.setFavSw(SQLConstants.FAV_SW_YES);
                     MediaLibraryManager.getTrackInfoList().set(selectedTrack.getTrackIndex(), selectedTrack);
                 }
             }
@@ -123,7 +124,7 @@ public class MediaplayerDAO {
         toast.show();
     }
 
-    public void removeFromFavourites(Playlist selectedPlaylist, Track selectedTrack) {
+    public void removeFromPlaylist(Playlist selectedPlaylist, Track selectedTrack) {
         SQLiteStatement updateStmt;
         String toastText;
         int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration;
@@ -138,7 +139,7 @@ public class MediaplayerDAO {
             //Deleting record from table 'Playlist_Detail'
             String args[] = {String.valueOf(playlistID), String.valueOf(trackID)};
             Log.d(LOG_TAG_SQL, db.toString());
-            db.execSQL(SQLConstants.SQL_DELETE_TRACK_FROM_FAVOURITES, args);
+            db.execSQL(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST, args);
 
             newPlaylistSize = playlistSize - 1;
             newPlaylistDuration = playlistDuration - selectedTrack.getTrackDuration();
@@ -167,7 +168,7 @@ public class MediaplayerDAO {
                 updateStmt.execute();
 
                 //Setting favSw in trackInfoList
-                selectedTrack.setFavouriteSw(SQLConstants.FAV_SW_NO);
+                selectedTrack.setFavSw(SQLConstants.FAV_SW_NO);
                 MediaLibraryManager.getTrackInfoList().set(selectedTrack.getTrackIndex(), selectedTrack);
 
                 //Setting success toast message
@@ -246,10 +247,10 @@ public class MediaplayerDAO {
             deleteStmt.execute();
 
             //Removing selected track from the list of tracks
-            MediaLibraryManager.removeTrack(selectedTrack.getTrackIndex());
+            MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
 
             //Sorting the list of tracks to update track indices
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_DEFAULT);
+            MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
 
             //Updating track indices
             updateTrackIndices();
@@ -458,7 +459,7 @@ public class MediaplayerDAO {
                     updateStmt.executeUpdateDelete();
 
                     //Updating trackInfoList with new value if favSw
-                    track.setFavouriteSw(SQLConstants.FAV_SW_YES);
+                    track.setFavSw(SQLConstants.FAV_SW_YES);
                     MediaLibraryManager.updateTrackInfoList(trackIndex, track);
                 }
 
@@ -516,7 +517,6 @@ public class MediaplayerDAO {
             track.setTrackID(playlistsCursor.getInt(c++));
             track.setTrackTitle(playlistsCursor.getString(c++));
             track.setTrackIndex(playlistsCursor.getInt(c++));
-            track.setCurrentTrackIndex(playlistsCursor.getInt(c++));
             track.setFileName(playlistsCursor.getString(c++));
             track.setTrackDuration(playlistsCursor.getInt(c++));
             track.setFileSize(playlistsCursor.getInt(c++));
@@ -524,7 +524,7 @@ public class MediaplayerDAO {
             track.setArtistName(playlistsCursor.getString(c++));
             track.setAlbumArt(playlistsCursor.getBlob(c++));
             track.setTrackLocation(playlistsCursor.getString(c++));
-            track.setFavouriteSw(playlistsCursor.getInt(c));
+            track.setFavSw(playlistsCursor.getInt(c));
 
             trackList.add(track);
             playlistsCursor.moveToNext();
@@ -575,7 +575,6 @@ public class MediaplayerDAO {
             track.setTrackID(tracksCursor.getInt(c++));
             track.setTrackTitle(tracksCursor.getString(c++));
             track.setTrackIndex(tracksCursor.getInt(c++));
-            track.setCurrentTrackIndex(tracksCursor.getInt(c++));
             track.setFileName(tracksCursor.getString(c++));
             track.setTrackDuration(tracksCursor.getInt(c++));
             track.setFileSize(tracksCursor.getInt(c++));
@@ -583,7 +582,7 @@ public class MediaplayerDAO {
             track.setArtistName(tracksCursor.getString(c++));
             track.setAlbumArt(tracksCursor.getBlob(c++));
             track.setTrackLocation(tracksCursor.getString(c++));
-            track.setFavouriteSw(tracksCursor.getInt(c));
+            track.setFavSw(tracksCursor.getInt(c));
 
             trackInfoList.add(track);
             tracksCursor.moveToNext();

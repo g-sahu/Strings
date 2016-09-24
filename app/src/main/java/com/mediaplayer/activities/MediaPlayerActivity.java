@@ -301,11 +301,11 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         songDuration = String.valueOf(requestedTrack.getTrackDuration());
 
         switch(selectedPlaylist) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 currentIndex = requestedTrack.getTrackIndex();
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 currentIndex = requestedTrack.getCurrentTrackIndex();
                 break;
         }
@@ -423,11 +423,11 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         int nextIndex = 0;
 
         switch(selectedPlaylist) {
-            case MediaPlayerConstants.KEY_PLAYLIST_DEFAULT :
+            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
                 playlistSize = MediaLibraryManager.getTrackInfoListSize();
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_USER :
+            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
                 playlistSize = MediaLibraryManager.getSelectedPlaylist().size();
                 break;
         }

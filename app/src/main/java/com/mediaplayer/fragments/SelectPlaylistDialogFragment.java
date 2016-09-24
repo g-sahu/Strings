@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 
 import com.mediaplayer.activities.HomeActivity;
 import com.mediaplayer.beans.Playlist;
+import com.mediaplayer.beans.Track;
 import com.mediaplayer.dao.MediaplayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 public class SelectPlaylistDialogFragment extends DialogFragment {
     private ArrayList<Playlist> selectedPlaylists;
     private ArrayList<Playlist> playlistInfoList = MediaLibraryManager.getPlaylistInfoList();
+    private Track selectedTrack;
 
     @NonNull
     @Override
@@ -28,6 +30,8 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
         int size = playlistInfoList.size();
         String list[];
         int c = 0;
+        Bundle args = getArguments();
+        selectedTrack = (Track) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK);
 
         //Checking if playlist size > 1 i.e. the user has created any custom playlist
         if(size > 1) {
@@ -64,7 +68,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     if(!selectedPlaylists.isEmpty()) {
                         //Add track to selected playlists
                         MediaplayerDAO dao = new MediaplayerDAO(getContext());
-                        dao.addToPlaylists(selectedPlaylists, HomeActivity.getSelectedTrack());
+                        dao.addToPlaylists(selectedPlaylists, selectedTrack);
                     }
                 }
             });
@@ -76,7 +80,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                 }
             });
         } else {
-            //// TODO: 23-Aug-16 Update this dialog's design. Add a button to create playlist
+            //TODO: 23-Aug-16 Update this dialog's design. Add a button to create playlist
             builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
             builder.setMessage(MessageConstants.NO_PLAYLIST_CREATED);
             builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {

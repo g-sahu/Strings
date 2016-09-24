@@ -51,21 +51,23 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
             stmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
             Iterator<Track> trackIterator = MediaLibraryManager.populateTrackInfoList(resources).iterator();
             Track track;
+            int c;
 
             while(trackIterator.hasNext()) {
                 track = trackIterator.next();
+                c = 1;
 
-                stmt.bindString(1, track.getTrackTitle());
-                stmt.bindLong(2, track.getTrackIndex());
-                stmt.bindString(3, track.getFileName());
-                stmt.bindLong(4, track.getTrackDuration());
-                stmt.bindLong(5, track.getFileSize());
-                stmt.bindString(6, track.getAlbumName());
-                stmt.bindString(7, track.getArtistName());
-                stmt.bindBlob(8, track.getAlbumArt());
-                stmt.bindString(9, track.getTrackLocation());
-                stmt.bindLong(10, track.isFavouriteSw());
-                stmt.bindString(11, Utilities.getCurrentDate());
+                stmt.bindString(c++, track.getTrackTitle());
+                stmt.bindLong(c++, track.getTrackIndex());
+                stmt.bindString(c++, track.getFileName());
+                stmt.bindLong(c++, track.getTrackDuration());
+                stmt.bindLong(c++, track.getFileSize());
+                stmt.bindString(c++, track.getAlbumName());
+                stmt.bindString(c++, track.getArtistName());
+                stmt.bindBlob(c++, track.getAlbumArt());
+                stmt.bindString(c++, track.getTrackLocation());
+                stmt.bindLong(c++, track.isFavSw());
+                stmt.bindString(c, Utilities.getCurrentDate());
 
                 Log.d(LOG_TAG_SQL, stmt.toString());
 
@@ -76,8 +78,6 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
                     Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
                 }
             }
-
-            //MediaLibraryManager.init(db);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());

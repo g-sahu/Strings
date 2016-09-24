@@ -36,5 +36,5 @@
         android:enabled="true"
         android:menuCategory="alternative"
         android:orderInCategory="3"
-        android:onClick="removeFromLibrary"/>
+        android:onClick="removeSong"/>
 </menu>
