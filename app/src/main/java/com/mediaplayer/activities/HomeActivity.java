@@ -93,8 +93,12 @@ public class HomeActivity extends AppCompatActivity {
 
     //Show dialog to select playlists
     public void addToPlaylist(MenuItem menuItem) {
-        DialogFragment newFragment = new SelectPlaylistDialogFragment();
-        newFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
+        DialogFragment selectPlaylistDialogFragment = new SelectPlaylistDialogFragment();
+        Bundle args = new Bundle();
+
+        args.putSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+        selectPlaylistDialogFragment.setArguments(args);
+        selectPlaylistDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
 
         //Updating list view adapter
         updatePlaylistsAdapter();
@@ -160,11 +164,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void addTracksToPlaylist(MenuItem menuItem) {
-        DialogFragment newFragment = new SelectTrackDialogFragment();
-        newFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TRACKS);
+        DialogFragment selectTrackDialogFragment = new SelectTrackDialogFragment();
+        Bundle args = new Bundle();
+
+        args.putSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
+        selectTrackDialogFragment.setArguments(args);
+        selectTrackDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TRACKS);
 
         //Updating list view adapter
-        updateSongsListAdapter();
+        //updateSongsListAdapter();
     }
 
     //Rename playlist menu option

@@ -35,7 +35,6 @@ public class PlaylistActivity extends AppCompatActivity {
     private FragmentManager supportFragmentManager;
     Track selectedTrack;
     Context homeContext;
-    //private static Playlist favouritesPlaylist;
     private static Playlist selectedPlaylist;
     private int playlistID;
 
@@ -69,18 +68,9 @@ public class PlaylistActivity extends AppCompatActivity {
                 ListAdapter playlistAdapter = new SongsListAdapter(this, trackList);
                 listView.setAdapter(playlistAdapter);
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void callMediaplayerActivity(View view) {
-        int position = listView.getPositionForView(view);
-        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
-        Intent intent = new Intent(this, MediaPlayerActivity.class);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_OTHER);
-        startActivity(intent);
     }
 
     public void showSongsPopupMenu(View view) {
@@ -110,15 +100,12 @@ public class PlaylistActivity extends AppCompatActivity {
 
     //Show dialog to select playlists
     public void addToPlaylist(MenuItem menuItem) {
-        DialogFragment newFragment = new SelectPlaylistDialogFragment();
+        DialogFragment selectPlaylistDialogFragment = new SelectPlaylistDialogFragment();
         Bundle args = new Bundle();
 
         args.putSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        newFragment.setArguments(args);
-        newFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
-
-        //Updating list view adapter
-        updatePlaylistsAdapter();
+        selectPlaylistDialogFragment.setArguments(args);
+        selectPlaylistDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
     }
 
     //Add or remove from favourites menu option
@@ -184,5 +171,14 @@ public class PlaylistActivity extends AppCompatActivity {
         ListView listView = PlaylistsFragment.listView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    public void callMediaplayerActivity(View view) {
+        int position = listView.getPositionForView(view);
+        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
+        Intent intent = new Intent(this, MediaPlayerActivity.class);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        startActivity(intent);
     }
 }

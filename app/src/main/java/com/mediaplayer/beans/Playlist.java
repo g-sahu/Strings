@@ -1,9 +1,10 @@
 package com.mediaplayer.beans;
 
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Playlist implements Comparator<Object> {
+public class Playlist implements Comparator<Object>, Serializable {
     private int playlistID;
     private int playlistIndex;
     private String playlistName;

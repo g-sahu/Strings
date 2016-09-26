@@ -53,8 +53,11 @@ public class PlaylistsFragment extends Fragment {
         createPlaylistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new CreatePlaylistDialogFragment();
-                newFragment.show(getActivity().getSupportFragmentManager(), MediaPlayerConstants.TAG_CREATE_PLAYLIST);
+                DialogFragment createPlaylistDialogFragment = new CreatePlaylistDialogFragment();
+                createPlaylistDialogFragment.show(getActivity().getSupportFragmentManager(), MediaPlayerConstants.TAG_CREATE_PLAYLIST);
+
+                //Updating list view adapter
+                //updatePlaylistsAdapter();
             }
         });
     }

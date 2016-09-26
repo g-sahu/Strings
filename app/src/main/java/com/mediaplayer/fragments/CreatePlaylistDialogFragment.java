@@ -1,6 +1,7 @@
 package com.mediaplayer.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.mediaplayer.R;
+import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.dao.MediaplayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
@@ -20,9 +23,11 @@ import com.mediaplayer.utilities.MessageConstants;
 import com.mediaplayer.utilities.SQLConstants;
 
 public class CreatePlaylistDialogFragment extends DialogFragment {
+    private Context context;
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.dialog_create_playlist, null);
@@ -59,6 +64,12 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
                                 MediaplayerDAO dao = new MediaplayerDAO(getContext());
                                 dao.createPlaylist(playlist);
+
+                                //Sorting the playlists
+                                MediaLibraryManager.sortPlaylists();
+
+                                //Updating list view adapter
+                                updatePlaylistsAdapter();
 
                                 //Dismissing the dialog window
                                 alertDialog.dismiss();
@@ -143,8 +154,22 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
         else if(newPlaylistTitle.equalsIgnoreCase(SQLConstants.PLAYLIST_TITLE_FAVOURITES)) {
             playlistTitleTextBox.setError(MessageConstants.ERROR_PLAYLIST_TITLE_FAVOURITES);
             return false;
-        } else {
+        }
+
+        //Checking if playlist title is not the same as an existing playlist
+        else if(MediaLibraryManager.getPlaylistByTitle(newPlaylistTitle) != null) {
+            playlistTitleTextBox.setError(MessageConstants.ERROR_PLAYLIST_TITLE);
+            return false;
+        }
+        else {
             return true;
         }
+    }
+
+    private void updatePlaylistsAdapter() {
+        PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
+        ListView listView = PlaylistsFragment.listView;
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 }

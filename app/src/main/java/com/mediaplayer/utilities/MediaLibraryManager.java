@@ -212,17 +212,18 @@ public class MediaLibraryManager {
     }
 
     public static Playlist getPlaylistByTitle(String title) {
-        Playlist playlist = null;
+        Playlist playlist;
         Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
 
         while(playlistIterator.hasNext()) {
             playlist = playlistIterator.next();
+
             if(title.equals(playlist.getPlaylistName())) {
-                break;
+                return playlist;
             }
         }
 
-        return playlist;
+        return null;
     }
 
     public static int getTrackInfoListSize() {

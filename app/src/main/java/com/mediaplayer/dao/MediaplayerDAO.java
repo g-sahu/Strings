@@ -107,11 +107,11 @@ public class MediaplayerDAO {
             } else {
                 toastText = MessageConstants.ADDED_TO_PLAYLISTS;
             }
-        } catch (SQLiteConstraintException sqle) {
+        } catch(SQLiteConstraintException sqle) {
             sqle.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
-        } catch (Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
 
             //Setting error toast message
@@ -202,8 +202,8 @@ public class MediaplayerDAO {
             String args[] = {String.valueOf(trackID)};
 
             //Fetching existing values for selected playlist
-            Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_ALL_PLAYLISTS_FOR_TRACK);
-            Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_ALL_PLAYLISTS_FOR_TRACK, args);
+            Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
+            Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
             updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
             cursor.moveToFirst();
 
@@ -533,6 +533,26 @@ public class MediaplayerDAO {
         return trackList;
     }
 
+    public ArrayList<Integer> getTrackIDsForPlaylist(int playlistID) {
+        ArrayList<Integer> trackList = null;
+        String args[] = {String.valueOf(playlistID)};
+
+        Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
+        Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);
+
+        if(cursor != null && cursor.getCount() > 0) {
+            trackList = new ArrayList<Integer>();
+            cursor.moveToFirst();
+
+            while(!cursor.isAfterLast()) {
+                trackList.add(cursor.getInt(0));
+                cursor.moveToNext();
+            }
+        }
+
+        return trackList;
+    }
+
     /**
      * Method to get the list of playlists from database
      * @return Sorted list of Playlists
@@ -590,5 +610,26 @@ public class MediaplayerDAO {
 
         tracksCursor.close();
         return trackInfoList;
+    }
+
+    public ArrayList<Integer> getPlaylistsForTrack(int trackID) {
+        ArrayList<Integer> playlist = null;
+        String args[] = {String.valueOf(trackID)};
+
+        //Fetching existing values for selected playlist
+        Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
+        Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK, args);
+
+        if(cursor != null && cursor.getCount() > 0) {
+            playlist = new ArrayList<Integer>();
+            cursor.moveToFirst();
+
+            while(!cursor.isAfterLast()) {
+                playlist.add(cursor.getInt(0));
+                cursor.moveToNext();
+            }
+        }
+
+        return playlist;
     }
 }

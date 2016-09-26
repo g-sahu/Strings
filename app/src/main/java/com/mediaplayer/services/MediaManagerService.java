@@ -19,6 +19,7 @@ public class MediaManagerService extends IntentService {
         MediaLibraryManager.init(this);
 
         Intent intent1 = new Intent();
+        // TODO: 25-Sep-16 Change this intent in AndroidManifest.xml
         intent1.setAction("com.tutorialspoint.CUSTOM_INTENT");
         sendBroadcast(intent1);
     }

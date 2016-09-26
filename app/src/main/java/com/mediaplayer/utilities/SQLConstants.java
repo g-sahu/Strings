@@ -72,7 +72,7 @@ public final class SQLConstants {
     public static final String SQL_SELECT_PLAYLISTS =
             "SELECT * FROM " + MediaplayerContract.Playlists.TABLE_NAME;
 
-    public static final String SQL_SELECT_ALL_PLAYLISTS_FOR_TRACK =
+    public static final String SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK =
             "SELECT " + MediaplayerContract.Playlists.PLAYLIST_INDEX +
                     " FROM " + MediaplayerContract.Playlists.TABLE_NAME +
                     " WHERE " + MediaplayerContract.Playlists.PLAYLIST_ID + " IN (" +
@@ -80,12 +80,23 @@ public final class SQLConstants {
                     MediaplayerContract.PlaylistDetail.TABLE_NAME + " WHERE " +
                     MediaplayerContract.PlaylistDetail.TRACK_ID + " = ?)";
 
+    public static final String SQL_SELECT_PLAYLISTS_FOR_TRACK =
+            "SELECT " + MediaplayerContract.PlaylistDetail.PLAYLIST_ID +
+                    " FROM " + MediaplayerContract.PlaylistDetail.TABLE_NAME +
+                    " WHERE " + MediaplayerContract.PlaylistDetail.TRACK_ID + " = ? " +
+                    " AND " + MediaplayerContract.PlaylistDetail.PLAYLIST_ID + " != " + PLAYLIST_ID_FAVOURITES;
+
     public static final String SQL_SELECT_ALL_TRACKS_FOR_PLAYLIST =
             "SELECT * FROM " + MediaplayerContract.Tracks.TABLE_NAME + " WHERE " +
                     MediaplayerContract.Tracks.TRACK_ID + " IN (SELECT " +
                     MediaplayerContract.PlaylistDetail.TRACK_ID +
                     " FROM " + MediaplayerContract.PlaylistDetail.TABLE_NAME +
                     " WHERE " + MediaplayerContract.PlaylistDetail.PLAYLIST_ID + " = ?)";
+
+    public static final String SQL_SELECT_TRACK_IDS_FOR_PLAYLIST =
+            "SELECT " + MediaplayerContract.PlaylistDetail.TRACK_ID +
+                    " FROM " + MediaplayerContract.PlaylistDetail.TABLE_NAME +
+                    " WHERE " + MediaplayerContract.PlaylistDetail.PLAYLIST_ID + " = ?";
 
     //Insert queries
     public static final String SQL_INSERT_TRACK =
