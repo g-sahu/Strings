@@ -9,8 +9,10 @@ import android.widget.Button;
 
 import com.mediaplayer.R;
 import com.mediaplayer.services.MediaManagerService;
+import com.mediaplayer.services.MediaPlayerService;
 
 public class SplashScreenActivity extends AppCompatActivity {
+    private static String LOG_TAG = "SplashScreenActivity";
     private Intent intent;
 
     @Override
@@ -19,17 +21,25 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         Button launchButton = (Button) findViewById(R.id.launch_button);
-        //intent = new Intent(this, HomeActivity.class);
         intent = new Intent(this, MediaManagerService.class);
 
         launchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                //startActivity(intent);
                 Log.d("SplashScreenActivity", "Starting MediaManagerService...");
                 startService(intent);
-                Log.d("SplashScreenActivity", "Exiting SplashScreenActivity");
+                Log.d(LOG_TAG, "Exiting SplashScreenActivity");
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.d(LOG_TAG, "SplashScreenActivity destroyed");
+
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        stopService(intent);
     }
 }

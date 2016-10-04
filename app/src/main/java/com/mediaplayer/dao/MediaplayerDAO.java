@@ -252,7 +252,7 @@ public class MediaplayerDAO {
             //Sorting the list of tracks to update track indices
             MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
 
-            //Updating track indices
+            //Updating track indices in db
             updateTrackIndices();
 
             //Setting success toast message

@@ -5,6 +5,7 @@ public class MediaPlayerConstants {
     public static final String NEXT = "NEXT";
     public static final String PLAY = "PLAY";
     public static final String PAUSE = "PAUSE";
+    public static final String STOP = "STOP";
     public static final String FILE_NAME = "FILE_NAME";
     public static final String FILE_PATH = "FILE_PATH";
     public static final String FILE_SIZE = "FILE_SIZE";
@@ -41,5 +42,6 @@ public class MediaPlayerConstants {
     public static final String KEY_PLAYLIST_ID = "PLAYLIST_ID";
     public static final String KEY_PLAYLIST_TITLE = "PLAYLIST_TITLE";
     public static final String KEY_PLAYLIST_INDEX = "PLAYLIST_INDEX";
+    public static final String KEY_TRACK_ORIGIN = "TRACK_ORIGIN";
 }
 

@@ -127,10 +127,11 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                 MediaplayerDAO dao = new MediaplayerDAO(getContext());
                                 dao.renamePlaylist(playlist);
 
+                                //Updating list view adapter
+                                updatePlaylistsAdapter();
+
                                 //Dismissing the dialog window
                                 alertDialog.dismiss();
-
-                                // TODO: 27-Aug-16 Refresh Playlist Fragment
                             }
                         }
                     });

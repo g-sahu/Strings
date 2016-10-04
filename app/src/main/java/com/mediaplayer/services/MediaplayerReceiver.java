@@ -15,7 +15,6 @@ public class MediaplayerReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("MediaplayerReceiver", "Broadcast received");
-        //Toast.makeText(context, "Intent Detected.", Toast.LENGTH_LONG).show();
         intent.setClass(context, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);

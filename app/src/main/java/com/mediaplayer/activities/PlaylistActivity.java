@@ -120,7 +120,7 @@ public class PlaylistActivity extends AppCompatActivity {
     //Add to favourites menu option
     private void addToFavourites() {
         ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
-        selectedPlaylists.add(selectedPlaylist);
+        selectedPlaylists.add(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES));
         MediaplayerDAO dao = new MediaplayerDAO(this);
         dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
@@ -131,13 +131,12 @@ public class PlaylistActivity extends AppCompatActivity {
     //Remove from favourites menu option
     private void removeFromFavourites() {
         MediaplayerDAO dao = new MediaplayerDAO(this);
-        dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
+        dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
-        //Removing track from selectedPlaylist
-        MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
-
-        //Sorting selectedPlaylist
-        MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        //Removing track from selected playlist if it is default playlist 'Favourites'
+        if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
+            MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+        }
 
         //Updating list view adapter
         updatePlaylistsAdapter();
@@ -161,13 +160,13 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void updateSongsListAdapter() {
-        SongsListAdapter adapter = new SongsListAdapter(homeContext, MediaLibraryManager.getSelectedPlaylist());
+        SongsListAdapter adapter = new SongsListAdapter(this, MediaLibraryManager.getSelectedPlaylist());
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
     private void updatePlaylistsAdapter() {
-        PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());
+        PlaylistsAdapter adapter = new PlaylistsAdapter(this, MediaLibraryManager.getPlaylistInfoList());
         ListView listView = PlaylistsFragment.listView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -177,8 +176,12 @@ public class PlaylistActivity extends AppCompatActivity {
         int position = listView.getPositionForView(view);
         Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
         Intent intent = new Intent(this, MediaPlayerActivity.class);
+
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, "PLAYLIST_ACTIVITY");
+        intent.setAction(MediaPlayerConstants.PLAY);
+
         startActivity(intent);
     }
 }

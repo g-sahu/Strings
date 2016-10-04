@@ -39,8 +39,7 @@
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.tutorialspoint.CUSTOM_INTENT">
-                </action>
+                <action android:name="com.tutorialspoint.CUSTOM_INTENT" />
             </intent-filter>
         </receiver>
     </application>
