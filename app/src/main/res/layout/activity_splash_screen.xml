@@ -6,27 +6,40 @@
     android:fitsSystemWindows="true"
     tools:context="com.mediaplayer.activities.SplashScreenActivity">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-    <!--<TextView
+    <TextView
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/app_name"
+        android:text="Strings"
         android:textColor="#33b5e5"
         android:textSize="50sp"
-        android:textStyle="bold" />-->
+        android:textStyle="bold" />
 
-    <Button
+    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >-->
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="228dp" />
+
+    <!--</RelativeLayout>-->
+
+    <!--<Button
         android:id="@+id/launch_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="LAUNCH"
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true" />-->
 
 </RelativeLayout>

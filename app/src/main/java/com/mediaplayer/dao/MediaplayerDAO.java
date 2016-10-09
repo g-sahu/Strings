@@ -2,6 +2,7 @@ package com.mediaplayer.dao;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -270,7 +271,7 @@ public class MediaplayerDAO {
         toast.show();
     }
 
-    private void updateTrackIndices() {
+    public void updateTrackIndices() {
         SQLiteStatement updateStmt;
         updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
         Iterator<Track> trackListIterator = MediaLibraryManager.getTrackInfoList().iterator();
@@ -501,6 +502,40 @@ public class MediaplayerDAO {
         toast.show();
     }
 
+    public void addTracksToLibrary(ArrayList<Track> trackList) {
+        //Inserting tracks in table 'Tracks'
+        SQLiteStatement insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
+        Iterator<Track> trackIterator = trackList.iterator();
+        Track track;
+        int c;
+
+        while(trackIterator.hasNext()) {
+            track = trackIterator.next();
+            c = 1;
+
+            insertStmt.bindString(c++, track.getTrackTitle());
+            insertStmt.bindLong(c++, track.getTrackIndex());
+            insertStmt.bindString(c++, track.getFileName());
+            insertStmt.bindLong(c++, track.getTrackDuration());
+            insertStmt.bindLong(c++, track.getFileSize());
+            insertStmt.bindString(c++, track.getAlbumName());
+            insertStmt.bindString(c++, track.getArtistName());
+            insertStmt.bindBlob(c++, track.getAlbumArt());
+            insertStmt.bindString(c++, track.getTrackLocation());
+            insertStmt.bindLong(c++, track.isFavSw());
+            insertStmt.bindString(c, Utilities.getCurrentDate());
+
+            Log.d(LOG_TAG_SQL, insertStmt.toString());
+
+            try {
+                insertStmt.execute();
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+                Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
+            }
+        }
+    }
+
     public ArrayList<Track> getTracksForPlaylist(int playlistID) {
         ArrayList<Track> trackList = new ArrayList<Track>();
         String args[] = {String.valueOf(playlistID)};
@@ -631,5 +666,36 @@ public class MediaplayerDAO {
         }
 
         return playlist;
+    }
+
+    public ArrayList<String> getFileNamesForTracks() {
+        ArrayList<String> fileNamesList = null;
+        Cursor tracksCursor =  null;
+        int c;
+
+        try {
+            Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
+            tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
+
+            if (tracksCursor.getCount() > 0) {
+                fileNamesList = new ArrayList<String>();
+                tracksCursor.moveToFirst();
+                c = 0;
+
+                while(!tracksCursor.isAfterLast()) {
+                    fileNamesList.add(tracksCursor.getString(c));
+                    tracksCursor.moveToNext();
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if (tracksCursor != null) {
+                tracksCursor.close();
+            }
+        }
+
+        return fileNamesList;
     }
 }

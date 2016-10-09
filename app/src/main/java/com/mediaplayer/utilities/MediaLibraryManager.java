@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.util.Log;
 
 import com.mediaplayer.R;
 import com.mediaplayer.beans.Playlist;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class MediaLibraryManager {
     private static String LOG_TAG_SQL = "Executing query";
@@ -34,8 +36,18 @@ public class MediaLibraryManager {
     public static void init(Context context) {
         MediaplayerDAO dao = new MediaplayerDAO(context);
 
+        //Get all filenames from db and store in an ArrayList
+        ArrayList<String> fileNamesList = dao.getFileNamesForTracks();
+
+        //Get all mp3 files from storage
+        ArrayList<Track> newTracksList = getUpdatedTracks(fileNamesList, context.getResources());
+
+        //Insert new tracks in db
+        dao.addTracksToLibrary(newTracksList);
+
         trackInfoList = dao.getTracks();
         sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+        dao.updateTrackIndices();
 
         playlistInfoList = dao.getPlaylists();
         sortPlaylists();
@@ -50,16 +62,17 @@ public class MediaLibraryManager {
         String fileName, filePath;
         long fileSize;
         ArrayList<HashMap<String, Object>> tracklist = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> song;
 
         //Iterate through the directory to search for .mp3 files
         for(File file: fileList) {
             //Check if file extension is .mp3
             if(validateExtension(file)) {
+                song = new HashMap<String, Object>();
                 fileName = file.getName().split("[.]")[0];
                 filePath = file.getAbsolutePath();
                 fileSize = file.length();
 
-                HashMap<String, Object> song = new HashMap<String, Object>();
                 song.put(MediaPlayerConstants.FILE_NAME, fileName);
                 song.put(MediaPlayerConstants.FILE_PATH, filePath);
                 song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
@@ -138,7 +151,6 @@ public class MediaLibraryManager {
         sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
         return trackInfoList;
     }
-
 
     /**
      * Method to sort list of tracks in Media library
@@ -350,6 +362,77 @@ public class MediaLibraryManager {
         }
 
         return isValidFile;
+    }
+
+    private static ArrayList<Track> getUpdatedTracks(ArrayList<String> fileNamesList, Resources resources) {
+        File[] fileList = path.listFiles();
+        String fileName, filePath,artistName, songTitle, albumName, trackLength;
+        long fileSize;
+        Bitmap albumArt;
+        byte data[];
+        ArrayList<Track> newTracksList = new ArrayList<Track>();
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        int c = -1;
+
+        try {
+            //Iterate through the directory to search for .mp3 files
+            for (File file : fileList) {
+                //Check if file extension is .mp3
+                if (validateExtension(file)) {
+                    fileName = file.getName().split("[.]")[0];
+
+                    if (!fileNamesList.contains(fileName)) {
+                        filePath = file.getAbsolutePath();
+                        fileSize = file.length();
+                        mmr.setDataSource(filePath);
+
+                        songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null
+                                ? fileName
+                                : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                        albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) == null
+                                ? MediaPlayerConstants.UNKNOWN_ALBUM
+                                : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+                        artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null
+                                ? MediaPlayerConstants.UNKNOWN_ARTIST
+                                : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                        trackLength = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) == null
+                                ? MediaPlayerConstants.TIME_ZERO
+                                : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+
+                        data = mmr.getEmbeddedPicture();
+
+                        Track track = new Track();
+                        track.setTrackTitle(songTitle);
+                        track.setTrackIndex(c--);
+                        track.setFileName(fileName);
+                        track.setTrackDuration(Integer.parseInt(trackLength));
+                        track.setFileSize(fileSize);
+                        track.setAlbumName(albumName);
+                        track.setArtistName(artistName);
+                        track.setTrackLocation(filePath);
+                        track.setFavSw(SQLConstants.FAV_SW_NO);
+
+                        if (data != null) {
+                            track.setAlbumArt(data);
+                        } else {
+                            albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            albumArt.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            track.setAlbumArt(stream.toByteArray());
+                        }
+
+                        newTracksList.add(track);
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            mmr.release();
+        }
+
+        return newTracksList;
     }
 
     /* Checks if external storage is available for read and write */

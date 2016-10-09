@@ -4,11 +4,10 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import com.mediaplayer.activities.HomeActivity;
-import com.mediaplayer.dao.MediaplayerDBHelper;
 import com.mediaplayer.utilities.MediaLibraryManager;
 
 public class MediaManagerService extends IntentService {
+
     public MediaManagerService() {
         super("MediaManagerService");
     }
@@ -18,10 +17,10 @@ public class MediaManagerService extends IntentService {
         Log.d("MediaManagerService", "Inside MediaManagerService");
         MediaLibraryManager.init(this);
 
-        Intent intent1 = new Intent();
+        Intent broadcastIntent = new Intent();
         // TODO: 25-Sep-16 Change this intent in AndroidManifest.xml
-        intent1.setAction("com.tutorialspoint.CUSTOM_INTENT");
-        sendBroadcast(intent1);
+        broadcastIntent.setAction("com.tutorialspoint.CUSTOM_INTENT");
+        sendBroadcast(broadcastIntent);
     }
 }
 
