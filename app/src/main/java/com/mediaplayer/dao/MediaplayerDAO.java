@@ -272,20 +272,31 @@ public class MediaplayerDAO {
     }
 
     public void updateTrackIndices() {
-        SQLiteStatement updateStmt;
-        updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
-        Iterator<Track> trackListIterator = MediaLibraryManager.getTrackInfoList().iterator();
+        SQLiteStatement updateStmt = null;
 
-        while (trackListIterator.hasNext()) {
-            Track track = trackListIterator.next();
+        try {
+            updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
+            Iterator<Track> trackListIterator = MediaLibraryManager.getTrackInfoList().iterator();
 
             //Updating the indices of all the tracks
-            updateStmt.bindLong(1, track.getTrackIndex());
-            updateStmt.bindString(2, Utilities.getCurrentDate());
-            updateStmt.bindLong(3, track.getTrackID());
-            Log.d(LOG_TAG_SQL, updateStmt.toString());
-            updateStmt.execute();
-            updateStmt.clearBindings();
+            while(trackListIterator.hasNext()) {
+                Track track = trackListIterator.next();
+
+                updateStmt.bindLong(1, track.getTrackIndex());
+                updateStmt.bindString(2, Utilities.getCurrentDate());
+                updateStmt.bindLong(3, track.getTrackID());
+
+                Log.d(LOG_TAG_SQL, updateStmt.toString());
+                updateStmt.execute();
+                updateStmt.clearBindings();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(updateStmt != null) {
+                updateStmt.close();
+            }
         }
     }
 
@@ -503,12 +514,14 @@ public class MediaplayerDAO {
     }
 
     public void addTracksToLibrary(ArrayList<Track> trackList) {
-        //Inserting tracks in table 'Tracks'
-        SQLiteStatement insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
-        Iterator<Track> trackIterator = trackList.iterator();
         Track track;
         int c;
+        long tracksAdded = 0;
 
+        SQLiteStatement insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
+        Iterator<Track> trackIterator = trackList.iterator();
+
+        //Inserting tracks in table 'Tracks'
         while(trackIterator.hasNext()) {
             track = trackIterator.next();
             c = 1;
@@ -528,12 +541,34 @@ public class MediaplayerDAO {
             Log.d(LOG_TAG_SQL, insertStmt.toString());
 
             try {
-                insertStmt.execute();
+                tracksAdded = tracksAdded + insertStmt.executeInsert();
             } catch (SQLException sqle) {
                 sqle.printStackTrace();
                 Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
             }
         }
+
+        Log.d("Tracks added to library", String.valueOf(tracksAdded));
+    }
+
+    public void deleteTracksFromLibrary(ArrayList<Track> deletedTracksList) {
+        Track track;
+        long trackID;
+        int tracksDeleted = 0;
+
+        SQLiteStatement deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
+        Iterator<Track> deletedTracksListIterator = deletedTracksList.iterator();
+
+        while(deletedTracksListIterator.hasNext()) {
+            track = deletedTracksListIterator.next();
+            trackID = track.getTrackID();
+            deleteStmt.bindLong(1, trackID);
+            Log.d(LOG_TAG_SQL, SQLConstants.SQL_DELETE_FROM_TRACKS);
+            tracksDeleted = tracksDeleted + deleteStmt.executeUpdateDelete();
+            deleteStmt.clearBindings();
+        }
+
+        Log.d("Tracks deleted", String.valueOf(tracksDeleted));
     }
 
     public ArrayList<Track> getTracksForPlaylist(int playlistID) {
@@ -668,8 +703,9 @@ public class MediaplayerDAO {
         return playlist;
     }
 
-    public ArrayList<String> getFileNamesForTracks() {
-        ArrayList<String> fileNamesList = null;
+    public ArrayList<Track> getTracksFromLibrary() {
+        ArrayList<Track> trackList = null;
+        Track track;
         Cursor tracksCursor =  null;
         int c;
 
@@ -677,13 +713,17 @@ public class MediaplayerDAO {
             Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
             tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
 
-            if (tracksCursor.getCount() > 0) {
-                fileNamesList = new ArrayList<String>();
+            if(tracksCursor.getCount() > 0) {
+                trackList = new ArrayList<Track>();
                 tracksCursor.moveToFirst();
-                c = 0;
 
                 while(!tracksCursor.isAfterLast()) {
-                    fileNamesList.add(tracksCursor.getString(c));
+                    c = 0;
+                    track = new Track();
+                    track.setTrackID(tracksCursor.getInt(c++));
+                    track.setFileName(tracksCursor.getString(c));
+
+                    trackList.add(track);
                     tracksCursor.moveToNext();
                 }
             }
@@ -696,6 +736,6 @@ public class MediaplayerDAO {
             }
         }
 
-        return fileNamesList;
+        return trackList;
     }
 }

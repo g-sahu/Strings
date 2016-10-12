@@ -7,6 +7,7 @@ public class MessageConstants {
     public static final String LOOPING_PLAYLIST = "Looping playlist";
     public static final String LOOPING_OFF = "Looping off";
 
+    public static final String LIBRARY_UPDATED = "Music library updated";
     public static final String ADDED_TO_PLAYLISTS = "Added to selected playlist(s).";
     public static final String ADDED_TO_FAVOURITES = "Added to Favourites.";
     public static final String REMOVED_FROM_PLAYLIST = "Removed from playlist.";

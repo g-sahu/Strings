@@ -3,8 +3,10 @@ package com.mediaplayer.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.mediaplayer.utilities.MediaLibraryManager;
+import com.mediaplayer.utilities.MessageConstants;
 
 public class MediaManagerService extends IntentService {
 
@@ -16,6 +18,9 @@ public class MediaManagerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d("MediaManagerService", "Inside MediaManagerService");
         MediaLibraryManager.init(this);
+
+        Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
+        toast.show();
 
         Intent broadcastIntent = new Intent();
         // TODO: 25-Sep-16 Change this intent in AndroidManifest.xml

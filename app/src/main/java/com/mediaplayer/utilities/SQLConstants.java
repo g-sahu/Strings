@@ -99,7 +99,8 @@ public final class SQLConstants {
                     " WHERE " + MediaplayerContract.PlaylistDetail.PLAYLIST_ID + " = ?";
 
     public static final String SQL_SELECT_FILE_NAMES =
-            "SELECT " + MediaplayerContract.Tracks.FILE_NAME +
+            "SELECT " + MediaplayerContract.Tracks.TRACK_ID + COMMA_SEP +
+                    MediaplayerContract.Tracks.FILE_NAME +
                     " FROM " + MediaplayerContract.Tracks.TABLE_NAME;
 
     //Insert queries
