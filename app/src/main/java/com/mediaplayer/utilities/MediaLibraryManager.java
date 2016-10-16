@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.mediaplayer.R;
@@ -15,6 +16,7 @@ import com.mediaplayer.dao.MediaplayerDAO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,27 +35,43 @@ public class MediaLibraryManager {
     public MediaLibraryManager(){}
 
     public static void init(Context context) {
+        HashMap<String, ArrayList<Track>> map;
+        ArrayList<Track> newTracksList = null, deletedTracksList = null;
+
         MediaplayerDAO dao = new MediaplayerDAO(context);
 
         //Get all filenames from db and store in an ArrayList
         ArrayList<Track> trackList = dao.getTracksFromLibrary();
 
         //Get all mp3 files from storage
-        HashMap<String, Object> map = getUpdatedTracks(trackList, context.getResources());
+        //if(trackList != null && !trackList.isEmpty()) {
+            map = getUpdatedTracks(trackList, context.getResources());
 
-        ArrayList<Track> newTracksList = (ArrayList<Track>) map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
-        ArrayList<Track> deletedTracksList = (ArrayList<Track>) map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+            //Check if map is not null. If null, it means there has been no change to the songs library
+            if(map != null) {
+                newTracksList = map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
+                deletedTracksList = map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+            }
+        //}
 
         //Insert new tracks in db
-        dao.addTracksToLibrary(newTracksList);
+        if(newTracksList != null && !newTracksList.isEmpty()) {
+            dao.addTracksToLibrary(newTracksList);
+        }
 
         //Delete deleted tracks from db
-        dao.deleteTracksFromLibrary(deletedTracksList);
+        if(deletedTracksList != null && !deletedTracksList.isEmpty()) {
+            dao.deleteTracksFromLibrary(deletedTracksList);
+        }
 
+        //Getting list of all tracks from db and sorting them
         trackInfoList = dao.getTracks();
         sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+
+        //Updating track indices in db to keep in sync with trackInfoList
         dao.updateTrackIndices();
 
+        //Getting list of all playlist from db and sorting them
         playlistInfoList = dao.getPlaylists();
         sortPlaylists();
     }
@@ -63,27 +81,36 @@ public class MediaLibraryManager {
      * and store the details in ArrayList
      * */
     private static ArrayList<HashMap<String, Object>> getTracks() {
-        File[] fileList = path.listFiles();
+        ArrayList<HashMap<String, Object>> tracklist = null;
+        HashMap<String, Object> song;
         String fileName, filePath;
         long fileSize;
-        ArrayList<HashMap<String, Object>> tracklist = new ArrayList<HashMap<String, Object>>();
-        HashMap<String, Object> song;
 
-        //Iterate through the directory to search for .mp3 files
-        for(File file: fileList) {
-            //Check if file extension is .mp3
-            if(validateExtension(file)) {
-                song = new HashMap<String, Object>();
-                fileName = file.getName().split("[.]")[0];
-                filePath = file.getAbsolutePath();
-                fileSize = file.length();
+        //Getting all the files at the given path
+        File[] fileList = path.listFiles();
 
-                song.put(MediaPlayerConstants.FILE_NAME, fileName);
-                song.put(MediaPlayerConstants.FILE_PATH, filePath);
-                song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
+        if(fileList != null && (fileList.length > 0)) {
+            Log.d("Files in the directory", String.valueOf(fileList.length));
+            tracklist = new ArrayList<HashMap<String, Object>>();
 
-                tracklist.add(song);
+            //Iterate through the directory to search for .mp3 files
+            for(File file : fileList) {
+                //Check if file extension is .mp3
+                if(validateExtension(file)) {
+                    song = new HashMap<String, Object>();
+                    fileName = file.getName().split("[.]")[0];
+                    filePath = file.getAbsolutePath();
+                    fileSize = file.length();
+
+                    song.put(MediaPlayerConstants.FILE_NAME, fileName);
+                    song.put(MediaPlayerConstants.FILE_PATH, filePath);
+                    song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
+
+                    tracklist.add(song);
+                }
             }
+
+            Log.d("Music files fetched", String.valueOf(tracklist.size()));
         }
 
         return tracklist;
@@ -95,65 +122,95 @@ public class MediaLibraryManager {
      * @return The list of songs read from memory
      */
     public static ArrayList<Track> populateTrackInfoList(Resources resources) {
-        trackInfoList = new ArrayList<Track>();
-        ArrayList<HashMap<String, Object>> tracklist = getTracks();
-        HashMap<String, Object> songMap;
         String artistName, songTitle, fileName, filePath, albumName, trackLength;
+        ArrayList<HashMap<String, Object>> tracklist;
+        Iterator<HashMap<String, Object>> tracklistIterator;
+        HashMap<String, Object> songMap;
+        MediaMetadataRetriever mmr = null;
         long fileSize;
         Bitmap albumArt;
         byte data[];
-        Iterator<HashMap<String, Object>> tracklistIterator = tracklist.iterator();
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        Track track;
+        ByteArrayOutputStream stream = null;
 
-        while(tracklistIterator.hasNext()) {
-            songMap = tracklistIterator.next();
-            filePath = songMap.get(MediaPlayerConstants.FILE_PATH).toString();
-            fileName = songMap.get(MediaPlayerConstants.FILE_NAME).toString();
-            fileSize = (Long) songMap.get(MediaPlayerConstants.FILE_SIZE);
-            mmr.setDataSource(filePath);
+        try {
+            //Getting the list of media files from storage
+            tracklist = getTracks();
 
-            songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null
+            if(tracklist != null && !tracklist.isEmpty()) {
+                trackInfoList = new ArrayList<Track>();
+                tracklistIterator = tracklist.iterator();
+                mmr = new MediaMetadataRetriever();
+
+                while(tracklistIterator.hasNext()) {
+                    songMap = tracklistIterator.next();
+                    filePath = songMap.get(MediaPlayerConstants.FILE_PATH).toString();
+                    fileName = songMap.get(MediaPlayerConstants.FILE_NAME).toString();
+                    fileSize = (Long) songMap.get(MediaPlayerConstants.FILE_SIZE);
+                    mmr.setDataSource(filePath);
+
+                    songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null
                             ? fileName
                             : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) == null
+                    albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) == null
                             ? MediaPlayerConstants.UNKNOWN_ALBUM
                             : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-            artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null
+                    artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null
                             ? MediaPlayerConstants.UNKNOWN_ARTIST
                             : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            trackLength = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) == null
+                    trackLength = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) == null
                             ? MediaPlayerConstants.TIME_ZERO
                             : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 
-            data = mmr.getEmbeddedPicture();
+                    data = mmr.getEmbeddedPicture();
 
-            Track track = new Track();
-            track.setTrackTitle(songTitle);
-            track.setFileName(fileName);
-            track.setTrackDuration(Integer.parseInt(trackLength));
-            track.setFileSize(fileSize);
-            track.setAlbumName(albumName);
-            track.setArtistName(artistName);
-            track.setTrackLocation(filePath);
-            track.setFavSw(SQLConstants.FAV_SW_NO);
+                    track = new Track();
+                    track.setTrackTitle(songTitle);
+                    track.setFileName(fileName);
+                    track.setTrackDuration(Integer.parseInt(trackLength));
+                    track.setFileSize(fileSize);
+                    track.setAlbumName(albumName);
+                    track.setArtistName(artistName);
+                    track.setTrackLocation(filePath);
+                    track.setFavSw(SQLConstants.FAV_SW_NO);
 
-            if(data != null) {
-                track.setAlbumArt(data);
+                    if(data != null) {
+                        track.setAlbumArt(data);
+                    } else {
+                        albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
+                        stream = new ByteArrayOutputStream();
+                        albumArt.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        track.setAlbumArt(stream.toByteArray());
+                    }
+
+                    trackInfoList.add(track);
+                }
+
+                tracklistSize = trackInfoList.size();
+
+                //Sorting the track list
+                sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
             } else {
-                albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                albumArt.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                track.setAlbumArt(stream.toByteArray());
+                tracklistSize = 0;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(mmr != null) {
+                mmr.release();
             }
 
-            trackInfoList.add(track);
+            if(stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                }
+            }
         }
 
-        mmr.release();
-        tracklistSize = trackInfoList.size();
-
-        //Sort the track list
-        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
         return trackInfoList;
     }
 
@@ -369,122 +426,166 @@ public class MediaLibraryManager {
         return isValidFile;
     }
 
-    private static HashMap<String, Object> getUpdatedTracks(ArrayList<Track> trackList, Resources resources) {
+    private static HashMap<String, ArrayList<Track>> getUpdatedTracks(ArrayList<Track> trackList, Resources resources) {
         String fileName, filePath, artistName, songTitle, albumName, trackLength;
+        ByteArrayOutputStream stream;
+        ArrayList<String> libraryFileNamesList = null, musicFileNamesList, newFileNamesList, deletedFileNamesList = null;
+        ArrayList<Track> newTracksList = null, deletedTracksList = null;
+        ArrayList<File> musicFilesList;
+        Iterator<Track> trackListIterator;
+        Iterator<File> musicFilesListIterator;
+        HashMap<String, ArrayList<Track>> map = null;
+        File[] fileList;
+        File musicFile;
+        Track track;
         long fileSize;
         Bitmap albumArt;
         byte data[];
         int c = -1;
-        File[] fileList;
-        ByteArrayOutputStream stream;
-        Iterator<Track> trackListIterator;
-        Iterator<File> musicFilesListIterator;
-        File musicFile;
-        Track track;
 
+        ArrayList<Track> renamedTracksList = new ArrayList<Track>();            // TODO: 13-Oct-16
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        ArrayList<Track> newTracksList = new ArrayList<Track>();
-        ArrayList<Track> deletedTracksList = new ArrayList<Track>();
-        ArrayList<Track> renamedTracksList = new ArrayList<Track>();
-        ArrayList<String> allFileNamesList = new ArrayList<String>();
-        ArrayList<String> libraryFileNamesList = new ArrayList<String>();
-        ArrayList<String> newFileNamesList = new ArrayList<String>();
-        ArrayList<String> deletedFileNamesList;
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        ArrayList<File> musicFilesList = new ArrayList<File>();
 
         try {
-            trackListIterator = trackList.iterator();
+            //Checking if tracks exist in db
+            if(trackList != null && !trackList.isEmpty()) {
+                trackListIterator = trackList.iterator();
+                libraryFileNamesList = new ArrayList<String>();
 
-            //Iterating trackList to get the list of all file names
-            while(trackListIterator.hasNext()) {
-                track = trackListIterator.next();
-                libraryFileNamesList.add(track.getFileName());
+                //Iterating trackList to get the list of all file names
+                while (trackListIterator.hasNext()) {
+                    track = trackListIterator.next();
+                    libraryFileNamesList.add(track.getFileName());
+                }
             }
 
             //Listing all files in the directory
             fileList = path.listFiles();
 
-            //Iterating the files to search for mp3 files
-            for(File file : fileList) {
-                //Check if file extension is .mp3
-                if(validateExtension(file)) {
-                    fileName = file.getName().split("[.]")[0];
-                    allFileNamesList.add(fileName);
-                    musicFilesList.add(file);
+            if(fileList != null && fileList.length > 0) {
+                Log.d("Files in the directory", String.valueOf(fileList.length));
+                musicFileNamesList = new ArrayList<String>();
+                musicFilesList = new ArrayList<File>();
+
+                //Iterating the files to search for mp3 files
+                for(File file : fileList) {
+                    //Check if file extension is .mp3
+                    if(validateExtension(file)) {
+                        fileName = file.getName().split("[.]")[0];
+                        musicFileNamesList.add(fileName);
+                        musicFilesList.add(file);
+                    }
                 }
-            }
 
-            //Getting all newly added tracks
-            newFileNamesList = new ArrayList<>(allFileNamesList);
-            newFileNamesList.removeAll(libraryFileNamesList);
+                if(!musicFileNamesList.isEmpty() && !musicFilesList.isEmpty()) {
+                    Log.d("Music files fetched", String.valueOf(musicFilesList.size()));
 
-            //Getting all deleted tracks
-            deletedFileNamesList = new ArrayList<>(libraryFileNamesList);
-            deletedFileNamesList.removeAll(allFileNamesList);
+                    if(libraryFileNamesList != null && !libraryFileNamesList.isEmpty()) {
+                        //Getting all newly added tracks
+                        newFileNamesList = new ArrayList<>(musicFileNamesList);
+                        newFileNamesList.removeAll(libraryFileNamesList);
+                    } else {
+                        newFileNamesList = musicFileNamesList;
+                    }
 
-            musicFilesListIterator = musicFilesList.iterator();
+                    if(!newFileNamesList.isEmpty()) {
+                        newTracksList = new ArrayList<Track>();
+                        musicFilesListIterator = musicFilesList.iterator();
 
-            while(musicFilesListIterator.hasNext()) {
-                musicFile = musicFilesListIterator.next();
+                        //Iterating music files list to get the list of tracks
+                        while(musicFilesListIterator.hasNext()) {
+                            musicFile = musicFilesListIterator.next();
+                            fileName = musicFile.getName().split("[.]")[0];
 
-                fileName = musicFile.getName().split("[.]")[0];
-                filePath = musicFile.getAbsolutePath();
-                fileSize = musicFile.length();
-                mmr.setDataSource(filePath);
+                            //Checking if it is a new track
+                            if(newFileNamesList.contains(fileName)) {
+                                filePath = musicFile.getAbsolutePath();
+                                fileSize = musicFile.length();
+                                mmr.setDataSource(filePath);
 
-                songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null
-                        ? fileName
-                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) == null
-                        ? MediaPlayerConstants.UNKNOWN_ALBUM
-                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-                artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null
-                        ? MediaPlayerConstants.UNKNOWN_ARTIST
-                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                trackLength = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) == null
-                        ? MediaPlayerConstants.TIME_ZERO
-                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                                //Retrieving track info
+                                songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null
+                                        ? fileName
+                                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                                albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) == null
+                                        ? MediaPlayerConstants.UNKNOWN_ALBUM
+                                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+                                artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null
+                                        ? MediaPlayerConstants.UNKNOWN_ARTIST
+                                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                                trackLength = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) == null
+                                        ? MediaPlayerConstants.TIME_ZERO
+                                        : mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 
-                data = mmr.getEmbeddedPicture();
+                                data = mmr.getEmbeddedPicture();
 
-                track = new Track();
-                track.setTrackTitle(songTitle);
-                track.setTrackIndex(c--);
-                track.setFileName(fileName);
-                track.setTrackDuration(Integer.parseInt(trackLength));
-                track.setFileSize(fileSize);
-                track.setAlbumName(albumName);
-                track.setArtistName(artistName);
-                track.setTrackLocation(filePath);
-                track.setFavSw(SQLConstants.FAV_SW_NO);
+                                //Creating track
+                                track = new Track();
+                                track.setTrackTitle(songTitle);
+                                track.setTrackIndex(c--);
+                                track.setFileName(fileName);
+                                track.setTrackDuration(Integer.parseInt(trackLength));
+                                track.setFileSize(fileSize);
+                                track.setAlbumName(albumName);
+                                track.setArtistName(artistName);
+                                track.setTrackLocation(filePath);
+                                track.setFavSw(SQLConstants.FAV_SW_NO);
 
-                if (data != null) {
-                    track.setAlbumArt(data);
+                                if(data != null) {
+                                    track.setAlbumArt(data);
+                                } else {
+                                    albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
+                                    stream = new ByteArrayOutputStream();
+                                    albumArt.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                    track.setAlbumArt(stream.toByteArray());
+                                }
+
+                                //Adding track to the list of new tracks
+                                newTracksList.add(track);
+                            }
+                        }
+                    }
+
+                    //Getting all deleted tracks
+                    if(libraryFileNamesList != null && !libraryFileNamesList.isEmpty()) {
+                        deletedFileNamesList = new ArrayList<>(libraryFileNamesList);
+                        deletedFileNamesList.removeAll(musicFileNamesList);
+                    }
                 } else {
-                    albumArt = BitmapFactory.decodeResource(resources, R.drawable.default_album_art);
-                    stream = new ByteArrayOutputStream();
-                    albumArt.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    track.setAlbumArt(stream.toByteArray());
+                    deletedTracksList = trackList;
                 }
+            } else {
+                deletedTracksList = trackList;
+            }
 
-                if(newFileNamesList.contains(fileName)) {
-                    newTracksList.add(track);
+            //Iterating trackList to create list of deleted tracks
+            if(deletedFileNamesList != null && !deletedFileNamesList.isEmpty()) {
+                deletedTracksList = new ArrayList<Track>();
+                trackListIterator = trackList.iterator();
+
+                while(trackListIterator.hasNext()) {
+                    track = trackListIterator.next();
+
+                    if(deletedFileNamesList.contains(track.getFileName())) {
+                        deletedTracksList.add(track);
+                    }
                 }
             }
 
-            trackListIterator = trackList.iterator();
+            if((newTracksList != null && !newTracksList.isEmpty()) ||
+                    (deletedTracksList != null && !deletedTracksList.isEmpty())) {
+                map = new HashMap<String, ArrayList<Track>>();
+                map.put(MediaPlayerConstants.KEY_NEW_TRACKS_LIST, newTracksList);
+                map.put(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST, deletedTracksList);
 
-            while(trackListIterator.hasNext()) {
-                track = trackListIterator.next();
+                if(newTracksList != null && !newTracksList.isEmpty()) {
+                    Log.d("New tracks", String.valueOf(newTracksList.size()));
+                }
 
-                if(deletedFileNamesList.contains(track.getFileName())) {
-                    deletedTracksList.add(track);
+                if(deletedTracksList != null && !deletedTracksList.isEmpty()) {
+                    Log.d("Deleted tracks", String.valueOf(deletedTracksList.size()));
                 }
             }
-
-            map.put(MediaPlayerConstants.KEY_NEW_TRACKS_LIST, newTracksList);
-            map.put(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST, deletedTracksList);
         } catch(Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());

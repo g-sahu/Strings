@@ -6,6 +6,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -513,7 +514,7 @@ public class MediaplayerDAO {
         toast.show();
     }
 
-    public void addTracksToLibrary(ArrayList<Track> trackList) {
+    public void addTracksToLibrary(@NonNull ArrayList<Track> trackList) {
         Track track;
         int c;
         long tracksAdded = 0;
@@ -524,7 +525,7 @@ public class MediaplayerDAO {
         //Inserting tracks in table 'Tracks'
         while(trackIterator.hasNext()) {
             track = trackIterator.next();
-            c = 1;
+            c = SQLConstants.ONE;
 
             insertStmt.bindString(c++, track.getTrackTitle());
             insertStmt.bindLong(c++, track.getTrackIndex());
@@ -541,7 +542,9 @@ public class MediaplayerDAO {
             Log.d(LOG_TAG_SQL, insertStmt.toString());
 
             try {
-                tracksAdded = tracksAdded + insertStmt.executeInsert();
+                insertStmt.executeInsert();
+                insertStmt.clearBindings();
+                ++tracksAdded;
             } catch (SQLException sqle) {
                 sqle.printStackTrace();
                 Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
@@ -551,7 +554,7 @@ public class MediaplayerDAO {
         Log.d("Tracks added to library", String.valueOf(tracksAdded));
     }
 
-    public void deleteTracksFromLibrary(ArrayList<Track> deletedTracksList) {
+    public void deleteTracksFromLibrary(@NonNull ArrayList<Track> deletedTracksList) {
         Track track;
         long trackID;
         int tracksDeleted = 0;
@@ -562,10 +565,12 @@ public class MediaplayerDAO {
         while(deletedTracksListIterator.hasNext()) {
             track = deletedTracksListIterator.next();
             trackID = track.getTrackID();
-            deleteStmt.bindLong(1, trackID);
+            deleteStmt.bindLong(SQLConstants.ONE, trackID);
+
             Log.d(LOG_TAG_SQL, SQLConstants.SQL_DELETE_FROM_TRACKS);
-            tracksDeleted = tracksDeleted + deleteStmt.executeUpdateDelete();
+            deleteStmt.executeUpdateDelete();
             deleteStmt.clearBindings();
+            ++tracksDeleted;
         }
 
         Log.d("Tracks deleted", String.valueOf(tracksDeleted));
@@ -707,18 +712,18 @@ public class MediaplayerDAO {
         ArrayList<Track> trackList = null;
         Track track;
         Cursor tracksCursor =  null;
-        int c;
+        int c, trackListSize = 0;
 
         try {
             Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
             tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
 
-            if(tracksCursor.getCount() > 0) {
+            if(tracksCursor != null && tracksCursor.getCount() > 0) {
                 trackList = new ArrayList<Track>();
                 tracksCursor.moveToFirst();
 
                 while(!tracksCursor.isAfterLast()) {
-                    c = 0;
+                    c = SQLConstants.ZERO;
                     track = new Track();
                     track.setTrackID(tracksCursor.getInt(c++));
                     track.setFileName(tracksCursor.getString(c));
@@ -726,16 +731,19 @@ public class MediaplayerDAO {
                     trackList.add(track);
                     tracksCursor.moveToNext();
                 }
+
+                trackListSize = trackList.size();
             }
         } catch(Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
         } finally {
-            if (tracksCursor != null) {
+            if(tracksCursor != null) {
                 tracksCursor.close();
             }
         }
 
+        Log.d("Tracks fetched from db", String.valueOf(trackListSize));
         return trackList;
     }
 }

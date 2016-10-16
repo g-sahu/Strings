@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     android:id="@+id/songsFragment">
 
+    <TextView
+        android:id="@+id/emptyLibraryMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_library"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:visibility="gone"/>
+
     <ListView android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />

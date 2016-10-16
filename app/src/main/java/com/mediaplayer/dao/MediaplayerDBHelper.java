@@ -13,6 +13,7 @@ import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.SQLConstants;
 import com.mediaplayer.utilities.Utilities;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MediaplayerDBHelper extends SQLiteOpenHelper {
@@ -27,6 +28,12 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        SQLiteStatement insertStmt = null;
+        ArrayList<Track> trackList;
+        Iterator<Track> trackIterator;
+        Track track;
+        int c, tracksInserted = 0;
+
         try {
             Log.d(LOG_TAG_SQL, SQLConstants.SQL_CREATE_TRACKS);
             db.execSQL(SQLConstants.SQL_CREATE_TRACKS);
@@ -38,49 +45,62 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
             db.execSQL(SQLConstants.SQL_CREATE_PLAYLIST_DETAIL);
 
             //Creating default playlist 'Favourites'
-            SQLiteStatement stmt = db.compileStatement(SQLConstants.SQL_INSERT_PLAYLIST);
-            stmt.bindLong(1, SQLConstants.PLAYLIST_INDEX_FAVOURITES);
-            stmt.bindString(2, SQLConstants.PLAYLIST_TITLE_FAVOURITES);
-            stmt.bindLong(3, SQLConstants.ZERO);
-            stmt.bindLong(4, SQLConstants.ZERO);
-            stmt.bindString(5, Utilities.getCurrentDate());
-            Log.d(LOG_TAG_SQL, stmt.toString());
-            stmt.execute();
+            insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_PLAYLIST);
+
+            insertStmt.bindLong(1, SQLConstants.PLAYLIST_INDEX_FAVOURITES);
+            insertStmt.bindString(2, SQLConstants.PLAYLIST_TITLE_FAVOURITES);
+            insertStmt.bindLong(3, SQLConstants.ZERO);
+            insertStmt.bindLong(4, SQLConstants.ZERO);
+            insertStmt.bindString(5, Utilities.getCurrentDate());
+
+            Log.d(LOG_TAG_SQL, insertStmt.toString());
+            insertStmt.execute();
+
+            //Fetching tracks from storage
+            trackList = MediaLibraryManager.populateTrackInfoList(resources);
 
             //Inserting tracks in table 'Tracks'
-            stmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
-            Iterator<Track> trackIterator = MediaLibraryManager.populateTrackInfoList(resources).iterator();
-            Track track;
-            int c;
+            insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
 
-            while(trackIterator.hasNext()) {
-                track = trackIterator.next();
-                c = 1;
+            if(trackList != null && !trackList.isEmpty()) {
+                trackIterator = trackList.iterator();
 
-                stmt.bindString(c++, track.getTrackTitle());
-                stmt.bindLong(c++, track.getTrackIndex());
-                stmt.bindString(c++, track.getFileName());
-                stmt.bindLong(c++, track.getTrackDuration());
-                stmt.bindLong(c++, track.getFileSize());
-                stmt.bindString(c++, track.getAlbumName());
-                stmt.bindString(c++, track.getArtistName());
-                stmt.bindBlob(c++, track.getAlbumArt());
-                stmt.bindString(c++, track.getTrackLocation());
-                stmt.bindLong(c++, track.isFavSw());
-                stmt.bindString(c, Utilities.getCurrentDate());
+                while (trackIterator.hasNext()) {
+                    track = trackIterator.next();
+                    c = SQLConstants.ONE;
 
-                Log.d(LOG_TAG_SQL, stmt.toString());
+                    insertStmt.bindString(c++, track.getTrackTitle());
+                    insertStmt.bindLong(c++, track.getTrackIndex());
+                    insertStmt.bindString(c++, track.getFileName());
+                    insertStmt.bindLong(c++, track.getTrackDuration());
+                    insertStmt.bindLong(c++, track.getFileSize());
+                    insertStmt.bindString(c++, track.getAlbumName());
+                    insertStmt.bindString(c++, track.getArtistName());
+                    insertStmt.bindBlob(c++, track.getAlbumArt());
+                    insertStmt.bindString(c++, track.getTrackLocation());
+                    insertStmt.bindLong(c++, track.isFavSw());
+                    insertStmt.bindString(c, Utilities.getCurrentDate());
 
-                try {
-                    stmt.execute();
-                } catch (SQLException sqle) {
-                    sqle.printStackTrace();
-                    Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
+                    Log.d(LOG_TAG_SQL, insertStmt.toString());
+
+                    try {
+                        insertStmt.executeInsert();
+                        ++tracksInserted;
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                        Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
+                    }
                 }
+
+                Log.d("Tracks added to library", String.valueOf(tracksInserted));
             }
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(insertStmt != null) {
+                insertStmt.close();
+            }
         }
     }
 

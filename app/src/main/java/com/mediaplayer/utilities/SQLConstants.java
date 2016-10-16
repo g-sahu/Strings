@@ -21,6 +21,7 @@ public final class SQLConstants {
     public static final int FAV_SW_YES = 1;
     public static final int FAV_SW_NO = 0;
     public static final int ZERO = 0;
+    public static final int ONE = 1;
 
     // Create tables
     public static final String SQL_CREATE_TRACKS =
