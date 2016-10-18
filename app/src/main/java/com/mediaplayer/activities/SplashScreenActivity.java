@@ -17,7 +17,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     private static String LOG_TAG = "SplashScreenActivity";
     private Intent intent;
 
-    // Storage Permissions
+    //Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final String[] PERMISSIONS_STORAGE = { Manifest.permission.WRITE_EXTERNAL_STORAGE };
 
@@ -25,7 +25,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-
         intent = new Intent(this, MediaManagerService.class);
 
         if(hasPermissions()) {

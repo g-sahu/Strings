@@ -610,18 +610,27 @@ public class MediaplayerDAO {
 
     public ArrayList<Integer> getTrackIDsForPlaylist(int playlistID) {
         ArrayList<Integer> trackList = null;
+        Cursor cursor = null;
         String args[] = {String.valueOf(playlistID)};
 
-        Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
-        Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);
+        try {
+            Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
+            cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);
 
-        if(cursor != null && cursor.getCount() > 0) {
-            trackList = new ArrayList<Integer>();
-            cursor.moveToFirst();
+            if(cursor != null && cursor.getCount() > 0) {
+                trackList = new ArrayList<Integer>();
+                cursor.moveToFirst();
 
-            while(!cursor.isAfterLast()) {
-                trackList.add(cursor.getInt(0));
-                cursor.moveToNext();
+                while (!cursor.isAfterLast()) {
+                    trackList.add(cursor.getInt(SQLConstants.ZERO));
+                    cursor.moveToNext();
+                }
+            }
+        } catch(Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(cursor != null) {
+                cursor.close();
             }
         }
 

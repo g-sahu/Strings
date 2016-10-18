@@ -596,6 +596,10 @@ public class MediaLibraryManager {
         return map;
     }
 
+    public static boolean isUserPlaylistEmpty() {
+        return (selectedPlaylist == null || selectedPlaylist.isEmpty());
+    }
+
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         return (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()));

@@ -21,7 +21,7 @@ public class MessageConstants {
     public static final String ERROR = "An error occurred!";
     public static final String ERROR_NO_TRACKS_ADDED = "There are no songs in the Library.";
     public static final String ERROR_NO_PLAYLIST_CREATED = "You haven't created any playlist yet!";
-    public static final String ERROR_NO_PLAYLIST = "There are no other playists to add to.";
+    public static final String ERROR_NO_PLAYLIST = "There are no other playlists to add to.";
     public static final String ERROR_NO_TRACK = "There are no other songs to add.";
     public static final String ERROR_DUPLICATE_TRACK_FAVOURITES = "Song already added to Favourites!";
     public static final String ERROR_DUPLICATE_TRACK_PLAYLIST = "Song already added to selected playlist(s)!";

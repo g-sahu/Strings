@@ -19,9 +19,6 @@ public class MediaManagerService extends IntentService {
         Log.d("MediaManagerService", "Inside MediaManagerService");
         MediaLibraryManager.init(this);
 
-        Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
-        toast.show();
-
         Intent broadcastIntent = new Intent();
         // TODO: 25-Sep-16 Change this intent in AndroidManifest.xml
         broadcastIntent.setAction("com.tutorialspoint.CUSTOM_INTENT");

@@ -17,6 +17,7 @@ import com.mediaplayer.dao.MediaplayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
+import com.mediaplayer.utilities.SQLConstants;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,59 +25,74 @@ import java.util.Iterator;
 public class SelectTrackDialogFragment extends DialogFragment {
     private Context context;
     private ArrayList<Track> selectedTracks;
-    private ArrayList<Track> trackInfoList = MediaLibraryManager.getTrackInfoList();
+    private ArrayList<Track> tracksInLibrary = MediaLibraryManager.getTrackInfoList();
     private Playlist selectedPlaylist;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        context = getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        Bundle args = getArguments();
-        selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
-        ArrayList<Integer> addedTracks;
-        int size = trackInfoList.size(), addedTracksSize, c = 0, listLength;
+        ArrayList<Integer> tracksInPlaylist;
+        final ArrayList<Track> tracksToDisplay;
+        Iterator<Track> tracksIterator;
         String list[];
         Track track;
         int trackID;
 
-        //Checking if playlist size > 1 i.e. the user has created any custom playlist
-        if(!trackInfoList.isEmpty()) {
-            MediaplayerDAO dao = new MediaplayerDAO(context);
-            addedTracks = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
+        context = getContext();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        Bundle args = getArguments();
+        selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
+        int size = tracksInLibrary.size(), trackInPlaylistSize, c = 0, listLength;
 
-            if(addedTracks != null) {
-                addedTracksSize = addedTracks.size();
+        //Checking if playlist size > 1 i.e. the user has created any custom playlist
+        if(!tracksInLibrary.isEmpty()) {
+            MediaplayerDAO dao = new MediaplayerDAO(context);
+            tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
+
+            if(tracksInPlaylist != null && !tracksInPlaylist.isEmpty()) {
+                trackInPlaylistSize = tracksInPlaylist.size();
             } else {
-                addedTracksSize = 0;
+                trackInPlaylistSize = 0;
+            }
+
+            //Creating list of tracks to display in multiselect dialog
+            tracksToDisplay = new ArrayList<>();
+
+            //Iterating tracks in library to remove tracks already added to playlist
+            tracksIterator = tracksInLibrary.iterator();
+
+            while(tracksIterator.hasNext()) {
+                track = tracksIterator.next();
+                trackID = track.getTrackID();
+
+                if(trackInPlaylistSize == SQLConstants.ZERO || !tracksInPlaylist.contains(trackID)) {
+                    tracksToDisplay.add(track);
+                }
             }
 
             selectedTracks = new ArrayList<Track>();
-            list = new String[size - addedTracksSize];
+            list = new String[tracksToDisplay.size()];
             listLength = list.length;
 
+            //Setting the title of the dialog window
             builder.setTitle(MediaPlayerConstants.TITLE_SELECT_TRACKS);
 
             if(listLength != 0) {
-                Iterator<Track> tracksIterator = trackInfoList.iterator();
+                tracksIterator = tracksToDisplay.iterator();
 
                 while(tracksIterator.hasNext()) {
                     track = tracksIterator.next();
-                    trackID = track.getTrackID();
-
-                    if(addedTracksSize == 0 || !addedTracks.contains(trackID)) {
-                        list[c++] = track.getTrackTitle();
-                    }
+                    list[c++] = track.getTrackTitle();
                 }
 
                 builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        Track track = trackInfoList.get(which);
+                        Track track = tracksToDisplay.get(which);
 
                         if(isChecked) {
                             selectedTracks.add(track);
-                        } else if (selectedTracks.contains(track)) {
+                        } else if(selectedTracks.contains(track)) {
                             selectedTracks.remove(track);
                         }
                     }
@@ -92,6 +108,9 @@ public class SelectTrackDialogFragment extends DialogFragment {
 
                             //Updating list view adapter
                             updatePlaylistsAdapter();
+
+                            //Removing added tracks from tracksInLibrary
+                            tracksToDisplay.removeAll(selectedTracks);
                         }
                     }
                 });

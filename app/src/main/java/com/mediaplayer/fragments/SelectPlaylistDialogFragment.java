@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.widget.ListView;
 
+import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.dao.MediaplayerDAO;
@@ -87,6 +89,9 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                             //Add track to selected playlists
                             MediaplayerDAO dao = new MediaplayerDAO(context);
                             dao.addToPlaylists(selectedPlaylists, selectedTrack);
+
+                            //Updating list view adapter
+                            updatePlaylistsAdapter();
                         }
                     }
                 });
@@ -119,5 +124,12 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
         }
 
         return builder.create();
+    }
+
+    private void updatePlaylistsAdapter() {
+        PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
+        ListView listView = PlaylistsFragment.listView;
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 }

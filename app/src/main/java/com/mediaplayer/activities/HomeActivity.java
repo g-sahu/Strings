@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mediaplayer.R;
 import com.mediaplayer.adapters.HomePagerAdapter;
@@ -30,6 +31,7 @@ import com.mediaplayer.fragments.SelectTrackDialogFragment;
 import com.mediaplayer.fragments.SongsFragment;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
+import com.mediaplayer.utilities.MessageConstants;
 import com.mediaplayer.utilities.SQLConstants;
 
 import java.util.ArrayList;
@@ -48,12 +50,15 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         context = this;
 
+        Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
+        toast.show();
+
         supportFragmentManager = getSupportFragmentManager();
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         FragmentPagerAdapter adapterViewPager = new HomePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapterViewPager);
 
-        // Give the TabLayout the ViewPager
+        //Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         favouritesPlaylist = MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES);
@@ -101,7 +106,7 @@ public class HomeActivity extends AppCompatActivity {
         selectPlaylistDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
 
         //Updating list view adapter
-        updatePlaylistsAdapter();
+        //updatePlaylistsAdapter();
     }
 
     //Add or remove from favourites menu option
@@ -170,9 +175,6 @@ public class HomeActivity extends AppCompatActivity {
         args.putSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
         selectTrackDialogFragment.setArguments(args);
         selectTrackDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TRACKS);
-
-        //Updating list view adapter
-        //updateSongsListAdapter();
     }
 
     //Rename playlist menu option

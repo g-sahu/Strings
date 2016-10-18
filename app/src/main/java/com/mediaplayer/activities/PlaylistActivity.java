@@ -133,6 +133,9 @@ public class PlaylistActivity extends AppCompatActivity {
         MediaplayerDAO dao = new MediaplayerDAO(this);
         dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
+        //Sorting the trackList for the selected playlist
+        MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+
         //Removing track from selected playlist if it is default playlist 'Favourites'
         if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
             MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
@@ -166,7 +169,12 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void updatePlaylistsAdapter() {
-        PlaylistsAdapter adapter = new PlaylistsAdapter(this, MediaLibraryManager.getPlaylistInfoList());
+        if(MediaLibraryManager.isUserPlaylistEmpty()) {
+            TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
+            textView.setVisibility(View.VISIBLE);
+        }
+
+        PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());
         ListView listView = PlaylistsFragment.listView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
