@@ -24,5 +24,6 @@
     <string name="add_to_favourites">Add to Favourites</string>
     <string name="remove_from_library">Remove from Library</string>
     <string name="empty_library">No music files found</string>
+    <string name="playlist_name">Playlist name</string>
 
 </resources>

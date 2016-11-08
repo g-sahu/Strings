@@ -25,6 +25,8 @@ public class SplashScreenActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+        Log.d(LOG_TAG, "SplashScreenActivity created");
+
         intent = new Intent(this, MediaManagerService.class);
 
         if(hasPermissions()) {
@@ -63,7 +65,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopService(intent);
+        //stopService(intent);
         Log.d(LOG_TAG, "SplashScreenActivity destroyed");
     }
 }

@@ -44,15 +44,13 @@ public class MediaLibraryManager {
         ArrayList<Track> trackList = dao.getTracksFromLibrary();
 
         //Get all mp3 files from storage
-        //if(trackList != null && !trackList.isEmpty()) {
-            map = getUpdatedTracks(trackList, context.getResources());
+        map = getUpdatedTracks(trackList, context.getResources());
 
-            //Check if map is not null. If null, it means there has been no change to the songs library
-            if(map != null) {
-                newTracksList = map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
-                deletedTracksList = map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
-            }
-        //}
+        //Check if map is not null. If null, it means there has been no change to the songs library
+        if(map != null) {
+            newTracksList = map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
+            deletedTracksList = map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+        }
 
         //Insert new tracks in db
         if(newTracksList != null && !newTracksList.isEmpty()) {
@@ -66,7 +64,11 @@ public class MediaLibraryManager {
 
         //Getting list of all tracks from db and sorting them
         trackInfoList = dao.getTracks();
-        sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+
+        if(trackInfoList != null) {
+            tracklistSize = trackInfoList.size();
+            sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+        }
 
         //Updating track indices in db to keep in sync with trackInfoList
         dao.updateTrackIndices();

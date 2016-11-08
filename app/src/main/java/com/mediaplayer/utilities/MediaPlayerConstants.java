@@ -34,6 +34,10 @@ public class MediaPlayerConstants {
     public static final String TAG_CREATE_PLAYLIST = "CREATE_PLAYLIST";
     public static final String TAG_RENAME_PLAYLIST = "RENAME_PLAYLIST";
     public static final String TAG_ADD_TRACKS = "ADD_TRACKS";
+    public static final String TAG_MEDIA_SESSION = "MEDIA_SESSION";
+    public static final String TAG_SONGS_LIST_VIEW = "SONGS_LIST_VIEW";
+    public static final String TAG_MEDIAPLAYER_ACTIVITY = "MEDIAPLAYER_ACTIVITY";
+    public static final String TAG_PLAYLIST_ACTIVITY = "PLAYLIST_ACTIVITY";
 
     public static final String KEY_PLAYLIST_LIBRARY = "LIBRARY_PLAYLIST";
     public static final String KEY_PLAYLIST_OTHER = "OTHER_PLAYLIST";

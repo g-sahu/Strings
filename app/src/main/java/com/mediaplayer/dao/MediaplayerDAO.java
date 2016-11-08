@@ -666,30 +666,36 @@ public class MediaplayerDAO {
 
     //Instantiates a new track list and populates it from table 'Tracks'
     public ArrayList<Track> getTracks() {
-        ArrayList<Track> trackInfoList = new ArrayList<Track>();
+        ArrayList<Track> trackInfoList = null;
+        Track track;
+        int c;
+
         Log.d(LOG_TAG_SQL, SQLConstants.SQL_SELECT_TRACKS);
         Cursor tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACKS, null);
         tracksCursor.moveToFirst();
-        int c;
 
-        while(!tracksCursor.isAfterLast()) {
-            Track track = new Track();
-            c = 0;
+        if(tracksCursor.getCount() > 0) {
+            trackInfoList = new ArrayList<Track>();
 
-            track.setTrackID(tracksCursor.getInt(c++));
-            track.setTrackTitle(tracksCursor.getString(c++));
-            track.setTrackIndex(tracksCursor.getInt(c++));
-            track.setFileName(tracksCursor.getString(c++));
-            track.setTrackDuration(tracksCursor.getInt(c++));
-            track.setFileSize(tracksCursor.getInt(c++));
-            track.setAlbumName(tracksCursor.getString(c++));
-            track.setArtistName(tracksCursor.getString(c++));
-            track.setAlbumArt(tracksCursor.getBlob(c++));
-            track.setTrackLocation(tracksCursor.getString(c++));
-            track.setFavSw(tracksCursor.getInt(c));
+            while (!tracksCursor.isAfterLast()) {
+                track = new Track();
+                c = 0;
 
-            trackInfoList.add(track);
-            tracksCursor.moveToNext();
+                track.setTrackID(tracksCursor.getInt(c++));
+                track.setTrackTitle(tracksCursor.getString(c++));
+                track.setTrackIndex(tracksCursor.getInt(c++));
+                track.setFileName(tracksCursor.getString(c++));
+                track.setTrackDuration(tracksCursor.getInt(c++));
+                track.setFileSize(tracksCursor.getInt(c++));
+                track.setAlbumName(tracksCursor.getString(c++));
+                track.setArtistName(tracksCursor.getString(c++));
+                track.setAlbumArt(tracksCursor.getBlob(c++));
+                track.setTrackLocation(tracksCursor.getString(c++));
+                track.setFavSw(tracksCursor.getInt(c));
+
+                trackInfoList.add(track);
+                tracksCursor.moveToNext();
+            }
         }
 
         tracksCursor.close();

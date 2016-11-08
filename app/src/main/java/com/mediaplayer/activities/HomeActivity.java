@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ import com.mediaplayer.fragments.PlaylistsFragment;
 import com.mediaplayer.fragments.SelectPlaylistDialogFragment;
 import com.mediaplayer.fragments.SelectTrackDialogFragment;
 import com.mediaplayer.fragments.SongsFragment;
+import com.mediaplayer.services.MediaPlayerService;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
@@ -43,13 +45,15 @@ public class HomeActivity extends AppCompatActivity {
     private static Playlist favouritesPlaylist;
     private FragmentManager supportFragmentManager;
     private static Context context;
+    private static String LOG_TAG = "HomeActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        context = this;
+        Log.d(LOG_TAG, "HomeActivity created");
 
+        context = this;
         Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
         toast.show();
 
@@ -209,7 +213,7 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
         intent.setAction(MediaPlayerConstants.PLAY);
-        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, "SONGS_LIST_VIEW");
+        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
         startActivity(intent);
     }
 
@@ -237,5 +241,17 @@ public class HomeActivity extends AppCompatActivity {
         ListView listView = PlaylistsFragment.listView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if(isTaskRoot()) {
+            Intent intent = new Intent(this, MediaPlayerService.class);
+            stopService(intent);
+        }
+
+        Log.d(LOG_TAG, "HomeActivity destroyed");
     }
 }

@@ -6,8 +6,6 @@ public final class MediaplayerContract {
     public static final String DATABASE_NAME = "Mediaplayer";
     public static final int DATABASE_VERSION = 1;
 
-    // To prevent someone from accidentally instantiating the contract class,
-    // give it an empty constructor.
     public MediaplayerContract() {}
 
     public static abstract class Tracks implements BaseColumns {

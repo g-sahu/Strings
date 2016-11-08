@@ -62,7 +62,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_player);
-        Log.d(LOG_TAG, "START: The onCreate() event");
+        Log.d(LOG_TAG, "MediaPlayerActivity created");
 
         context = getApplicationContext();
         Intent intent = getIntent();
@@ -80,10 +80,12 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                     break;
 
                 case MediaPlayerConstants.PAUSE:
+                    playButton.setTag(R.id.playButton, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
                     playButton.performClick();
                     break;
 
                 case MediaPlayerConstants.PLAY:
+                    playButton.setTag(R.id.playButton, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
                     playButton.performClick();
                     break;
 
@@ -155,36 +157,35 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     }
 
     public void play(View view) {
+        Object tag;
         mp = MediaPlayerService.getMp();
+
+        if(view != null) {
+            tag = view.getTag(R.id.playButton);
+
+            if(tag != null) {
+                origin = tag.toString();
+                view.setTag(R.id.playButton, null);
+            } else {
+                origin = MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY;
+            }
+        }
 
         if(mp != null) {
             if(mp.isPlaying()) {
-                /*if("SONGS_LIST_VIEW".equals(origin)) {
-                    mp.reset();
-                    playSong(selectedTrack);
-                } else {
-                    // If already playing, pause the current track
-                    mp.pause();
-                    isPaused = true;
-                    playButton.setImageResource(R.drawable.play_button);
-                    mService.stopForeground(false);
-                    Log.d(LOG_TAG, "Is foreground?: false");
-                    mService.createNotification(selectedTrack);
-                }*/
-
                 switch(origin) {
-                    case "SONGS_LIST_VIEW":
+                    case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
                         mp.reset();
                         playSong(selectedTrack);
                         break;
 
-                    case "PLAYLIST_ACTIVITY":
+                    case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
                         mp.reset();
                         playSong(selectedTrack);
                         break;
 
-                    default:
-                        // If already playing, pause the current track
+                    case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
+                        //If already playing, pause the current track
                         mp.pause();
                         isPaused = true;
                         playButton.setImageResource(R.drawable.play_button);
@@ -232,10 +233,14 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             } else {
                 //Stop playback
                 playButton.setImageResource(R.drawable.play_button);
+                toastText = MessageConstants.END_OF_PLAYLIST;
+                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
+                toast.show();
+                mService.createNotification(selectedTrack);
                 return;
             }
         } else {
-            //Else, play the previous song
+            //Else, play the next song in the playlist
             selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, ++currentIndex);
         }
 
@@ -263,6 +268,10 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             } else {
                 //Stop playback
                 playButton.setImageResource(R.drawable.play_button);
+                toastText = MessageConstants.BEG_OF_PLAYLIST;
+                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
+                toast.show();
+                mService.createNotification(selectedTrack);
                 return;
             }
         } else {
@@ -367,16 +376,16 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         Intent intent = new Intent(this, MediaPlayerService.class);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
 
-        //Bind to MediaPlayerService
         if(MediaPlayerService.isServiceRunning) {
             if(!MediaPlayerService.isServiceBound) {
+                //Binding to MediaPlayerService
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             } else if(isPaused){
+                mService.playSong(selectedTrack);
                 mService.startForeground(1, mService.createNotification(selectedTrack));
-                mService.playSong(selectedTrack);
             } else {
-                mService.createNotification(selectedTrack);
                 mService.playSong(selectedTrack);
+                mService.createNotification(selectedTrack);
             }
         } else {
             Log.d(LOG_TAG, "Service not running");
@@ -551,8 +560,12 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             Log.d(LOG_TAG, "Service connected: " + mService);
             mBound = true;
 
-            mService.playSong(selectedTrack);
-            mService.createNotification(selectedTrack);
+            MediaPlayer mp = MediaPlayerService.getMp();
+
+            if(MediaPlayerService.isServiceRunning) {
+                mService.playSong(selectedTrack);
+                mService.createNotification(selectedTrack);
+            }
         }
 
         @Override

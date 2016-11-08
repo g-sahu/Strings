@@ -20,6 +20,7 @@ import com.mediaplayer.R;
 import com.mediaplayer.activities.MediaPlayerActivity;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.utilities.MediaPlayerConstants;
+import com.mediaplayer.utilities.SQLConstants;
 
 import java.io.IOException;
 
@@ -102,12 +103,12 @@ public class MediaPlayerService extends IntentService {
         byte data[] = selectedTrack.getAlbumArt();
 
         if(data != null) {
-            bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+            bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
         }
 
         Notification.Builder builder = new Notification.Builder(this);
         Notification.MediaStyle mediaStyle = new Notification.MediaStyle();
-        MediaSession mMediaSession = new MediaSession(this, "Session");
+        MediaSession mMediaSession = new MediaSession(this, MediaPlayerConstants.TAG_MEDIA_SESSION);
 
         //Creating Icons for actions
         Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
@@ -116,7 +117,7 @@ public class MediaPlayerService extends IntentService {
         Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
 
         //Setting mediastyle attributes
-        mediaStyle.setShowActionsInCompactView(1);
+        mediaStyle.setShowActionsInCompactView(SQLConstants.ONE);
         mediaStyle.setMediaSession(mMediaSession.getSessionToken());
 
         //Setting builder attributes
@@ -141,14 +142,14 @@ public class MediaPlayerService extends IntentService {
         pauseIntent.setAction(MediaPlayerConstants.PAUSE).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         playIntent.setAction(MediaPlayerConstants.PLAY).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         nextIntent.setAction(MediaPlayerConstants.NEXT).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        deleteIntent.setAction("STOP");
+        deleteIntent.setAction(MediaPlayerConstants.STOP);
 
         //Creating pending intents
-        PendingIntent prevPendingIntent = PendingIntent.getActivity(this, 0, prevIntent, 0);
-        PendingIntent pausePendingIntent = PendingIntent.getActivity(this, 0, pauseIntent, 0);
-        PendingIntent playPendingIntent = PendingIntent.getActivity(this, 0, playIntent, 0);
-        PendingIntent nextPendingIntent = PendingIntent.getActivity(this, 0, nextIntent, 0);
-        PendingIntent deletePendingIntent = PendingIntent.getActivity(this, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent prevPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, prevIntent, SQLConstants.ZERO);
+        PendingIntent pausePendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, pauseIntent, SQLConstants.ZERO);
+        PendingIntent playPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, playIntent, SQLConstants.ZERO);
+        PendingIntent nextPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, nextIntent, SQLConstants.ZERO);
+        PendingIntent deletePendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         //Creating notification actions
         Notification.Action prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
@@ -171,7 +172,7 @@ public class MediaPlayerService extends IntentService {
         //Building notification
         Notification notification = builder.build();
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, notification);
+        mNotificationManager.notify(SQLConstants.ONE, notification);
 
         Log.d(LOG_TAG, "Notification created");
         return notification;
