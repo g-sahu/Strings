@@ -38,8 +38,8 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private static Track selectedTrack;
     private static String selectedPlaylist;
     private static SeekBar songProgressBar;
-    private static TextView titleBar, artistBar, timeElapsed, trackDuration;
-    private static ImageView albumArt;
+    private static TextView titleBar, artistBar, albumBar, timeElapsed, trackDuration;
+    private static ImageView albumArt, albumArtThumbnail;
     private static String songTitle, albumName, artistName, songDuration;
 
     private Handler mHandler = new Handler();
@@ -49,7 +49,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private int playlistSize;
     private byte data[];
     private Bitmap bm;
-    private LinearLayout albumArtLayout;
+    //private LinearLayout albumArtLayout;
     private Toast toast;
     private Context context;
     private String toastText;
@@ -209,8 +209,6 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                 mService.startForeground(1, mService.createNotification(selectedTrack));
             }
         }
-
-        //mService.createNotification(selectedTrack);
     }
 
     public void next(View view) {
@@ -330,10 +328,12 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
         titleBar = (TextView) findViewById(R.id.titleBar);
         artistBar = (TextView) findViewById(R.id.artistBar);
+        albumBar = (TextView) findViewById(R.id.albumBar);
         timeElapsed = (TextView) findViewById(R.id.timeElapsed);
         trackDuration = (TextView) findViewById(R.id.trackDuration);
         albumArt = (ImageView) findViewById(R.id.albumArt);
-        albumArtLayout = (LinearLayout) findViewById(R.id.albumArtLayout);
+        albumArtThumbnail = (ImageView) findViewById(R.id.albumArtThumbnail);
+        //albumArtLayout = (LinearLayout) findViewById(R.id.albumArtLayout);
         songTitle = requestedTrack.getTrackTitle();
         albumName = requestedTrack.getAlbumName();
         artistName = requestedTrack.getArtistName();
@@ -364,8 +364,10 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
 
         titleBar.setText(songTitle);
         artistBar.setText(artistName);
+        albumBar.setText(albumName);
         trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
         albumArt.setImageBitmap(bm);
+        albumArtThumbnail.setImageBitmap(bm);
 
         Log.d(LOG_TAG, "Media Player initialized");
     }
@@ -484,11 +486,6 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String action = intent.getAction();
-
-        if(intent.hasExtra(MediaPlayerConstants.KEY_SELECTED_TRACK)) {
-            selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
-        }
-
         setIntent(intent);
         Log.d(LOG_TAG, action);
     }
@@ -498,13 +495,8 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         super.onResume();
         Log.d(LOG_TAG, "Mediaplayer activity resumed");
 
-        /*Intent intent = getIntent();
+        Intent intent = getIntent();
         String action = intent.getAction();
-
-        if(intent.hasExtra(MediaPlayerConstants.KEY_SELECTED_TRACK)) {
-            selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
-            initializePlayer(selectedTrack);
-        }
 
         if(action != null) {
             switch(action) {
@@ -529,7 +521,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                     mService.stopSelf();
                     break;
             }
-        }*/
+        }
     }
 
     @Override
@@ -559,8 +551,6 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             mService = binder.getService();
             Log.d(LOG_TAG, "Service connected: " + mService);
             mBound = true;
-
-            MediaPlayer mp = MediaPlayerService.getMp();
 
             if(MediaPlayerService.isServiceRunning) {
                 mService.playSong(selectedTrack);

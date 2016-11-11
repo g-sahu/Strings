@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.mediaplayer.activities.MediaPlayerActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mediaplayer.activities.MediaPlayerActivity"
     android:clickable="false"
     android:orientation="vertical"
     android:weightSum="1">
@@ -11,42 +12,83 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="0.1"
+        android:orientation="horizontal"
         android:weightSum="1"
         android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp">
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
 
-        <TextView android:id="@+id/titleBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/track_title"
-            android:textColor="#000000"
-            android:textIsSelectable="false"
-            android:textSize="18sp"
-            android:typeface="sans"
-            android:singleLine="true" />
+        <LinearLayout
+            android:id="@+id/albumArtTNLayout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:orientation="vertical"
+            android:background="#d9c6c6">
 
-        <TextView android:id="@+id/artistBar"
-            android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/albumArtThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/album_art_thumbnail" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/artist_name"
-            android:textColor="#000000"
-            android:textIsSelectable="false"
-            android:textSize="12sp"
-            android:typeface="sans"
-            android:singleLine="true" />
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/trackInfoBar"
+            android:baselineAligned="false">
+
+            <TextView
+                android:id="@+id/titleBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/track_title"
+                android:textColor="#000000"
+                android:textIsSelectable="false"
+                android:textSize="18sp"
+                android:typeface="sans"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/artistBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/artist_name"
+                android:textColor="#000000"
+                android:textIsSelectable="false"
+                android:textSize="12sp"
+                android:typeface="sans"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/albumBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/album_name"
+                android:textColor="#000000"
+                android:textIsSelectable="false"
+                android:textSize="12sp"
+                android:typeface="sans"
+                android:singleLine="true" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/albumArtLayout"
+    <LinearLayout
+        android:id="@+id/albumArtLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.9"
+        android:layout_weight="0.95"
         android:background="#d9c6c6">
 
-        <ImageView android:id="@+id/albumArt"
+        <ImageView
+            android:id="@+id/albumArt"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/album_art" />
@@ -57,11 +99,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.2" >
+        android:layout_weight="0.03">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="22dp"
+            android:layout_height="20dp"
             android:orientation="vertical">
 
             <SeekBar
@@ -76,94 +118,98 @@
 
         </LinearLayout>
 
-        <!--<LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="0.3"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_height="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp">
 
-            <TextView android:id="@+id/timeElapsed"
+            <TextView
+                android:id="@+id/timeElapsed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
-                android:text="@string/time_zero"/>
+                android:text="@string/time_zero"
+                android:layout_weight="0"/>
 
-            <TextView android:id="@+id/trackDuration"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/filler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text=""
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/trackDuration"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="end|center_vertical"
-                android:text="@string/time_zero"/>
+                android:text="@string/time_zero"
+                android:layout_weight="0"/>
 
-        </LinearLayout>-->
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="65dp"
+            android:layout_height="50dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginRight="10dp">
 
-            <TextView android:id="@+id/timeElapsed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start|center_vertical"
-                android:text="@string/time_zero"/>
-
-            <ImageButton android:id="@+id/repeatButton"
+            <ImageButton
+                android:id="@+id/repeatButton"
                 android:src="@drawable/ic_repeat_black_18dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/repeat_button"
-                android:onClick="repeat" />
+                android:onClick="repeat"
+                android:layout_weight="0.20" />
 
-            <ImageButton android:id="@+id/previousButton"
+            <ImageButton
+                android:id="@+id/previousButton"
                 android:src="@drawable/previous_button"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|start"
-                android:layout_weight="0.33"
+                android:layout_weight="0.20"
                 android:contentDescription="@string/previous_button"
                 android:onClick="previous"/>
 
-            <ImageButton android:id="@+id/playButton"
+            <ImageButton
+                android:id="@+id/playButton"
                 android:src="@drawable/play_button"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="0.33"
+                android:layout_weight="0.20"
                 android:contentDescription="@string/play_button"
                 android:onClick="play"/>
 
-            <ImageButton android:id="@+id/nextButton"
+            <ImageButton
+                android:id="@+id/nextButton"
                 android:src="@drawable/next_button"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|end"
-                android:layout_weight="0.33"
+                android:layout_weight="0.20"
                 android:contentDescription="@string/next_button"
                 android:onClick="next"/>
 
-            <ImageButton android:id="@+id/shuffleButton"
+            <ImageButton
+                android:id="@+id/shuffleButton"
                 android:src="@drawable/ic_shuffle_black_18dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/shuffle_button"
-                android:onClick="shuffle"/>
-
-            <TextView android:id="@+id/trackDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end|center_vertical"
-                android:text="@string/time_zero"/>
+                android:onClick="shuffle"
+                android:layout_weight="0.20" />
 
         </LinearLayout>
     </LinearLayout>
