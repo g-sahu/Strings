@@ -3,7 +3,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#ffffff">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -24,8 +25,9 @@
             android:layout_gravity="start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
             android:text="@string/track_title"
+            android:textSize="17sp"
+            android:textColor="#030303"
             android:layout_alignTop="@+id/albumThumbnail"
             android:layout_toRightOf="@+id/albumThumbnail"
             android:layout_toEndOf="@+id/albumThumbnail" />
@@ -36,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
+            android:textColor="#555555"
             android:text="@string/artist_name"
             android:layout_alignBottom="@+id/albumThumbnail"
             android:layout_alignLeft="@+id/trackTitle"
