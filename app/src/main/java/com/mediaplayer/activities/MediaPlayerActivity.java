@@ -26,12 +26,13 @@ import com.mediaplayer.services.MediaPlayerService;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
+import com.mediaplayer.utilities.SQLConstants;
 import com.mediaplayer.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBar.OnSeekBarChangeListener {
+public class MediaPlayerActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
     private static String LOG_TAG = "MediaPlayerActivity";
     private static MediaPlayer mp;
     private static ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
@@ -42,7 +43,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     private static ImageView albumArt, albumArtThumbnail;
     private static String songTitle, albumName, artistName, songDuration;
 
-    private Handler mHandler = new Handler();
+    private static Handler mHandler = new Handler();
     private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
     private boolean isPaused = false, isIdle = true, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
     private int currentIndex;
@@ -73,6 +74,77 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
         initializePlayer(selectedTrack);
 
+        // Listener for seek bar
+        songProgressBar.setOnSeekBarChangeListener(this);
+
+        if(mp != null) {
+            // Set listener for playback completion
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    //Checking if track is on loop
+                    if(isRepeatingCurrent) {
+                        mp.reset();
+                        isIdle = true;
+                        playSong(selectedTrack);
+
+                    //Checking if it is not the last track in the playlist
+                    } else if(!MediaLibraryManager.isLastTrack(selectedPlaylist, currentIndex)) {
+                        if(isShuffling) {
+                            // Play next random song in the playlist
+                            currentIndex = getNextIndex();
+                        } else {
+                            // Play next song in the playlist
+                            ++currentIndex;
+                        }
+
+                        mp.reset();
+                        isIdle = true;
+                        selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
+                        initializePlayer(selectedTrack);
+                        playSong(selectedTrack);
+
+                    //Checking if playlist is on loop
+                    } else if(isRepeatingAll) {
+                        if(isShuffling) {
+                            // Play next random song in the playlist
+                            currentIndex = getNextIndex();
+                        } else {
+                            // Play first song in the playlist
+                            currentIndex = 0;
+                        }
+
+                        mp.reset();
+                        isIdle = true;
+                        selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
+                        initializePlayer(selectedTrack);
+                        playSong(selectedTrack);
+
+                    //Else, if looping is off and it is the last track in the playlist
+                    } else {
+                        if(isShuffling) {
+                            currentIndex = getNextIndex();
+                            mp.reset();
+                            isIdle = true;
+                            selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
+                            initializePlayer(selectedTrack);
+                            playSong(selectedTrack);
+                        } else {
+                            //Stop playback
+                            //mp.stop();
+                            mp.reset();
+                            playButton.setImageResource(R.drawable.play_button);
+                            //songProgressBar.setProgress(0);
+                            stopProgressBar();
+                            isPaused = false;
+                            mService.stopForeground(false);
+                            mService.createNotification(selectedTrack);
+                        }
+                    }
+                }
+            });
+        }
+
         if(action != null) {
             switch(action) {
                 case MediaPlayerConstants.PREVIOUS:
@@ -98,60 +170,6 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         }
 
         playSong(selectedTrack);
-
-        // Listeners
-        //songProgressBar.setOnSeekBarChangeListener(this);
-
-        /*if(mp != null) {
-            // Set listener for playback completion
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    if (isRepeatingCurrent) {
-                        mp.reset();
-                        isIdle = true;
-                        //playSong(currentIndex);
-                        playSong(selectedTrack);
-
-                    } else if (currentIndex < playlistSize - 1) {
-                        if (isShuffling) {
-                            currentIndex = getNextIndex();
-                        } else {
-                            currentIndex = currentIndex + 1;
-                        }
-
-                        // Play next song in the playlist
-                        mp.reset();
-                        isIdle = true;
-                        playSong(currentIndex);
-                    } else if (isRepeatingAll) {
-                        if (isShuffling) {
-                            currentIndex = getNextIndex();
-                        } else {
-                            currentIndex = 0;
-                        }
-
-                        // Play first song in the playlist
-                        mp.reset();
-                        isIdle = true;
-                        playSong(currentIndex);
-                    } else {
-                        if (isShuffling) {
-                            currentIndex = getNextIndex();
-                            mp.reset();
-                            isIdle = true;
-                            playSong(currentIndex);
-                        } else {
-                            // Stop playback
-                            mp.stop();
-                            playButton.setImageResource(R.drawable.play_button);
-                            songProgressBar.setProgress(0);
-                            isPaused = false;
-                        }
-                    }
-                }
-            });
-        }*/
 
         Log.d(LOG_TAG, "END: The onCreate() event");
     }
@@ -206,7 +224,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                 mp.start();
                 isPaused = false;
                 playButton.setImageResource(R.drawable.pause_button);
-                mService.startForeground(1, mService.createNotification(selectedTrack));
+                mService.startForeground(SQLConstants.ONE, mService.createNotification(selectedTrack));
             }
         }
     }
@@ -234,7 +252,9 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                 toastText = MessageConstants.END_OF_PLAYLIST;
                 toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
                 toast.show();
+                mService.stopForeground(false);
                 mService.createNotification(selectedTrack);
+                stopProgressBar();
                 return;
             }
         } else {
@@ -269,7 +289,9 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                 toastText = MessageConstants.BEG_OF_PLAYLIST;
                 toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
                 toast.show();
+                mService.stopForeground(false);
                 mService.createNotification(selectedTrack);
+                stopProgressBar();
                 return;
             }
         } else {
@@ -378,13 +400,19 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         Intent intent = new Intent(this, MediaPlayerService.class);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
 
+        //Checking if service is running
         if(MediaPlayerService.isServiceRunning) {
+            //Checking if MediaplayerActivity is bound to service
             if(!MediaPlayerService.isServiceBound) {
                 //Binding to MediaPlayerService
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+            //Else, if service is running and bound and track is paused, resume playback
             } else if(isPaused){
                 mService.playSong(selectedTrack);
-                mService.startForeground(1, mService.createNotification(selectedTrack));
+                mService.startForeground(SQLConstants.ONE, mService.createNotification(selectedTrack));
+
+            //Else, if track is stoppped, play current track
             } else {
                 mService.playSong(selectedTrack);
                 mService.createNotification(selectedTrack);
@@ -396,18 +424,18 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         }
 
         playButton.setImageResource(R.drawable.pause_button);
-        //updateProgressBar();
+        updateProgressBar();
 
         Log.d(LOG_TAG, "END: The playSong() event");
     }
 
     //Update timer on seekbar
-    /*public void updateProgressBar() {
+    public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 10);
-    }*/
+    }
 
     //Background Runnable thread for updating progress bar
-    /*private Runnable mUpdateTimeTask = new Runnable() {
+    private static Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             long totalDuration = mp.getDuration();
             long currentDuration = mp.getCurrentPosition();
@@ -422,9 +450,9 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
             // Running this thread after 5 milliseconds
             mHandler.postDelayed(this, 5);
         }
-    };*/
+    };
 
-    /*@Override
+    @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
     }
@@ -444,7 +472,7 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
 
         mp.seekTo(currentPosition);
         updateProgressBar();
-    }*/
+    }
 
     public int getNextIndex() {
         boolean isPlayed;
@@ -486,17 +514,6 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String action = intent.getAction();
-        setIntent(intent);
-        Log.d(LOG_TAG, action);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "Mediaplayer activity resumed");
-
-        Intent intent = getIntent();
-        String action = intent.getAction();
 
         if(action != null) {
             switch(action) {
@@ -522,6 +539,15 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
                     break;
             }
         }
+
+        setIntent(intent);
+        Log.d(LOG_TAG, action);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG, "Mediaplayer activity resumed");
     }
 
     @Override
@@ -541,6 +567,13 @@ public class MediaPlayerActivity extends AppCompatActivity { //implements SeekBa
         }
 
         Log.d(LOG_TAG, "Mediaplayer activity destroyed");
+    }
+
+    public static void stopProgressBar() {
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        timeElapsed.setText(Utilities.milliSecondsToTimer(SQLConstants.ZERO));
+        songProgressBar.setProgress(SQLConstants.ZERO);
+
     }
 
     //Defines callbacks for service binding, passed to bindService()

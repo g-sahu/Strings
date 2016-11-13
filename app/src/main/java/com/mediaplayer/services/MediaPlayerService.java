@@ -13,14 +13,18 @@ import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.activities.MediaPlayerActivity;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.SQLConstants;
+import com.mediaplayer.utilities.Utilities;
 
 import java.io.IOException;
 
@@ -30,6 +34,10 @@ public class MediaPlayerService extends IntentService {
     public static boolean isServiceRunning;
     public static boolean isServiceBound;
     private IBinder mBinder = new MyBinder();
+
+    private static TextView timeElapsed;
+    private static SeekBar songProgressBar;
+    private Handler mHandler = new Handler();
 
     public MediaPlayerService() {
         super("MediaPlayerService");
@@ -46,13 +54,16 @@ public class MediaPlayerService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        /*timeElapsed = (TextView) findViewById(R.id.timeElapsed);
+        songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);*/
+
         Log.d(LOG_TAG, "Service created");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(LOG_TAG, "Starting service...");
-
         isServiceRunning = true;
 
         while(isServiceRunning) {}

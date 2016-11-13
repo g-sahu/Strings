@@ -3,6 +3,7 @@ package com.mediaplayer.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -248,6 +249,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onDestroy();
 
         if(isTaskRoot()) {
+            MediaPlayerActivity.stopProgressBar();
+
             Intent intent = new Intent(this, MediaPlayerService.class);
             stopService(intent);
         }
