@@ -23,26 +23,32 @@
         <TextView
             android:id="@+id/trackTitle"
             android:layout_gravity="start"
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:text="@string/track_title"
             android:textSize="17sp"
             android:textColor="#030303"
             android:layout_alignTop="@+id/albumThumbnail"
             android:layout_toRightOf="@+id/albumThumbnail"
-            android:layout_toEndOf="@+id/albumThumbnail" />
+            android:layout_toEndOf="@+id/albumThumbnail"
+            android:maxLines="1"
+            android:maxLength="30"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/artistName"
             android:layout_gravity="start"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="#555555"
             android:text="@string/artist_name"
             android:layout_alignBottom="@+id/albumThumbnail"
             android:layout_alignLeft="@+id/trackTitle"
-            android:layout_alignStart="@+id/trackTitle" />
+            android:layout_alignStart="@+id/trackTitle"
+            android:maxLines="1"
+            android:maxLength="35"
+            android:ellipsize="end"/>
     </RelativeLayout>
 
     <ImageButton
