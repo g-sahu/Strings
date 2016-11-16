@@ -131,10 +131,8 @@ public class MediaPlayerActivity extends AppCompatActivity implements SeekBar.On
                             playSong(selectedTrack);
                         } else {
                             //Stop playback
-                            //mp.stop();
                             mp.reset();
                             playButton.setImageResource(R.drawable.play_button);
-                            //songProgressBar.setProgress(0);
                             stopProgressBar();
                             isPaused = false;
                             mService.stopForeground(false);

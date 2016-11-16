@@ -1,7 +1,9 @@
 package com.mediaplayer.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
@@ -26,6 +28,7 @@ import com.mediaplayer.adapters.SongsListAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.fragments.AboutUsDialogFragment;
 import com.mediaplayer.fragments.CreatePlaylistDialogFragment;
 import com.mediaplayer.fragments.PlaylistsFragment;
 import com.mediaplayer.fragments.SelectPlaylistDialogFragment;
@@ -242,6 +245,39 @@ public class HomeActivity extends AppCompatActivity {
         ListView listView = PlaylistsFragment.listView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    public void showAppPopupMenu(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+        Menu menu = popup.getMenu();
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_app_options, menu);
+        popup.show();
+    }
+
+    public void rateApp(MenuItem item) {
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent myAppLinkToMarket = new Intent(Intent.ACTION_VIEW, uri);
+
+        try {
+            startActivity(myAppLinkToMarket);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, " unable to find market app", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void shareApp(MenuItem item) {
+        String link = "http://play.google.com/store/apps/details?id=" + getPackageName();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, link);
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
+
+    public void aboutUs(MenuItem item) {
+        DialogFragment aboutUsDialogFragment = new AboutUsDialogFragment();
+        aboutUsDialogFragment.show(supportFragmentManager, "ABOUT_US");
     }
 
     @Override

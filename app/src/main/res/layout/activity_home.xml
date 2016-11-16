@@ -24,4 +24,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <ImageButton
+        android:id="@+id/moreAppOptionsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/list_item_height"
+        android:src="@drawable/ic_more_vert_white_18dp"
+        android:contentDescription="@string/more_options"
+        android:background="@null"
+        android:adjustViewBounds="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:onClick="showAppPopupMenu"
+        android:layout_alignBottom="@+id/tab_layout" />
+
 </RelativeLayout>

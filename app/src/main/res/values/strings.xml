@@ -27,5 +27,8 @@
     <string name="playlist_name">Playlist name</string>
     <string name="album_art_thumbnail">Album Art Thumbnail</string>
     <string name="album_name">Album Name</string>
+    <string name="rate_app">Rate</string>
+    <string name="about_us">About</string>
+    <string name="share_app">Share</string>
 
 </resources>
