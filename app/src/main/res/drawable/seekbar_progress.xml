@@ -3,23 +3,13 @@
 
     <item android:id="@android:id/background"
         android:drawable="@drawable/img_seekbar_bg"
-        android:dither="true">
-    </item>
-	
-    <item android:id="@android:id/secondaryProgress">
-        <clip>
-            <shape>
-                <gradient
-                    android:startColor="#80028ac8"
-                    android:centerColor="#80127fb1"
-                    android:centerY="0.75"
-                    android:endColor="#a004638f"
-                    android:angle="270" />
-            </shape>
-        </clip>
-    </item>
-	
+        android:dither="true"
+        android:height="10dp"
+        android:gravity="center_vertical" />
+
     <item
         android:id="@android:id/progress"
-        android:drawable="@drawable/seekbar_progress_bg" />
+        android:drawable="@drawable/seekbar_progress_bg"
+        android:height="10dp"
+        android:gravity="center_vertical"/>
 </layer-list>

@@ -30,6 +30,7 @@ import java.io.IOException;
 
 public class MediaPlayerService extends IntentService {
     private static String LOG_TAG = "MediaPlayerService";
+    private static String LOG_TAG_EXCEPTION = "Exception";
     private static MediaPlayer mp;
     public static boolean isServiceRunning;
     public static boolean isServiceBound;
@@ -110,80 +111,90 @@ public class MediaPlayerService extends IntentService {
 
     @TargetApi(23)
     public Notification createNotification(Track selectedTrack) {
+        Notification notification = null;
         Bitmap bm = null;
-        byte data[] = selectedTrack.getAlbumArt();
+        int zero = SQLConstants.ZERO;
+        int flag = PendingIntent.FLAG_CANCEL_CURRENT;
+        String keySelectedTrack = MediaPlayerConstants.KEY_SELECTED_TRACK;
 
-        if(data != null) {
-            bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
+        try {
+            byte data[] = selectedTrack.getAlbumArt();
+
+            if (data != null) {
+                bm = BitmapFactory.decodeByteArray(data, zero, data.length);
+            }
+
+            Notification.Builder builder = new Notification.Builder(this);
+            Notification.MediaStyle mediaStyle = new Notification.MediaStyle();
+            MediaSession mMediaSession = new MediaSession(this, MediaPlayerConstants.TAG_MEDIA_SESSION);
+
+            //Setting mediastyle attributes
+            mediaStyle.setShowActionsInCompactView(SQLConstants.ONE);
+            mediaStyle.setMediaSession(mMediaSession.getSessionToken());
+
+            //Setting builder attributes
+            builder.setStyle(mediaStyle);
+            builder.setContentTitle(selectedTrack.getTrackTitle());
+            builder.setContentText(selectedTrack.getArtistName());
+            builder.setSubText(selectedTrack.getAlbumName());
+            builder.setLargeIcon(bm);
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            builder.setSmallIcon(R.drawable.ic_library_music_white_18dp);
+            builder.setShowWhen(false);
+
+            //Creating intents
+            Intent prevIntent = new Intent(this, MediaPlayerActivity.class);
+            Intent pauseIntent = new Intent(this, MediaPlayerActivity.class);
+            Intent playIntent = new Intent(this, MediaPlayerActivity.class);
+            Intent nextIntent = new Intent(this, MediaPlayerActivity.class);
+            Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
+
+            //Setting actions for intents
+            prevIntent.setAction(MediaPlayerConstants.PREVIOUS).putExtra(keySelectedTrack, selectedTrack);
+            pauseIntent.setAction(MediaPlayerConstants.PAUSE).putExtra(keySelectedTrack, selectedTrack);
+            playIntent.setAction(MediaPlayerConstants.PLAY).putExtra(keySelectedTrack, selectedTrack);
+            nextIntent.setAction(MediaPlayerConstants.NEXT).putExtra(keySelectedTrack, selectedTrack);
+            deleteIntent.setAction(MediaPlayerConstants.STOP);
+
+            //Creating pending intents
+            PendingIntent prevPendingIntent = PendingIntent.getActivity(this, zero, prevIntent, flag);
+            PendingIntent pausePendingIntent = PendingIntent.getActivity(this, zero, pauseIntent, flag);
+            PendingIntent playPendingIntent = PendingIntent.getActivity(this, zero, playIntent, flag);
+            PendingIntent nextPendingIntent = PendingIntent.getActivity(this, zero, nextIntent, flag);
+            PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
+
+            //Creating Icons for actions
+            Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
+            Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_24dp);
+            Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_24dp);
+            Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
+
+            //Creating notification actions
+            Notification.Action prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
+            Notification.Action pauseAction = new Notification.Action.Builder(pauseIcon, MediaPlayerConstants.PLAY, pausePendingIntent).build();
+            Notification.Action playAction = new Notification.Action.Builder(playIcon, MediaPlayerConstants.PAUSE, playPendingIntent).build();
+            Notification.Action nextAction = new Notification.Action.Builder(nextIcon, MediaPlayerConstants.NEXT, nextPendingIntent).build();
+
+            //Adding notification actions to the builder
+            builder.addAction(prevAction);
+
+            if (mp.isPlaying()) {
+                builder.addAction(pauseAction);
+            } else {
+                builder.addAction(playAction);
+            }
+
+            builder.addAction(nextAction);
+            builder.setDeleteIntent(deletePendingIntent);
+
+            //Building notification
+            notification = builder.build();
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(SQLConstants.ONE, notification);
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
         }
-
-        Notification.Builder builder = new Notification.Builder(this);
-        Notification.MediaStyle mediaStyle = new Notification.MediaStyle();
-        MediaSession mMediaSession = new MediaSession(this, MediaPlayerConstants.TAG_MEDIA_SESSION);
-
-        //Creating Icons for actions
-        Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
-        Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_24dp);
-        Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_24dp);
-        Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
-
-        //Setting mediastyle attributes
-        mediaStyle.setShowActionsInCompactView(SQLConstants.ONE);
-        mediaStyle.setMediaSession(mMediaSession.getSessionToken());
-
-        //Setting builder attributes
-        builder.setStyle(mediaStyle);
-        builder.setContentTitle(selectedTrack.getTrackTitle());
-        builder.setContentText(selectedTrack.getArtistName());
-        builder.setSubText(selectedTrack.getAlbumName());
-        builder.setLargeIcon(bm);
-        builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-        builder.setSmallIcon(R.drawable.ic_library_music_white_18dp);
-        builder.setShowWhen(false);
-
-        //Creating intents
-        Intent prevIntent = new Intent(this, MediaPlayerActivity.class);
-        Intent pauseIntent = new Intent(this, MediaPlayerActivity.class);
-        Intent playIntent = new Intent(this, MediaPlayerActivity.class);
-        Intent nextIntent = new Intent(this, MediaPlayerActivity.class);
-        Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
-
-        //Setting actions for intents
-        prevIntent.setAction(MediaPlayerConstants.PREVIOUS).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        pauseIntent.setAction(MediaPlayerConstants.PAUSE).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        playIntent.setAction(MediaPlayerConstants.PLAY).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        nextIntent.setAction(MediaPlayerConstants.NEXT).putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        deleteIntent.setAction(MediaPlayerConstants.STOP);
-
-        //Creating pending intents
-        PendingIntent prevPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, prevIntent, SQLConstants.ZERO);
-        PendingIntent pausePendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, pauseIntent, SQLConstants.ZERO);
-        PendingIntent playPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, playIntent, SQLConstants.ZERO);
-        PendingIntent nextPendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, nextIntent, SQLConstants.ZERO);
-        PendingIntent deletePendingIntent = PendingIntent.getActivity(this, SQLConstants.ZERO, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        //Creating notification actions
-        Notification.Action prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
-        Notification.Action pauseAction = new Notification.Action.Builder(pauseIcon, MediaPlayerConstants.PLAY, pausePendingIntent).build();
-        Notification.Action playAction = new Notification.Action.Builder(playIcon, MediaPlayerConstants.PAUSE, playPendingIntent).build();
-        Notification.Action nextAction = new Notification.Action.Builder(nextIcon, MediaPlayerConstants.NEXT, nextPendingIntent).build();
-
-        //Adding notification actions to the builder
-        builder.addAction(prevAction);
-
-        if(mp.isPlaying()) {
-            builder.addAction(pauseAction);
-        } else {
-            builder.addAction(playAction);
-        }
-
-        builder.addAction(nextAction);
-        builder.setDeleteIntent(deletePendingIntent);
-
-        //Building notification
-        Notification notification = builder.build();
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(SQLConstants.ONE, notification);
 
         Log.d(LOG_TAG, "Notification created");
         return notification;

@@ -387,6 +387,7 @@ public class MediaPlayerActivity extends AppCompatActivity implements SeekBar.On
         albumBar.setText(albumName);
         trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
         albumArt.setImageBitmap(bm);
+        //albumArtThumbnail.setImageBitmap(Bitmap.createScaledBitmap(bm, 200, 300, false));
         albumArtThumbnail.setImageBitmap(bm);
 
         Log.d(LOG_TAG, "Media Player initialized");
