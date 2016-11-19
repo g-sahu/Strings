@@ -13,6 +13,7 @@ import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -109,9 +110,10 @@ public class MediaPlayerService extends IntentService {
         Log.d(LOG_TAG, "END: The playSong() event");
     }
 
-    @TargetApi(23)
+
     public Notification createNotification(Track selectedTrack) {
         Notification notification = null;
+        Notification.Action prevAction = null, pauseAction = null, playAction = null, nextAction = null;
         Bitmap bm = null;
         int zero = SQLConstants.ZERO;
         int flag = PendingIntent.FLAG_CANCEL_CURRENT;
@@ -163,17 +165,27 @@ public class MediaPlayerService extends IntentService {
             PendingIntent nextPendingIntent = PendingIntent.getActivity(this, zero, nextIntent, flag);
             PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
 
-            //Creating Icons for actions
-            Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
-            Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_24dp);
-            Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_24dp);
-            Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
+            //Checking OS build version
+            if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
+                    android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
+                //Creating notification actions
+                prevAction = new Notification.Action.Builder(R.drawable.ic_skip_previous_white_24dp, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
+                pauseAction = new Notification.Action.Builder(R.drawable.ic_pause_white_24dp, MediaPlayerConstants.PAUSE, pausePendingIntent).build();
+                playAction = new Notification.Action.Builder(R.drawable.ic_play_arrow_white_24dp, MediaPlayerConstants.PLAY, playPendingIntent).build();
+                nextAction = new Notification.Action.Builder(R.drawable.ic_skip_next_white_24dp, MediaPlayerConstants.NEXT, nextPendingIntent).build();
+            } else if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+                //Creating Icons for actions
+                Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
+                Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_24dp);
+                Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_24dp);
+                Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
 
-            //Creating notification actions
-            Notification.Action prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
-            Notification.Action pauseAction = new Notification.Action.Builder(pauseIcon, MediaPlayerConstants.PLAY, pausePendingIntent).build();
-            Notification.Action playAction = new Notification.Action.Builder(playIcon, MediaPlayerConstants.PAUSE, playPendingIntent).build();
-            Notification.Action nextAction = new Notification.Action.Builder(nextIcon, MediaPlayerConstants.NEXT, nextPendingIntent).build();
+                //Creating notification actions
+                prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
+                pauseAction = new Notification.Action.Builder(pauseIcon, MediaPlayerConstants.PAUSE, pausePendingIntent).build();
+                playAction = new Notification.Action.Builder(playIcon, MediaPlayerConstants.PLAY, playPendingIntent).build();
+                nextAction = new Notification.Action.Builder(nextIcon, MediaPlayerConstants.NEXT, nextPendingIntent).build();
+            }
 
             //Adding notification actions to the builder
             builder.addAction(prevAction);
