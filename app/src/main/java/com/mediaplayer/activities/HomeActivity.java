@@ -49,16 +49,21 @@ public class HomeActivity extends AppCompatActivity {
     private FragmentManager supportFragmentManager;
     private static Context context;
     private static String LOG_TAG = "HomeActivity";
+    private boolean isBackPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Log.d(LOG_TAG, "HomeActivity created");
-
         context = this;
-        Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
-        toast.show();
+
+        Intent intent = getIntent();
+
+        if(intent.getBooleanExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, false)) {
+            Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
         supportFragmentManager = getSupportFragmentManager();
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -69,10 +74,6 @@ public class HomeActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         favouritesPlaylist = MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES);
-    }
-
-    public static Track getSelectedTrack() {
-        return selectedTrack;
     }
 
     public static Playlist getSelectedPlaylist() {
@@ -96,7 +97,7 @@ public class HomeActivity extends AppCompatActivity {
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
-        if(selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
+        if(selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
             menuItem.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
         }
 
@@ -111,9 +112,6 @@ public class HomeActivity extends AppCompatActivity {
         args.putSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         selectPlaylistDialogFragment.setArguments(args);
         selectPlaylistDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
-
-        //Updating list view adapter
-        //updatePlaylistsAdapter();
     }
 
     //Add or remove from favourites menu option
@@ -276,14 +274,22 @@ public class HomeActivity extends AppCompatActivity {
 
     public void aboutUs(MenuItem item) {
         DialogFragment aboutUsDialogFragment = new AboutUsDialogFragment();
-        aboutUsDialogFragment.show(supportFragmentManager, "ABOUT_US");
+        aboutUsDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ABOUT_US);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(LOG_TAG, "Back button pressed");
+        isBackPressed = true;
+        finish();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if(isTaskRoot()) {
+        //if(isTaskRoot()) {
+        if(!isBackPressed) {
             MediaPlayerActivity.stopProgressBar();
 
             Intent intent = new Intent(this, MediaPlayerService.class);

@@ -27,6 +27,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         Log.d(LOG_TAG, "SplashScreenActivity created");
 
+        //Creating intent for MediaManagerService
         intent = new Intent(this, MediaManagerService.class);
 
         if(hasPermissions()) {

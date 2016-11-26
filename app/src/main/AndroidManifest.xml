@@ -21,11 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.HomeActivity" />
         <activity
             android:name=".activities.MediaPlayerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" />
-        <activity android:name=".activities.HomeActivity" />
         <activity android:name=".activities.PlaylistActivity" />
 
         <service
@@ -36,11 +36,11 @@
             android:exported="false" />
 
         <receiver
-            android:name=".services.MediaplayerReceiver"
+            android:name=".services.MediaPlayerReceiver"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.tutorialspoint.CUSTOM_INTENT" />
+                <action android:name="com.mediaplayer.SERVICE_BROADCAST" />
             </intent-filter>
         </receiver>
     </application>

@@ -36,8 +36,10 @@ public class MediaPlayerConstants {
     public static final String TAG_ADD_TRACKS = "ADD_TRACKS";
     public static final String TAG_MEDIA_SESSION = "MEDIA_SESSION";
     public static final String TAG_SONGS_LIST_VIEW = "SONGS_LIST_VIEW";
+    public static final String TAG_NOTIFICATION = "NOTIFICATION";
     public static final String TAG_MEDIAPLAYER_ACTIVITY = "MEDIAPLAYER_ACTIVITY";
     public static final String TAG_PLAYLIST_ACTIVITY = "PLAYLIST_ACTIVITY";
+    public static final String TAG_ABOUT_US = "ABOUT_US";
 
     public static final String KEY_PLAYLIST_LIBRARY = "LIBRARY_PLAYLIST";
     public static final String KEY_PLAYLIST_OTHER = "OTHER_PLAYLIST";
@@ -49,5 +51,7 @@ public class MediaPlayerConstants {
     public static final String KEY_TRACK_ORIGIN = "TRACK_ORIGIN";
     public static final String KEY_NEW_TRACKS_LIST = "NEW_TRACKS_LIST";
     public static final String KEY_DELETED_TRACKS_LIST = "DELETED_TRACKS_LIST";
+
+    public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
 }
 

@@ -65,7 +65,7 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
             if(trackList != null && !trackList.isEmpty()) {
                 trackIterator = trackList.iterator();
 
-                while (trackIterator.hasNext()) {
+                while(trackIterator.hasNext()) {
                     track = trackIterator.next();
                     c = SQLConstants.ONE;
 
@@ -94,7 +94,7 @@ public class MediaplayerDBHelper extends SQLiteOpenHelper {
 
                 Log.d("Tracks added to library", String.valueOf(tracksInserted));
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
         } finally {

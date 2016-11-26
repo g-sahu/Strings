@@ -123,7 +123,8 @@
                 android:paddingStart="0dp"
                 android:paddingRight="0dp"
                 android:paddingEnd="0dp"
-                android:thumbPosition="midpoint"/>
+                android:thumbPosition="midpoint"
+                android:maxHeight="10dp"/>
 
         </LinearLayout>
 

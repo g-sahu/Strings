@@ -34,48 +34,65 @@ public class MediaLibraryManager {
 
     public MediaLibraryManager(){}
 
-    public static void init(Context context) {
+    public static boolean init(Context context) {
         HashMap<String, ArrayList<Track>> map;
-        ArrayList<Track> newTracksList = null, deletedTracksList = null;
+        ArrayList<Track> trackList, newTracksList = null, deletedTracksList = null;
+        MediaplayerDAO dao = null;
+        boolean isChanged = false;
 
-        MediaplayerDAO dao = new MediaplayerDAO(context);
+        try {
+            dao = new MediaplayerDAO(context);
 
-        //Get all filenames from db and store in an ArrayList
-        ArrayList<Track> trackList = dao.getTracksFromLibrary();
+            //Get all filenames from db and store in an ArrayList
+            trackList = dao.getTracksFromLibrary();
 
-        //Get all mp3 files from storage
-        map = getUpdatedTracks(trackList, context.getResources());
+            //Get all mp3 files from storage
+            map = getUpdatedTracks(trackList, context.getResources());
 
-        //Check if map is not null. If null, it means there has been no change to the songs library
-        if(map != null) {
-            newTracksList = map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
-            deletedTracksList = map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+            //Check if map is not null. If null, it means there has been no change to the songs library
+            if (map != null) {
+                newTracksList = map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
+                deletedTracksList = map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+                isChanged = true;
+            }
+
+            //Insert new tracks in db
+            if (newTracksList != null && !newTracksList.isEmpty()) {
+                dao.addTracksToLibrary(newTracksList);
+            }
+
+            //Delete deleted tracks from db
+            if (deletedTracksList != null && !deletedTracksList.isEmpty()) {
+                dao.deleteTracksFromLibrary(deletedTracksList);
+            }
+
+            //Getting list of all tracks from db
+            trackInfoList = dao.getTracks();
+
+            if(trackInfoList != null) {
+                tracklistSize = trackInfoList.size();
+
+                //Sorting the track list
+                sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+
+                if (map != null) {
+                    //Updating track indices in db to keep in sync with trackInfoList
+                    dao.updateTrackIndices();
+                }
+            }
+
+            //Getting list of all playlist from db and sorting them
+            playlistInfoList = dao.getPlaylists();
+            sortPlaylists();
+        } catch(Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
         }
-
-        //Insert new tracks in db
-        if(newTracksList != null && !newTracksList.isEmpty()) {
-            dao.addTracksToLibrary(newTracksList);
-        }
-
-        //Delete deleted tracks from db
-        if(deletedTracksList != null && !deletedTracksList.isEmpty()) {
-            dao.deleteTracksFromLibrary(deletedTracksList);
-        }
-
-        //Getting list of all tracks from db and sorting them
-        trackInfoList = dao.getTracks();
-
-        if(trackInfoList != null) {
-            tracklistSize = trackInfoList.size();
-            sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
-        }
-
-        //Updating track indices in db to keep in sync with trackInfoList
-        dao.updateTrackIndices();
-
-        //Getting list of all playlist from db and sorting them
-        playlistInfoList = dao.getPlaylists();
-        sortPlaylists();
+        return isChanged;
     }
 
     /**
@@ -497,7 +514,7 @@ public class MediaLibraryManager {
                         //Iterating music files list to get the list of tracks
                         while(musicFilesListIterator.hasNext()) {
                             musicFile = musicFilesListIterator.next();
-                            fileName = musicFile.getName().split("[.]")[0];
+                            fileName = musicFile.getName().split("[.]")[SQLConstants.ZERO];
 
                             //Checking if it is a new track
                             if(newFileNamesList.contains(fileName)) {
@@ -600,18 +617,5 @@ public class MediaLibraryManager {
 
     public static boolean isUserPlaylistEmpty() {
         return (selectedPlaylist == null || selectedPlaylist.isEmpty());
-    }
-
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        return (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()));
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-
-        return (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 }

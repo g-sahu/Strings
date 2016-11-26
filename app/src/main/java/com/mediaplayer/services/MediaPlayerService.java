@@ -1,6 +1,5 @@
 package com.mediaplayer.services;
 
-import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,18 +13,14 @@ import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.activities.MediaPlayerActivity;
 import com.mediaplayer.beans.Track;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.SQLConstants;
-import com.mediaplayer.utilities.Utilities;
 
 import java.io.IOException;
 
@@ -36,10 +31,6 @@ public class MediaPlayerService extends IntentService {
     public static boolean isServiceRunning;
     public static boolean isServiceBound;
     private IBinder mBinder = new MyBinder();
-
-    private static TextView timeElapsed;
-    private static SeekBar songProgressBar;
-    private Handler mHandler = new Handler();
 
     public MediaPlayerService() {
         super("MediaPlayerService");
@@ -56,10 +47,6 @@ public class MediaPlayerService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        /*timeElapsed = (TextView) findViewById(R.id.timeElapsed);
-        songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);*/
-
         Log.d(LOG_TAG, "Service created");
     }
 
@@ -78,8 +65,10 @@ public class MediaPlayerService extends IntentService {
         Log.d(LOG_TAG, "Binding activity to service...");
 
         Track selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
+        String selectedPlaylist = intent.getStringExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
         playSong(selectedTrack);
-        Notification notification = createNotification(selectedTrack);
+        //Notification notification = createNotification(selectedTrack);
+        Notification notification = createNotification(selectedTrack, selectedPlaylist);
         startForeground(1, notification);
         Log.d(LOG_TAG, "Is foreground?: true");
         isServiceBound = true;
@@ -110,19 +99,21 @@ public class MediaPlayerService extends IntentService {
         Log.d(LOG_TAG, "END: The playSong() event");
     }
 
-
-    public Notification createNotification(Track selectedTrack) {
+    public Notification createNotification(Track selectedTrack, String selectedPlaylist) {
         Notification notification = null;
         Notification.Action prevAction = null, pauseAction = null, playAction = null, nextAction = null;
         Bitmap bm = null;
         int zero = SQLConstants.ZERO;
         int flag = PendingIntent.FLAG_CANCEL_CURRENT;
         String keySelectedTrack = MediaPlayerConstants.KEY_SELECTED_TRACK;
+        String keySelectedPlaylist = MediaPlayerConstants.KEY_SELECTED_PLAYLIST;
+        String keyTrackOrigin = MediaPlayerConstants.KEY_TRACK_ORIGIN;
+        String origin = MediaPlayerConstants.TAG_NOTIFICATION;
 
         try {
             byte data[] = selectedTrack.getAlbumArt();
 
-            if (data != null) {
+            if(data != null) {
                 bm = BitmapFactory.decodeByteArray(data, zero, data.length);
             }
 
@@ -151,11 +142,23 @@ public class MediaPlayerService extends IntentService {
             Intent nextIntent = new Intent(this, MediaPlayerActivity.class);
             Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
 
-            //Setting actions for intents
-            prevIntent.setAction(MediaPlayerConstants.PREVIOUS).putExtra(keySelectedTrack, selectedTrack);
-            pauseIntent.setAction(MediaPlayerConstants.PAUSE).putExtra(keySelectedTrack, selectedTrack);
-            playIntent.setAction(MediaPlayerConstants.PLAY).putExtra(keySelectedTrack, selectedTrack);
-            nextIntent.setAction(MediaPlayerConstants.NEXT).putExtra(keySelectedTrack, selectedTrack);
+            //Setting actions and extras for intents
+            prevIntent.setAction(MediaPlayerConstants.PREVIOUS)
+                    .putExtra(keySelectedTrack, selectedTrack)
+                    .putExtra(keySelectedPlaylist, selectedPlaylist)
+                    .putExtra(keyTrackOrigin, origin);
+            pauseIntent.setAction(MediaPlayerConstants.PAUSE)
+                    .putExtra(keySelectedTrack, selectedTrack)
+                    .putExtra(keySelectedPlaylist, selectedPlaylist)
+                    .putExtra(keyTrackOrigin, origin);
+            playIntent.setAction(MediaPlayerConstants.PLAY)
+                    .putExtra(keySelectedTrack, selectedTrack)
+                    .putExtra(keySelectedPlaylist, selectedPlaylist)
+                    .putExtra(keyTrackOrigin, origin);
+            nextIntent.setAction(MediaPlayerConstants.NEXT)
+                    .putExtra(keySelectedTrack, selectedTrack)
+                    .putExtra(keySelectedPlaylist, selectedPlaylist)
+                    .putExtra(keyTrackOrigin, origin);
             deleteIntent.setAction(MediaPlayerConstants.STOP);
 
             //Creating pending intents
@@ -165,7 +168,7 @@ public class MediaPlayerService extends IntentService {
             PendingIntent nextPendingIntent = PendingIntent.getActivity(this, zero, nextIntent, flag);
             PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
 
-            //Checking OS build version
+            //Checking OS build version for notification compatibility
             if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
                     android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
                 //Creating notification actions
@@ -190,7 +193,7 @@ public class MediaPlayerService extends IntentService {
             //Adding notification actions to the builder
             builder.addAction(prevAction);
 
-            if (mp.isPlaying()) {
+            if(mp.isPlaying()) {
                 builder.addAction(pauseAction);
             } else {
                 builder.addAction(playAction);
@@ -226,18 +229,13 @@ public class MediaPlayerService extends IntentService {
     }
 
     @Override
-    public void onTaskRemoved (Intent rootIntent) {
-        Log.d(LOG_TAG, "Task removed");
-    }
-
-    @Override
     public void onDestroy() {
         if(mp != null) {
             mp.release();
         }
 
         isServiceRunning = false;
-        Log.d(LOG_TAG, "Service destroyed");
+        Log.d(LOG_TAG, "MediaPlayerService destroyed");
     }
 
     public class MyBinder extends Binder {
