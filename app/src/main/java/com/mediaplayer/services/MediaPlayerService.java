@@ -132,7 +132,8 @@ public class MediaPlayerService extends IntentService {
             builder.setSubText(selectedTrack.getAlbumName());
             builder.setLargeIcon(bm);
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-            builder.setSmallIcon(R.drawable.ic_library_music_white_18dp);
+            //builder.setSmallIcon(R.drawable.ic_library_music_white_18dp);
+            builder.setSmallIcon(R.drawable.ic_launcher);
             builder.setShowWhen(false);
 
             //Creating intents

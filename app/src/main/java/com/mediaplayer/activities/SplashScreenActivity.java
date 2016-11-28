@@ -3,12 +3,14 @@ package com.mediaplayer.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 
 import com.mediaplayer.R;
 import com.mediaplayer.services.MediaManagerService;
@@ -26,6 +28,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         Log.d(LOG_TAG, "SplashScreenActivity created");
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        Log.d("Width", String.valueOf(size.x));
+        Log.d("Height", String.valueOf(size.y));
 
         //Creating intent for MediaManagerService
         intent = new Intent(this, MediaManagerService.class);

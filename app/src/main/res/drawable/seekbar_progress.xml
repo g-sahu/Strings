@@ -4,12 +4,12 @@
     <item android:id="@android:id/background"
         android:drawable="@drawable/img_seekbar_bg"
         android:dither="true"
-        android:height="10dp"
+        android:height="5dp"
         android:gravity="center_vertical" />
 
     <item
         android:id="@android:id/progress"
         android:drawable="@drawable/seekbar_progress_bg"
-        android:height="10dp"
+        android:height="5dp"
         android:gravity="center_vertical"/>
 </layer-list>

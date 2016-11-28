@@ -12,74 +12,111 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp">
+        android:orientation="vertical"
+        android:background="@android:color/holo_blue_bright"
+        android:layout_weight=".12">
 
         <LinearLayout
-            android:id="@+id/albumArtTNLayout"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:orientation="vertical"
-            android:background="#d9c6c6">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="0.7">
 
-            <ImageView
-                android:id="@+id/albumArtThumbnail"
+            <LinearLayout
+                android:id="@+id/albumArtTNLayout"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:orientation="vertical"
+                android:background="#d9c6c6"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="15dp">
+
+                <ImageView
+                    android:id="@+id/albumArtThumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/album_art_thumbnail" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/album_art_thumbnail" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/trackInfoBar"
+                android:baselineAligned="false"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/titleBar"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/track_title"
+                    android:textColor="#000000"
+                    android:textIsSelectable="false"
+                    android:textSize="18sp"
+                    android:typeface="sans"
+                    android:singleLine="false"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/artistBar"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/artist_name"
+                    android:textColor="#000000"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp"
+                    android:typeface="sans"
+                    android:singleLine="false"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:id="@+id/albumBar"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/album_name"
+                    android:textColor="#000000"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp"
+                    android:typeface="sans"
+                    android:singleLine="false"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/trackInfoBar"
-            android:baselineAligned="false">
+            android:orientation="horizontal"
+            android:layout_marginLeft="15dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.3">
 
             <TextView
-                android:id="@+id/titleBar"
-                android:layout_width="300dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/track_title"
-                android:textColor="#000000"
-                android:textIsSelectable="false"
-                android:textSize="18sp"
-                android:typeface="sans"
-                android:singleLine="false"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/artistBar"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:text="@string/artist_name"
-                android:textColor="#000000"
-                android:textIsSelectable="false"
-                android:textSize="12sp"
-                android:typeface="sans"
-                android:singleLine="false"
+                android:text="Playing from: "
                 android:ellipsize="end"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:typeface="sans" />
 
             <TextView
-                android:id="@+id/albumBar"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:text="@string/album_name"
+                android:text="Library"
                 android:textColor="#000000"
-                android:textIsSelectable="false"
-                android:textSize="12sp"
-                android:typeface="sans"
-                android:singleLine="false"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="18sp"
+                android:typeface="sans" />
 
         </LinearLayout>
 
@@ -90,7 +127,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.95"
+        android:layout_weight="0.80"
         android:background="#ffffff">
 
         <ImageView
@@ -105,7 +142,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.03">
+        android:layout_weight="0.08"
+        android:background="@android:color/holo_blue_bright">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -132,7 +170,8 @@
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp">
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:id="@+id/timeElapsed"
@@ -162,9 +201,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center_vertical">
 
             <ImageButton
                 android:id="@+id/repeatButton"
