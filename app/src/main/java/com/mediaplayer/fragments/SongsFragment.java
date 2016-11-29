@@ -19,10 +19,11 @@ import com.mediaplayer.utilities.MediaLibraryManager;
 
 import java.util.ArrayList;
 
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+
 public class SongsFragment extends Fragment {
     private Context context;
     public static ListView trackListView;
-    private static String LOG_TAG_EXCEPTION = "Exception";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

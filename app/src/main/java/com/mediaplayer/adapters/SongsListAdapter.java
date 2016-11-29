@@ -63,7 +63,7 @@ public class SongsListAdapter extends BaseAdapter {
         return position;
     }
 
-    public class Holder {
+    private class Holder {
         ImageView albumArt;
         TextView trackTitle;
         TextView artistName;

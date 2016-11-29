@@ -55,7 +55,7 @@ public class PlaylistsAdapter extends BaseAdapter {
         return position;
     }
 
-    public class Holder {
+    private class Holder {
         TextView playlistTitle;
         TextView playlistInfo;
         ImageButton moreOptions;

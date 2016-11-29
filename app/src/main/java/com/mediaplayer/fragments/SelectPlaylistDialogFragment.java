@@ -12,7 +12,7 @@ import android.widget.ListView;
 import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
@@ -41,7 +41,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
 
         //Checking if playlist size > 1 i.e. the user has created any custom playlist
         if(size > 1) {
-            MediaplayerDAO dao = new MediaplayerDAO(context);
+            MediaPlayerDAO dao = new MediaPlayerDAO(context);
             addedPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
 
             if(addedPlaylists != null) {
@@ -87,7 +87,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         if(!selectedPlaylists.isEmpty()) {
                             //Add track to selected playlists
-                            MediaplayerDAO dao = new MediaplayerDAO(context);
+                            MediaPlayerDAO dao = new MediaPlayerDAO(context);
                             dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
                             //Updating list view adapter

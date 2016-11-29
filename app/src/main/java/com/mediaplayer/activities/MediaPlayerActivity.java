@@ -32,15 +32,17 @@ import com.mediaplayer.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MediaPlayerActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
+public class MediaPlayerActivity extends AppCompatActivity
+        implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
     private static String LOG_TAG = "MediaPlayerActivity";
     private static MediaPlayer mp;
-    private static ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
+    private ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
     private static Track selectedTrack;
     private static String selectedPlaylist;
     private static SeekBar songProgressBar;
-    private static TextView titleBar, artistBar, albumBar, timeElapsed, trackDuration;
-    private static ImageView albumArt, albumArtThumbnail;
+    private TextView titleBar, artistBar, albumBar, trackDuration;
+    private static TextView timeElapsed;
+    private ImageView albumArt, albumArtThumbnail;
     private static String songTitle, albumName, artistName, songDuration;
 
     private static Handler mHandler = new Handler();

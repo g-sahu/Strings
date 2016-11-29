@@ -1,17 +1,20 @@
 package com.mediaplayer.utilities;
 
 public class MediaPlayerConstants {
+    public static final String LOG_TAG_SQL = "Executing query";
+    public static final String LOG_TAG_EXCEPTION = "Exception";
+
     public static final String PREVIOUS = "PREVIOUS";
     public static final String NEXT = "NEXT";
     public static final String PLAY = "PLAY";
     public static final String PAUSE = "PAUSE";
     public static final String STOP = "STOP";
-    public static final String FILE_NAME = "FILE_NAME";
-    public static final String FILE_PATH = "FILE_PATH";
-    public static final String FILE_SIZE = "FILE_SIZE";
-    public static final String UNKNOWN_ALBUM = "Unknown album";
-    public static final String UNKNOWN_ARTIST = "Unknown artist";
-    public static final String TIME_ZERO = "0:00";
+    static final String FILE_NAME = "FILE_NAME";
+    static final String FILE_PATH = "FILE_PATH";
+    static final String FILE_SIZE = "FILE_SIZE";
+    static final String UNKNOWN_ALBUM = "Unknown album";
+    static final String UNKNOWN_ARTIST = "Unknown artist";
+    static final String TIME_ZERO = "0:00";
     public static final int PAGE_COUNT = 2;
 
     public static final String TITLE_SONGS = "Songs";
@@ -49,8 +52,8 @@ public class MediaPlayerConstants {
     public static final String KEY_PLAYLIST_TITLE = "PLAYLIST_TITLE";
     public static final String KEY_PLAYLIST_INDEX = "PLAYLIST_INDEX";
     public static final String KEY_TRACK_ORIGIN = "TRACK_ORIGIN";
-    public static final String KEY_NEW_TRACKS_LIST = "NEW_TRACKS_LIST";
-    public static final String KEY_DELETED_TRACKS_LIST = "DELETED_TRACKS_LIST";
+    static final String KEY_NEW_TRACKS_LIST = "NEW_TRACKS_LIST";
+    static final String KEY_DELETED_TRACKS_LIST = "DELETED_TRACKS_LIST";
 
     public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
 }

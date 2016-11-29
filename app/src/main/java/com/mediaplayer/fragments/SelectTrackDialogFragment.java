@@ -13,7 +13,7 @@ import com.mediaplayer.activities.HomeActivity;
 import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
@@ -26,7 +26,6 @@ public class SelectTrackDialogFragment extends DialogFragment {
     private Context context;
     private ArrayList<Track> selectedTracks;
     private ArrayList<Track> tracksInLibrary = MediaLibraryManager.getTrackInfoList();
-    private Playlist selectedPlaylist;
 
     @NonNull
     @Override
@@ -41,12 +40,12 @@ public class SelectTrackDialogFragment extends DialogFragment {
         context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
+        Playlist selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
         int size = tracksInLibrary.size(), trackInPlaylistSize, c = 0, listLength;
 
         //Checking if playlist size > 1 i.e. the user has created any custom playlist
         if(!tracksInLibrary.isEmpty()) {
-            MediaplayerDAO dao = new MediaplayerDAO(context);
+            MediaPlayerDAO dao = new MediaPlayerDAO(context);
             tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
 
             if(tracksInPlaylist != null && !tracksInPlaylist.isEmpty()) {
@@ -103,7 +102,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         if(!selectedTracks.isEmpty()) {
                             //Add track to selected playlists
-                            MediaplayerDAO dao = new MediaplayerDAO(getContext());
+                            MediaPlayerDAO dao = new MediaPlayerDAO(getContext());
                             dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
 
                             //Updating list view adapter

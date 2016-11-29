@@ -74,7 +74,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //stopService(intent);
         Log.d(LOG_TAG, "SplashScreenActivity destroyed");
     }
 }

@@ -6,13 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.mediaplayer.R;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,9 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+
 public class MediaLibraryManager {
-    private static String LOG_TAG_SQL = "Executing query";
-    private static String LOG_TAG_EXCEPTION = "Exception";
     private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
     private static ArrayList<Track> trackInfoList;
     private static ArrayList<Track> selectedPlaylist;
@@ -37,11 +36,11 @@ public class MediaLibraryManager {
     public static boolean init(Context context) {
         HashMap<String, ArrayList<Track>> map;
         ArrayList<Track> trackList, newTracksList = null, deletedTracksList = null;
-        MediaplayerDAO dao = null;
+        MediaPlayerDAO dao = null;
         boolean isChanged = false;
 
         try {
-            dao = new MediaplayerDAO(context);
+            dao = new MediaPlayerDAO(context);
 
             //Get all filenames from db and store in an ArrayList
             trackList = dao.getTracksFromLibrary();
@@ -115,7 +114,7 @@ public class MediaLibraryManager {
             //Iterate through the directory to search for .mp3 files
             for(File file : fileList) {
                 //Check if file extension is .mp3
-                if(validateExtension(file)) {
+                if(isExtensionValid(file)) {
                     song = new HashMap<String, Object>();
                     fileName = file.getName().split("[.]")[0];
                     filePath = file.getAbsolutePath();
@@ -427,7 +426,7 @@ public class MediaLibraryManager {
         MediaLibraryManager.selectedPlaylist = selectedPlaylist;
     }
 
-    private static boolean validateExtension(File file) {
+    private static boolean isExtensionValid(File file) {
         boolean isValidFile = false;
         String fileName = file.getName();
         String extension = "";
@@ -489,7 +488,7 @@ public class MediaLibraryManager {
                 //Iterating the files to search for mp3 files
                 for(File file : fileList) {
                     //Check if file extension is .mp3
-                    if(validateExtension(file)) {
+                    if(isExtensionValid(file)) {
                         fileName = file.getName().split("[.]")[0];
                         musicFileNamesList.add(fileName);
                         musicFilesList.add(file);

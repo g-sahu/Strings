@@ -26,7 +26,7 @@ import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.adapters.SongsListAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 import com.mediaplayer.fragments.AboutUsDialogFragment;
 import com.mediaplayer.fragments.CreatePlaylistDialogFragment;
 import com.mediaplayer.fragments.PlaylistsFragment;
@@ -127,7 +127,7 @@ public class HomeActivity extends AppCompatActivity {
     private void addToFavourites() {
         ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
         selectedPlaylists.add(favouritesPlaylist);
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
         //Updating list view adapter
@@ -136,7 +136,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //Remove from favourites menu option
     private void removeFromFavourites() {
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.removeFromPlaylist(favouritesPlaylist, selectedTrack);
 
         //Updating list view adapter
@@ -145,7 +145,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //Remove from library menu option
     public void removeSong(MenuItem menuItem) {
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.removeFromLibrary(selectedTrack);
 
         //Updating list view adapter
@@ -198,7 +198,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //Delete playlist menu option
     public void deletePlaylist(MenuItem menuItem) {
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.deletePlaylist(selectedPlaylist);
 
         //Updating list view adapter

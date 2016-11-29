@@ -21,7 +21,7 @@ import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.adapters.SongsListAdapter;
 import com.mediaplayer.beans.Playlist;
 import com.mediaplayer.beans.Track;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 import com.mediaplayer.fragments.PlaylistsFragment;
 import com.mediaplayer.fragments.SelectPlaylistDialogFragment;
 import com.mediaplayer.utilities.MediaLibraryManager;
@@ -33,8 +33,8 @@ import java.util.ArrayList;
 public class PlaylistActivity extends AppCompatActivity {
     private ListView listView;
     private FragmentManager supportFragmentManager;
-    Track selectedTrack;
-    Context homeContext;
+    private Track selectedTrack;
+    private Context homeContext;
     private static Playlist selectedPlaylist;
     private int playlistID;
 
@@ -52,7 +52,7 @@ public class PlaylistActivity extends AppCompatActivity {
             playlistID = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, 0);
             int playlistIndex = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, 0);
             selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(playlistIndex);
-            MediaplayerDAO dao = new MediaplayerDAO(this);
+            MediaPlayerDAO dao = new MediaPlayerDAO(this);
 
             //Fetching all tracks for the selected playlist from database
             ArrayList<Track> trackList = dao.getTracksForPlaylist(playlistID);
@@ -85,7 +85,7 @@ public class PlaylistActivity extends AppCompatActivity {
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
-        if(selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
+        if (selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
             optionTwo.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
         }
 
@@ -121,7 +121,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private void addToFavourites() {
         ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
         selectedPlaylists.add(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES));
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
         //Updating list view adapter
@@ -130,7 +130,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     //Remove from favourites menu option
     private void removeFromFavourites() {
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
         //Sorting the trackList for the selected playlist
@@ -148,7 +148,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     //Remove from playlist menu option
     public void removeSong(MenuItem menuItem) {
-        MediaplayerDAO dao = new MediaplayerDAO(this);
+        MediaPlayerDAO dao = new MediaPlayerDAO(this);
         dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
 
         //Removing track from selectedPlaylist
@@ -187,7 +187,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_OTHER);
-        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, "PLAYLIST_ACTIVITY");
+        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY);
         intent.setAction(MediaPlayerConstants.PLAY);
 
         startActivity(intent);

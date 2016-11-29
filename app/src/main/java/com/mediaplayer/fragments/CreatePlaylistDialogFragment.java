@@ -16,7 +16,7 @@ import android.widget.ListView;
 import com.mediaplayer.R;
 import com.mediaplayer.adapters.PlaylistsAdapter;
 import com.mediaplayer.beans.Playlist;
-import com.mediaplayer.dao.MediaplayerDAO;
+import com.mediaplayer.dao.MediaPlayerDAO;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.MessageConstants;
@@ -24,6 +24,7 @@ import com.mediaplayer.utilities.SQLConstants;
 
 public class CreatePlaylistDialogFragment extends DialogFragment {
     private Context context;
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                 playlist.setPlaylistSize(SQLConstants.ZERO);
                                 playlist.setPlaylistDuration(SQLConstants.ZERO);
 
-                                MediaplayerDAO dao = new MediaplayerDAO(getContext());
+                                MediaPlayerDAO dao = new MediaPlayerDAO(getContext());
                                 dao.createPlaylist(playlist);
 
                                 //Sorting the playlists
@@ -124,7 +125,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                 playlist.setPlaylistIndex(newPlaylistIndex);
 
                                 //Updating table 'Playlist' with new values of playlist_title and playlist_index
-                                MediaplayerDAO dao = new MediaplayerDAO(getContext());
+                                MediaPlayerDAO dao = new MediaPlayerDAO(getContext());
                                 dao.renamePlaylist(playlist);
 
                                 //Updating list view adapter
