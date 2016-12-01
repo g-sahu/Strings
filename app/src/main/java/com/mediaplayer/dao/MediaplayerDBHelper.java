@@ -16,13 +16,14 @@ import com.mediaplayer.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MediaplayerDBHelper extends SQLiteOpenHelper {
-    private Resources resources;
-    private static String LOG_TAG_SQL = "Executing query";
-    private static String LOG_TAG_EXCEPTION = "Exception";
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 
-    public MediaplayerDBHelper(Context context) {
-        super(context, MediaplayerContract.DATABASE_NAME, null, MediaplayerContract.DATABASE_VERSION);
+class MediaPlayerDBHelper extends SQLiteOpenHelper {
+    private Resources resources;
+
+    MediaPlayerDBHelper(Context context) {
+        super(context, MediaPlayerContract.DATABASE_NAME, null, MediaPlayerContract.DATABASE_VERSION);
         resources = context.getResources();
     }
 

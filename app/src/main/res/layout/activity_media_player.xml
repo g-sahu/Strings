@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/holo_blue_bright"
-        android:layout_weight=".12">
+        android:layout_weight=".12"
+        android:background="#ffffff">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:orientation="vertical"
                 android:background="#d9c6c6"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="15dp">
+                android:layout_marginStart="15dp">
 
                 <ImageView
                     android:id="@+id/albumArtThumbnail"
@@ -40,50 +40,47 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/trackInfoBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginLeft="10dp"
-                android:id="@+id/trackInfoBar"
+                android:layout_marginStart="10dp"
                 android:baselineAligned="false"
                 android:layout_gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/titleBar"
-                    android:layout_width="300dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/track_title"
                     android:textColor="#000000"
                     android:textIsSelectable="false"
                     android:textSize="18sp"
                     android:typeface="sans"
-                    android:singleLine="false"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
                 <TextView
                     android:id="@+id/artistBar"
-                    android:layout_width="250dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/artist_name"
                     android:textColor="#000000"
                     android:textIsSelectable="false"
                     android:textSize="12sp"
                     android:typeface="sans"
-                    android:singleLine="false"
                     android:ellipsize="end"
                     android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/albumBar"
-                    android:layout_width="250dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/album_name"
                     android:textColor="#000000"
                     android:textIsSelectable="false"
                     android:textSize="12sp"
                     android:typeface="sans"
-                    android:singleLine="false"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
@@ -95,13 +92,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="0.3">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:text="Playing from: "
                 android:ellipsize="end"
                 android:maxLines="1"
@@ -110,7 +107,7 @@
                 android:typeface="sans" />
 
             <TextView
-                android:layout_width="250dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Library"
                 android:textColor="#000000"
@@ -143,7 +140,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="0.08"
-        android:background="@android:color/holo_blue_bright">
+        android:background="#ffffff">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -162,7 +159,7 @@
                 android:paddingRight="0dp"
                 android:paddingEnd="0dp"
                 android:thumbPosition="midpoint"
-                android:maxHeight="10dp"/>
+                android:maxHeight="5dp"/>
 
         </LinearLayout>
 
@@ -262,5 +259,7 @@
                 android:layout_weight="0.20" />
 
         </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

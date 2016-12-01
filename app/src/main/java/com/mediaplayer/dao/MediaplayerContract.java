@@ -2,11 +2,11 @@ package com.mediaplayer.dao;
 
 import android.provider.BaseColumns;
 
-public final class MediaplayerContract {
-    public static final String DATABASE_NAME = "Mediaplayer";
-    public static final int DATABASE_VERSION = 1;
+public final class MediaPlayerContract {
+    static final String DATABASE_NAME = "Strings";
+    static final int DATABASE_VERSION = 1;
 
-    public MediaplayerContract() {}
+    public MediaPlayerContract() {}
 
     public static abstract class Tracks implements BaseColumns {
         public static final String TABLE_NAME = "tracks";

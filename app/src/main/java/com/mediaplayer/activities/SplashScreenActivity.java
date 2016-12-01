@@ -63,7 +63,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             case REQUEST_EXTERNAL_STORAGE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(LOG_TAG, "Starting MediaManagerService...");
-                    startService(intent);
+                    //startService(intent);
+
+                    intent = new Intent(this, SplashScreenActivity.class);
+                    startActivity(intent);
                 } else {
                     finish();
                 }

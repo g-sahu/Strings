@@ -21,16 +21,17 @@ import com.mediaplayer.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MediaplayerDAO {
-    private SQLiteDatabase db;
-    private MediaplayerDBHelper mDbHelper;
-    private Context context;
-    private static String LOG_TAG_SQL = "Executing query";
-    private static String LOG_TAG_EXCEPTION = "Exception";
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 
-    public MediaplayerDAO(Context context) {
+public class MediaPlayerDAO {
+    private SQLiteDatabase db;
+    private MediaPlayerDBHelper mDbHelper;
+    private Context context;
+
+    public MediaPlayerDAO(Context context) {
         this.context = context;
-        mDbHelper = new MediaplayerDBHelper(context);
+        mDbHelper = new MediaPlayerDBHelper(context);
         db = mDbHelper.getWritableDatabase();
     }
 

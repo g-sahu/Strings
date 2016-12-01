@@ -288,7 +288,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        //if(isTaskRoot()) {
         if(!isBackPressed) {
             MediaPlayerActivity.stopProgressBar();
 
