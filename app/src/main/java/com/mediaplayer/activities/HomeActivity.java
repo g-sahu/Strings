@@ -94,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
 
         ListView listView = SongsFragment.trackListView;
         position = listView.getPositionForView(view);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY, position);
+        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
         if(selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
@@ -208,11 +208,11 @@ public class HomeActivity extends AppCompatActivity {
     public void callMediaplayerActivity(View view) {
         ListView listView = SongsFragment.trackListView;
         position = listView.getPositionForView(view);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY,  position);
+        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY,  position);
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
         intent.setAction(MediaPlayerConstants.PLAY);
         intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
         startActivity(intent);

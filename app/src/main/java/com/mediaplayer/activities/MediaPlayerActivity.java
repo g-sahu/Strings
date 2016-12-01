@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +39,7 @@ public class MediaPlayerActivity extends AppCompatActivity
     private static Track selectedTrack;
     private static String selectedPlaylist;
     private static SeekBar songProgressBar;
-    private TextView titleBar, artistBar, albumBar, trackDuration;
+    private TextView titleBar, artistBar, albumBar, trackDuration, playingFrom;
     private static TextView timeElapsed;
     private ImageView albumArt, albumArtThumbnail;
     private static String songTitle, albumName, artistName, songDuration;
@@ -55,8 +54,7 @@ public class MediaPlayerActivity extends AppCompatActivity
     //private LinearLayout albumArtLayout;
     private Toast toast;
     private Context context;
-    private String toastText;
-    private String origin;
+    private String toastText, origin, playlistName;
 
     private MediaPlayerService mService;
     private boolean mBound = false;
@@ -73,6 +71,7 @@ public class MediaPlayerActivity extends AppCompatActivity
 
         selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
         selectedPlaylist = intent.getStringExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
+        playlistName = intent.getStringExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE);
         origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
         initializePlayer(selectedTrack);
 
@@ -291,6 +290,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         titleBar = (TextView) findViewById(R.id.titleBar);
         artistBar = (TextView) findViewById(R.id.artistBar);
         albumBar = (TextView) findViewById(R.id.albumBar);
+        playingFrom = (TextView) findViewById(R.id.playingFrom);
         timeElapsed = (TextView) findViewById(R.id.timeElapsed);
         trackDuration = (TextView) findViewById(R.id.trackDuration);
         albumArt = (ImageView) findViewById(R.id.albumArt);
@@ -302,11 +302,12 @@ public class MediaPlayerActivity extends AppCompatActivity
         songDuration = String.valueOf(requestedTrack.getTrackDuration());
 
         switch(selectedPlaylist) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 currentIndex = requestedTrack.getTrackIndex();
+                playlistName = MediaPlayerConstants.TITLE_LIBRARY;
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 currentIndex = requestedTrack.getCurrentTrackIndex();
                 break;
         }
@@ -329,6 +330,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         titleBar.setText(songTitle);
         artistBar.setText(artistName);
         albumBar.setText(albumName);
+        playingFrom.setText(playlistName);
         trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
         albumArt.setImageBitmap(bm);
         //albumArtThumbnail.setImageBitmap(Bitmap.createScaledBitmap(bm, 200, 300, false));
@@ -422,11 +424,11 @@ public class MediaPlayerActivity extends AppCompatActivity
         int nextIndex = 0;
 
         switch(selectedPlaylist) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 playlistSize = MediaLibraryManager.getTrackInfoListSize();
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 playlistSize = MediaLibraryManager.getSelectedPlaylist().size();
                 break;
         }

@@ -27,6 +27,7 @@ public class MediaPlayerConstants {
     public static final String TITLE_RENAME_PLAYLIST = "Rename playlist";
     public static final String TITLE_SELECT_TRACKS = "Select song(s)";
     public static final String TITLE_ERROR = "Error!";
+    public static final String TITLE_LIBRARY = "Music Library";
 
     public static final String OK = "OK";
     public static final String CANCEL = "Cancel";
@@ -43,9 +44,9 @@ public class MediaPlayerConstants {
     public static final String TAG_MEDIAPLAYER_ACTIVITY = "MEDIAPLAYER_ACTIVITY";
     public static final String TAG_PLAYLIST_ACTIVITY = "PLAYLIST_ACTIVITY";
     public static final String TAG_ABOUT_US = "ABOUT_US";
+    public static final String TAG_PLAYLIST_LIBRARY = "LIBRARY_PLAYLIST";
+    public static final String TAG_PLAYLIST_OTHER = "OTHER_PLAYLIST";
 
-    public static final String KEY_PLAYLIST_LIBRARY = "LIBRARY_PLAYLIST";
-    public static final String KEY_PLAYLIST_OTHER = "OTHER_PLAYLIST";
     public static final String KEY_SELECTED_TRACK = "SELECTED_TRACK";
     public static final String KEY_SELECTED_PLAYLIST = "SELECTED_PLAYLIST";
     public static final String KEY_PLAYLIST_ID = "PLAYLIST_ID";
@@ -57,4 +58,3 @@ public class MediaPlayerConstants {
 
     public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
 }
-

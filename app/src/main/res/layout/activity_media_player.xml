@@ -107,9 +107,10 @@
                 android:typeface="sans" />
 
             <TextView
+                android:id="@+id/playingFrom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Library"
+                android:text="Music Library"
                 android:textColor="#000000"
                 android:maxLines="1"
                 android:textSize="18sp"

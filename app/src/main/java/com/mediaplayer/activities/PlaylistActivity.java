@@ -58,7 +58,7 @@ public class PlaylistActivity extends AppCompatActivity {
             ArrayList<Track> trackList = dao.getTracksForPlaylist(playlistID);
 
             MediaLibraryManager.setSelectedPlaylist(trackList);
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
             trackList = MediaLibraryManager.getSelectedPlaylist();
 
             if(trackList.isEmpty()) {
@@ -82,7 +82,7 @@ public class PlaylistActivity extends AppCompatActivity {
         MenuItem optionThree = menu.findItem(R.id.removeSong);
 
         int position = listView.getPositionForView(view);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
+        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
         if (selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
@@ -134,11 +134,11 @@ public class PlaylistActivity extends AppCompatActivity {
         dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
         //Sorting the trackList for the selected playlist
-        MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
 
         //Removing track from selected playlist if it is default playlist 'Favourites'
         if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
         }
 
         //Updating list view adapter
@@ -152,10 +152,10 @@ public class PlaylistActivity extends AppCompatActivity {
         dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
 
         //Removing track from selectedPlaylist
-        MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+        MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
 
         //Sorting selectedPlaylist
-        MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
 
         //Updating list view adapter
         updatePlaylistsAdapter();
@@ -182,11 +182,12 @@ public class PlaylistActivity extends AppCompatActivity {
 
     public void callMediaplayerActivity(View view) {
         int position = listView.getPositionForView(view);
-        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.KEY_PLAYLIST_OTHER, position);
+        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.KEY_PLAYLIST_OTHER);
+        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+        intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE, selectedPlaylist.getPlaylistName());
         intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY);
         intent.setAction(MediaPlayerConstants.PLAY);
 

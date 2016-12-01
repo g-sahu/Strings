@@ -250,10 +250,10 @@ public class MediaPlayerDAO {
             deleteStmt.execute();
 
             //Removing selected track from the list of tracks
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
+            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
 
             //Sorting the list of tracks to update track indices
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
 
             //Updating track indices in db
             updateTrackIndices();

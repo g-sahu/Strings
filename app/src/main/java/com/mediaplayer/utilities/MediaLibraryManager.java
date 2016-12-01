@@ -72,7 +72,7 @@ public class MediaLibraryManager {
                 tracklistSize = trackInfoList.size();
 
                 //Sorting the track list
-                sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+                sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
 
                 if (map != null) {
                     //Updating track indices in db to keep in sync with trackInfoList
@@ -207,7 +207,7 @@ public class MediaLibraryManager {
                 tracklistSize = trackInfoList.size();
 
                 //Sorting the track list
-                sortTracklist(MediaPlayerConstants.KEY_PLAYLIST_LIBRARY);
+                sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
             } else {
                 tracklistSize = 0;
             }
@@ -241,7 +241,7 @@ public class MediaLibraryManager {
         int i = 0;
 
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 Collections.sort(trackInfoList, new Track());
                 tracklistIterator = trackInfoList.iterator();
 
@@ -253,7 +253,7 @@ public class MediaLibraryManager {
 
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 Collections.sort(selectedPlaylist, new Track());
                 tracklistIterator = selectedPlaylist.iterator();
 
@@ -336,10 +336,10 @@ public class MediaLibraryManager {
 
     public static Track getTrackByIndex(String playlistType, int index) {
         switch (playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(index);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(index);
 
             default:
@@ -349,10 +349,10 @@ public class MediaLibraryManager {
 
     public static Track getFirstTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(0);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(0);
 
             default:
@@ -362,10 +362,10 @@ public class MediaLibraryManager {
 
     public static Track getLastTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(tracklistSize - 1);
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(selectedPlaylist.size() - 1);
 
             default:
@@ -379,10 +379,10 @@ public class MediaLibraryManager {
 
     public static boolean isLastTrack(String playlistType, int index) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 return (index == (tracklistSize - 1));
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 return (index == (selectedPlaylist.size() - 1));
 
             default:
@@ -396,11 +396,11 @@ public class MediaLibraryManager {
 
     public static void removeTrack(String playlistType, int index) {
         switch(playlistType) {
-            case MediaPlayerConstants.KEY_PLAYLIST_LIBRARY:
+            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
                 trackInfoList.remove(index);
                 break;
 
-            case MediaPlayerConstants.KEY_PLAYLIST_OTHER:
+            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
                 selectedPlaylist.remove(index);
                 break;
         }
