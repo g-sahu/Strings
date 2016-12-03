@@ -28,7 +28,9 @@ public class PlaylistsAdapter extends BaseAdapter {
         Holder holder = new Holder();
         View rowView = inflater.inflate(R.layout.item_playlist, null);
         Playlist playlist = playlistInfoList.get(position);
-        String infoText = playlist.getPlaylistSize() + " songs,\t\t" + Utilities.milliSecondsToTimer(playlist.getPlaylistDuration());
+        int playlistSize = playlist.getPlaylistSize();
+        String text = (playlistSize == 1) ? " song,\t" : " songs,\t";
+        String infoText = playlistSize + text + Utilities.milliSecondsToTimer(playlist.getPlaylistDuration());
 
         holder.playlistTitle = (TextView) rowView.findViewById(R.id.playlistTitle);
         holder.playlistInfo = (TextView) rowView.findViewById(R.id.playlistInfo);

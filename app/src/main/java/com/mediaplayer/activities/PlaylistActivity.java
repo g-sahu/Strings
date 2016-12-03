@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import com.mediaplayer.fragments.SelectPlaylistDialogFragment;
 import com.mediaplayer.utilities.MediaLibraryManager;
 import com.mediaplayer.utilities.MediaPlayerConstants;
 import com.mediaplayer.utilities.SQLConstants;
+import com.mediaplayer.utilities.Utilities;
 
 import java.util.ArrayList;
 
@@ -43,15 +45,26 @@ public class PlaylistActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
+        Intent intent;
+        int playlistIndex, playlistSize;
+        TextView playlistName, playlistInfo, emptyPlaylistMessage;
+        String playlistTitle, infoText, text;
+
         try {
             homeContext = HomeActivity.getContext();
             supportFragmentManager = getSupportFragmentManager();
 
-            TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
-            Intent intent = getIntent();
+            playlistName = (TextView) findViewById(R.id.playlistName);
+            playlistInfo = (TextView) findViewById(R.id.playlistDetails);
+            emptyPlaylistMessage = (TextView) findViewById(R.id.emptyPlaylistMessage);
+
+            intent = getIntent();
             playlistID = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, 0);
-            int playlistIndex = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, 0);
+            playlistIndex = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, 0);
             selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(playlistIndex);
+            playlistTitle = selectedPlaylist.getPlaylistName();
+            infoText = getPlaylistDetails();
+
             MediaPlayerDAO dao = new MediaPlayerDAO(this);
 
             //Fetching all tracks for the selected playlist from database
@@ -62,8 +75,11 @@ public class PlaylistActivity extends AppCompatActivity {
             trackList = MediaLibraryManager.getSelectedPlaylist();
 
             if(trackList.isEmpty()) {
-                textView.setVisibility(View.VISIBLE);
+                emptyPlaylistMessage.setVisibility(View.VISIBLE);
             } else {
+                playlistName.setText(playlistTitle);
+                playlistInfo.setText(infoText);
+
                 listView = (ListView) findViewById(R.id.listView);
                 ListAdapter playlistAdapter = new SongsListAdapter(this, trackList);
                 listView.setAdapter(playlistAdapter);
@@ -169,10 +185,15 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void updatePlaylistsAdapter() {
+        TextView playlistInfo, emptyPlaylistMessage;
+
         if(MediaLibraryManager.isUserPlaylistEmpty()) {
-            TextView textView = (TextView) findViewById(R.id.emptyPlaylistMessage);
-            textView.setVisibility(View.VISIBLE);
+            emptyPlaylistMessage = (TextView) findViewById(R.id.emptyPlaylistMessage);
+            emptyPlaylistMessage.setVisibility(View.VISIBLE);
         }
+
+        playlistInfo = (TextView) findViewById(R.id.playlistDetails);
+        playlistInfo.setText(getPlaylistDetails());
 
         PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());
         ListView listView = PlaylistsFragment.listView;
@@ -192,5 +213,16 @@ public class PlaylistActivity extends AppCompatActivity {
         intent.setAction(MediaPlayerConstants.PLAY);
 
         startActivity(intent);
+    }
+
+    private String getPlaylistDetails() {
+        String text, infoText;
+        int playlistSize;
+
+        playlistSize = selectedPlaylist.getPlaylistSize();
+        text = (playlistSize == 1) ? " song,\t" : " songs,\t";
+        infoText = playlistSize + text + Utilities.milliSecondsToTimer(selectedPlaylist.getPlaylistDuration());
+
+        return infoText;
     }
 }

@@ -17,8 +17,11 @@
             android:layout_gravity="center"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_launcher"
-            android:layout_margin="5dp" />
+            android:src="@drawable/default_album_art"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp" />
 
         <TextView
             android:id="@+id/trackTitle"
@@ -29,7 +32,6 @@
             android:textSize="17sp"
             android:textColor="#030303"
             android:layout_alignTop="@+id/albumThumbnail"
-            android:layout_toRightOf="@+id/albumThumbnail"
             android:layout_toEndOf="@+id/albumThumbnail"
             android:maxLines="1"
             android:maxLength="30"
@@ -44,7 +46,6 @@
             android:textColor="#555555"
             android:text="@string/artist_name"
             android:layout_alignBottom="@+id/albumThumbnail"
-            android:layout_alignLeft="@+id/trackTitle"
             android:layout_alignStart="@+id/trackTitle"
             android:maxLines="1"
             android:maxLength="35"
@@ -59,9 +60,8 @@
         android:contentDescription="@string/more_options"
         android:background="@null"
         android:adjustViewBounds="false"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:onClick="showSongsPopupMenu" />
