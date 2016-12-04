@@ -41,12 +41,13 @@ public class SongsFragment extends Fragment {
         try {
             view = inflater.inflate(R.layout.fragment_songs, container, false);
             textView = (TextView) view.findViewById(R.id.emptyLibraryMessage);
+            trackListView = (ListView) view.findViewById(R.id.listView);
             trackInfoList = MediaLibraryManager.getTrackInfoList();
 
             if(trackInfoList == null || trackInfoList.isEmpty()) {
                 textView.setVisibility(View.VISIBLE);
+                trackListView.setVisibility(View.GONE);
             } else {
-                trackListView = (ListView) view.findViewById(R.id.listView);
                 songsListAdapter = new SongsListAdapter(context, trackInfoList);
                 trackListView.setAdapter(songsListAdapter);
             }

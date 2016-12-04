@@ -41,10 +41,10 @@ public class SelectTrackDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
         Playlist selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
-        int size = tracksInLibrary.size(), trackInPlaylistSize, c = 0, listLength;
+        int trackInPlaylistSize, c = 0, listLength;
 
         //Checking if playlist size > 1 i.e. the user has created any custom playlist
-        if(!tracksInLibrary.isEmpty()) {
+        if(tracksInLibrary != null && !tracksInLibrary.isEmpty()) {
             MediaPlayerDAO dao = new MediaPlayerDAO(context);
             tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
 

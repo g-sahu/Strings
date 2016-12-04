@@ -259,7 +259,7 @@ public class HomeActivity extends AppCompatActivity {
         try {
             startActivity(myAppLinkToMarket);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, " unable to find market app", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, MessageConstants.ERROR_404, Toast.LENGTH_LONG).show();
         }
     }
 

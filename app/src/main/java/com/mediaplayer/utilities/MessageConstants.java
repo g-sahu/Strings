@@ -26,8 +26,9 @@ public class MessageConstants {
     public static final String ERROR_NO_PLAYLIST = "There are no other playlists to add to.";
     public static final String ERROR_NO_TRACK = "There are no other songs to add.";
     public static final String ERROR_DUPLICATE_TRACK_FAVOURITES = "Song already added to Favourites!";
-    public static final String ERROR_DUPLICATE_TRACK_PLAYLIST = "Song already added to selected playlist(s)!";
     public static final String ERROR_PLAYLIST_TITLE_BLANK = "Please enter a name for the playlist!";
     public static final String ERROR_PLAYLIST_TITLE_FAVOURITES = "Playlist 'Favourites' already exists. Please enter a new name!";
     public static final String ERROR_PLAYLIST_TITLE = "A playlist with this name already exists. Please enter a new name!";
+    public static final String ERROR_404 = "Could not find app on Google Play Store!";
+    public static final String APP_DESC = "Strings - Music Player";
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -219,7 +218,7 @@ public class PlaylistActivity extends AppCompatActivity {
         int playlistSize;
 
         playlistSize = selectedPlaylist.getPlaylistSize();
-        text = (playlistSize == 1) ? " song,\t" : " songs,\t";
+        text = (playlistSize == SQLConstants.ONE) ? " song,\t" : " songs,\t";
         infoText = playlistSize + text + Utilities.milliSecondsToTimer(selectedPlaylist.getPlaylistDuration());
 
         return infoText;
