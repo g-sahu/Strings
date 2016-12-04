@@ -6,15 +6,18 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,27 +46,33 @@ public class MediaPlayerActivity extends AppCompatActivity
     private static TextView timeElapsed;
     private ImageView albumArt, albumArtThumbnail;
     private static String songTitle, albumName, artistName, songDuration;
-
     private static Handler mHandler = new Handler();
     private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
-    private boolean isPaused = false, isIdle = true, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
+    private boolean isPaused = false, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
     private int currentIndex;
     private int playlistSize;
     private byte data[];
     private Bitmap bm;
-    //private LinearLayout albumArtLayout;
     private Toast toast;
     private Context context;
     private String toastText, origin, playlistName;
-
     private MediaPlayerService mService;
     private boolean mBound = false;
+    private int width, height;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_player);
         Log.d(LOG_TAG, "MediaPlayerActivity created");
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+        Log.d("Width", String.valueOf(width));
+        Log.d("Height", String.valueOf(height));
 
         context = getApplicationContext();
         Intent intent = getIntent();
@@ -75,7 +84,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
         initializePlayer(selectedTrack);
 
-        // Listener for seek bar
+        //Setting SeekBar listener
         songProgressBar.setOnSeekBarChangeListener(this);
 
         if(action != null) {
@@ -154,9 +163,8 @@ public class MediaPlayerActivity extends AppCompatActivity
                 //Else, if stopped, start playback
                 playSong(selectedTrack);
                 isPaused = false;
-                songProgressBar.setProgress(0);
-                songProgressBar.setMax(100);
-                //updateProgressBar();
+                songProgressBar.setProgress(SQLConstants.ZERO);
+                songProgressBar.setMax(SQLConstants.HUNDRED);
             } else {
                 //Else, if paused, resume current track
                 mp.start();
@@ -171,7 +179,6 @@ public class MediaPlayerActivity extends AppCompatActivity
         mp = MediaPlayerService.getMp();
         mp.reset();
         MediaPlayerService.setMp(mp);
-        isIdle = true;
 
         if(isShuffling) {
             //If shuffling is on, play a random song
@@ -208,7 +215,6 @@ public class MediaPlayerActivity extends AppCompatActivity
         mp = MediaPlayerService.getMp();
         mp.reset();
         MediaPlayerService.setMp(mp);
-        isIdle = true;
 
         if(isShuffling) {
             //If shuffling is on, play a random song
@@ -228,7 +234,6 @@ public class MediaPlayerActivity extends AppCompatActivity
                 toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
                 toast.show();
                 mService.stopForeground(false);
-                //mService.createNotification(selectedTrack);
                 mService.createNotification(selectedTrack, selectedPlaylist);
                 stopProgressBar();
                 return;
@@ -295,7 +300,6 @@ public class MediaPlayerActivity extends AppCompatActivity
         trackDuration = (TextView) findViewById(R.id.trackDuration);
         albumArt = (ImageView) findViewById(R.id.albumArt);
         albumArtThumbnail = (ImageView) findViewById(R.id.albumArtThumbnail);
-        //albumArtLayout = (LinearLayout) findViewById(R.id.albumArtLayout);
         songTitle = requestedTrack.getTrackTitle();
         albumName = requestedTrack.getAlbumName();
         artistName = requestedTrack.getArtistName();
@@ -313,12 +317,8 @@ public class MediaPlayerActivity extends AppCompatActivity
         }
 
         data = requestedTrack.getAlbumArt();
-        songProgressBar.setProgress(0);
-        songProgressBar.setMax(100);
-
-        if(data != null) {
-            bm = BitmapFactory.decodeByteArray(data, 0, data.length);
-        }
+        songProgressBar.setProgress(SQLConstants.ZERO);
+        songProgressBar.setMax(SQLConstants.HUNDRED);
 
         if(mp == null) {
             mp = new MediaPlayer();
@@ -332,10 +332,18 @@ public class MediaPlayerActivity extends AppCompatActivity
         albumBar.setText(albumName);
         playingFrom.setText(playlistName);
         trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
-        albumArt.setImageBitmap(bm);
-        //albumArtThumbnail.setImageBitmap(Bitmap.createScaledBitmap(bm, 200, 300, false));
-        albumArtThumbnail.setImageBitmap(bm);
 
+        if(data != null) {
+            bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
+
+            if(bm != null) {
+                int size = width / 2;
+                albumArt.setImageBitmap(Bitmap.createScaledBitmap(bm, size, size, false));
+            }
+        }
+
+        //albumArt.setImageBitmap(bm);
+        albumArtThumbnail.setImageBitmap(bm);
         Log.d(LOG_TAG, "Media Player initialized");
     }
 
@@ -569,7 +577,6 @@ public class MediaPlayerActivity extends AppCompatActivity
             //Checking if track is on loop
             if (isRepeatingCurrent) {
                 mp.reset();
-                isIdle = true;
                 playSong(selectedTrack);
 
                 //Checking if it is not the last track in the playlist
@@ -583,7 +590,6 @@ public class MediaPlayerActivity extends AppCompatActivity
                 }
 
                 mp.reset();
-                isIdle = true;
                 selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
                 initializePlayer(selectedTrack);
                 playSong(selectedTrack);
@@ -599,7 +605,6 @@ public class MediaPlayerActivity extends AppCompatActivity
                 }
 
                 mp.reset();
-                isIdle = true;
                 selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
                 initializePlayer(selectedTrack);
                 playSong(selectedTrack);
@@ -609,7 +614,6 @@ public class MediaPlayerActivity extends AppCompatActivity
                 if (isShuffling) {
                     currentIndex = getNextIndex();
                     mp.reset();
-                    isIdle = true;
                     selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
                     initializePlayer(selectedTrack);
                     playSong(selectedTrack);
@@ -620,7 +624,6 @@ public class MediaPlayerActivity extends AppCompatActivity
                     stopProgressBar();
                     isPaused = false;
                     mService.stopForeground(false);
-                    //mService.createNotification(selectedTrack);
                     mService.createNotification(selectedTrack, selectedPlaylist);
                 }
             }

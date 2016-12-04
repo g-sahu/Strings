@@ -46,7 +46,7 @@ public class PlaylistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playlist);
 
         Intent intent;
-        int playlistIndex, playlistSize;
+        int playlistIndex;
         TextView playlistName, playlistInfo, emptyPlaylistMessage;
         String playlistTitle, infoText, text;
 
@@ -73,13 +73,12 @@ public class PlaylistActivity extends AppCompatActivity {
             MediaLibraryManager.setSelectedPlaylist(trackList);
             MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
             trackList = MediaLibraryManager.getSelectedPlaylist();
+            playlistName.setText(playlistTitle);
+            playlistInfo.setText(infoText);
 
             if(trackList.isEmpty()) {
                 emptyPlaylistMessage.setVisibility(View.VISIBLE);
             } else {
-                playlistName.setText(playlistTitle);
-                playlistInfo.setText(infoText);
-
                 listView = (ListView) findViewById(R.id.listView);
                 ListAdapter playlistAdapter = new SongsListAdapter(this, trackList);
                 listView.setAdapter(playlistAdapter);

@@ -29,7 +29,6 @@ public class MediaLibraryManager {
     private static ArrayList<Track> selectedPlaylist;
     private static ArrayList<Playlist> playlistInfoList;
     private static int tracklistSize;
-    private static int selectedPlaylistSize;
 
     public MediaLibraryManager(){}
 

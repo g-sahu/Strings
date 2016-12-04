@@ -29,12 +29,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         Log.d(LOG_TAG, "SplashScreenActivity created");
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        Log.d("Width", String.valueOf(size.x));
-        Log.d("Height", String.valueOf(size.y));
-
         //Creating intent for MediaManagerService
         intent = new Intent(this, MediaManagerService.class);
 
