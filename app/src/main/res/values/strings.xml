@@ -30,5 +30,7 @@
     <string name="rate_app">Rate</string>
     <string name="about_us">About</string>
     <string name="share_app">Share</string>
+    <string name="playing_from">Playing from:\t</string>
+    <string name="music_library">Music Library</string>
 
 </resources>

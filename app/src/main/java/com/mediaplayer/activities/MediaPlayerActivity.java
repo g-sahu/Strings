@@ -339,10 +339,11 @@ public class MediaPlayerActivity extends AppCompatActivity
             if(bm != null) {
                 int size = width / 2;
                 albumArt.setImageBitmap(Bitmap.createScaledBitmap(bm, size, size, false));
+            } else {
+                albumArt.setImageBitmap(bm);
             }
         }
 
-        //albumArt.setImageBitmap(bm);
         albumArtThumbnail.setImageBitmap(bm);
         Log.d(LOG_TAG, "Media Player initialized");
     }
