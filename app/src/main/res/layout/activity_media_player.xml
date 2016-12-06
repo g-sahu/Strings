@@ -177,6 +177,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
                 android:text="@string/time_zero"
+                android:textColor="#000000"
                 android:layout_weight="0"/>
 
             <TextView
@@ -193,6 +194,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="end|center_vertical"
                 android:text="@string/time_zero"
+                android:textColor="#000000"
                 android:layout_weight="0"/>
 
         </LinearLayout>

@@ -123,7 +123,7 @@ public class MediaPlayerService extends IntentService {
             MediaSession mMediaSession = new MediaSession(this, MediaPlayerConstants.TAG_MEDIA_SESSION);
 
             //Setting mediastyle attributes
-            mediaStyle.setShowActionsInCompactView(SQLConstants.ONE);
+            mediaStyle.setShowActionsInCompactView(0, 1, 2);
             mediaStyle.setMediaSession(mMediaSession.getSessionToken());
 
             //Setting builder attributes
@@ -133,7 +133,6 @@ public class MediaPlayerService extends IntentService {
             builder.setSubText(selectedTrack.getAlbumName());
             builder.setLargeIcon(bm);
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-            //builder.setSmallIcon(R.drawable.ic_library_music_white_18dp);
             builder.setSmallIcon(R.drawable.ic_launcher);
             builder.setShowWhen(false);
 
