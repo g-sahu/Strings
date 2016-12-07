@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +32,8 @@ import com.mediaplayer.utilities.Utilities;
 
 import java.util.ArrayList;
 
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+
 public class PlaylistActivity extends AppCompatActivity {
     private ListView listView;
     private FragmentManager supportFragmentManager;
@@ -47,7 +50,8 @@ public class PlaylistActivity extends AppCompatActivity {
         Intent intent;
         int playlistIndex;
         TextView playlistName, playlistInfo, emptyPlaylistMessage;
-        String playlistTitle, infoText, text;
+        String playlistTitle, infoText;
+        MediaPlayerDAO dao = null;
 
         try {
             homeContext = HomeActivity.getContext();
@@ -64,7 +68,7 @@ public class PlaylistActivity extends AppCompatActivity {
             playlistTitle = selectedPlaylist.getPlaylistName();
             infoText = getPlaylistDetails();
 
-            MediaPlayerDAO dao = new MediaPlayerDAO(this);
+            dao = new MediaPlayerDAO(this);
 
             //Fetching all tracks for the selected playlist from database
             ArrayList<Track> trackList = dao.getTracksForPlaylist(playlistID);
@@ -83,7 +87,11 @@ public class PlaylistActivity extends AppCompatActivity {
                 listView.setAdapter(playlistAdapter);
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
         }
     }
 
@@ -134,46 +142,76 @@ public class PlaylistActivity extends AppCompatActivity {
     //Add to favourites menu option
     private void addToFavourites() {
         ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
-        selectedPlaylists.add(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES));
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.addToPlaylists(selectedPlaylists, selectedTrack);
+        MediaPlayerDAO dao = null;
 
-        //Updating list view adapter
-        updatePlaylistsAdapter();
+        try {
+            selectedPlaylists.add(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES));
+            dao = new MediaPlayerDAO(this);
+            dao.addToPlaylists(selectedPlaylists, selectedTrack);
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     //Remove from favourites menu option
     private void removeFromFavourites() {
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
+        MediaPlayerDAO dao = null;
 
-        //Sorting the trackList for the selected playlist
-        MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+        try {
+            dao = new MediaPlayerDAO(this);
+            dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
-        //Removing track from selected playlist if it is default playlist 'Favourites'
-        if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+            //Sorting the trackList for the selected playlist
+            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+
+            //Removing track from selected playlist if it is default playlist 'Favourites'
+            if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
+                MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+            }
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+            updateSongsListAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
         }
-
-        //Updating list view adapter
-        updatePlaylistsAdapter();
-        updateSongsListAdapter();
     }
 
     //Remove from playlist menu option
     public void removeSong(MenuItem menuItem) {
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
+        MediaPlayerDAO dao = null;
 
-        //Removing track from selectedPlaylist
-        MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+        try {
+            dao = new MediaPlayerDAO(this);
+            dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
 
-        //Sorting selectedPlaylist
-        MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+            //Removing track from selectedPlaylist
+            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
 
-        //Updating list view adapter
-        updatePlaylistsAdapter();
-        updateSongsListAdapter();
+            //Sorting selectedPlaylist
+            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+            updateSongsListAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     private void updateSongsListAdapter() {

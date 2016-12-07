@@ -40,6 +40,10 @@ import com.mediaplayer.utilities.MessageConstants;
 import com.mediaplayer.utilities.SQLConstants;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 
 public class HomeActivity extends AppCompatActivity {
     private int position;
@@ -57,7 +61,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         Log.d(LOG_TAG, "HomeActivity created");
         context = this;
-
         Intent intent = getIntent();
 
         if(intent.getBooleanExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, false)) {
@@ -125,31 +128,61 @@ public class HomeActivity extends AppCompatActivity {
 
     //Add to favourites menu option
     private void addToFavourites() {
+        MediaPlayerDAO dao = null;
         ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
-        selectedPlaylists.add(favouritesPlaylist);
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
-        //Updating list view adapter
-        updatePlaylistsAdapter();
+        try {
+            selectedPlaylists.add(favouritesPlaylist);
+            dao = new MediaPlayerDAO(this);
+            dao.addToPlaylists(selectedPlaylists, selectedTrack);
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     //Remove from favourites menu option
     private void removeFromFavourites() {
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.removeFromPlaylist(favouritesPlaylist, selectedTrack);
+        MediaPlayerDAO dao = null;
 
-        //Updating list view adapter
-        updatePlaylistsAdapter();
+        try {
+            dao = new MediaPlayerDAO(this);
+            dao.removeFromPlaylist(favouritesPlaylist, selectedTrack);
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     //Remove from library menu option
     public void removeSong(MenuItem menuItem) {
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.removeFromLibrary(selectedTrack);
+        MediaPlayerDAO dao = null;
 
-        //Updating list view adapter
-        updateSongsListAdapter();
+        try {
+            dao = new MediaPlayerDAO(this);
+            dao.removeFromLibrary(selectedTrack);
+
+            //Updating list view adapter
+            updateSongsListAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     //Show playlists pop-up menu options
@@ -198,11 +231,21 @@ public class HomeActivity extends AppCompatActivity {
 
     //Delete playlist menu option
     public void deletePlaylist(MenuItem menuItem) {
-        MediaPlayerDAO dao = new MediaPlayerDAO(this);
-        dao.deletePlaylist(selectedPlaylist);
+        MediaPlayerDAO dao = null;
 
-        //Updating list view adapter
-        updatePlaylistsAdapter();
+        try {
+            dao = new MediaPlayerDAO(this);
+            dao.deletePlaylist(selectedPlaylist);
+
+            //Updating list view adapter
+            updatePlaylistsAdapter();
+        } catch (Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
+        }
     }
 
     public void callMediaplayerActivity(View view) {

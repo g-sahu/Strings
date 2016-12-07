@@ -3,14 +3,12 @@ package com.mediaplayer.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 
 import com.mediaplayer.R;
 import com.mediaplayer.services.MediaManagerService;
@@ -57,10 +55,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             case REQUEST_EXTERNAL_STORAGE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(LOG_TAG, "Starting MediaManagerService...");
-                    //startService(intent);
+                    startService(intent);
 
-                    intent = new Intent(this, SplashScreenActivity.class);
-                    startActivity(intent);
+                    /*intent = new Intent(this, SplashScreenActivity.class);
+                    startActivity(intent);*/
                 } else {
                     finish();
                 }

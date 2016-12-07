@@ -286,10 +286,6 @@ public class MediaLibraryManager {
         }
     }
 
-    public static void addTrack(Track track) {
-        trackInfoList.add(track);
-    }
-
     public static ArrayList<Track> getTrackInfoList() {
         return trackInfoList;
     }

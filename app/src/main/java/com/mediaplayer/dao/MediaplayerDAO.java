@@ -49,7 +49,7 @@ public class MediaPlayerDAO {
     public void addToPlaylists(ArrayList<Playlist> selectedPlaylists, Track selectedTrack) {
         SQLiteStatement insertStmt, updateStmt;
         String toastText;
-        int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration;
+        int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, increment = SQLConstants.ONE;
         Playlist playlist;
 
         try {
@@ -65,7 +65,7 @@ public class MediaPlayerDAO {
                 playlistID = playlist.getPlaylistID();
                 playlistSize = playlist.getPlaylistSize();
                 playlistDuration = playlist.getPlaylistDuration();
-                newPlaylistSize = playlistSize + 1;
+                newPlaylistSize = playlistSize + increment;
                 newPlaylistDuration = playlistDuration + selectedTrack.getTrackDuration();
 
                 //Making an entry in table 'Playlist_Detail' for the selected playlist
@@ -141,8 +141,8 @@ public class MediaPlayerDAO {
 
             //Deleting record from table 'Playlist_Detail'
             String args[] = {String.valueOf(playlistID), String.valueOf(trackID)};
-            Log.d(LOG_TAG_SQL, db.toString());
             db.execSQL(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST, args);
+            Log.d(LOG_TAG_SQL, SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST);
 
             newPlaylistSize = playlistSize - 1;
             newPlaylistDuration = playlistDuration - selectedTrack.getTrackDuration();

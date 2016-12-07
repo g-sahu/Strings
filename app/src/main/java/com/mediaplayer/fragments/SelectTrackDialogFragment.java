@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.mediaplayer.activities.HomeActivity;
@@ -22,6 +23,8 @@ import com.mediaplayer.utilities.SQLConstants;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+
 public class SelectTrackDialogFragment extends DialogFragment {
     private Context context;
     private ArrayList<Track> selectedTracks;
@@ -36,92 +39,116 @@ public class SelectTrackDialogFragment extends DialogFragment {
         String list[];
         Track track;
         int trackID;
+        AlertDialog.Builder builder = null;
+        MediaPlayerDAO dao = null;
 
-        context = getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        Bundle args = getArguments();
-        Playlist selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
-        int trackInPlaylistSize, c = 0, listLength;
+        try {
+            context = getContext();
+            builder = new AlertDialog.Builder(getActivity());
+            Bundle args = getArguments();
+            Playlist selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
+            int trackInPlaylistSize, c = 0, listLength;
 
-        //Checking if playlist size > 1 i.e. the user has created any custom playlist
-        if(tracksInLibrary != null && !tracksInLibrary.isEmpty()) {
-            MediaPlayerDAO dao = new MediaPlayerDAO(context);
-            tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
+            //Checking if playlist size > 1 i.e. the user has created any custom playlist
+            if(tracksInLibrary != null && !tracksInLibrary.isEmpty()) {
+                dao = new MediaPlayerDAO(context);
+                tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
 
-            if(tracksInPlaylist != null && !tracksInPlaylist.isEmpty()) {
-                trackInPlaylistSize = tracksInPlaylist.size();
-            } else {
-                trackInPlaylistSize = 0;
-            }
-
-            //Creating list of tracks to display in multiselect dialog
-            tracksToDisplay = new ArrayList<>();
-
-            //Iterating tracks in library to remove tracks already added to playlist
-            tracksIterator = tracksInLibrary.iterator();
-
-            while(tracksIterator.hasNext()) {
-                track = tracksIterator.next();
-                trackID = track.getTrackID();
-
-                if(trackInPlaylistSize == SQLConstants.ZERO || !tracksInPlaylist.contains(trackID)) {
-                    tracksToDisplay.add(track);
+                if (tracksInPlaylist != null && !tracksInPlaylist.isEmpty()) {
+                    trackInPlaylistSize = tracksInPlaylist.size();
+                } else {
+                    trackInPlaylistSize = 0;
                 }
-            }
 
-            selectedTracks = new ArrayList<Track>();
-            list = new String[tracksToDisplay.size()];
-            listLength = list.length;
+                //Creating list of tracks to display in multiselect dialog
+                tracksToDisplay = new ArrayList<>();
 
-            //Setting the title of the dialog window
-            builder.setTitle(MediaPlayerConstants.TITLE_SELECT_TRACKS);
+                //Iterating tracks in library to remove tracks already added to playlist
+                tracksIterator = tracksInLibrary.iterator();
 
-            if(listLength != 0) {
-                tracksIterator = tracksToDisplay.iterator();
-
-                while(tracksIterator.hasNext()) {
+                while (tracksIterator.hasNext()) {
                     track = tracksIterator.next();
-                    list[c++] = track.getTrackTitle();
+                    trackID = track.getTrackID();
+
+                    if (trackInPlaylistSize == SQLConstants.ZERO || !tracksInPlaylist.contains(trackID)) {
+                        tracksToDisplay.add(track);
+                    }
                 }
 
-                builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        Track track = tracksToDisplay.get(which);
+                selectedTracks = new ArrayList<Track>();
+                list = new String[tracksToDisplay.size()];
+                listLength = list.length;
 
-                        if(isChecked) {
-                            selectedTracks.add(track);
-                        } else if(selectedTracks.contains(track)) {
-                            selectedTracks.remove(track);
+                //Setting the title of the dialog window
+                builder.setTitle(MediaPlayerConstants.TITLE_SELECT_TRACKS);
+
+                if (listLength != 0) {
+                    tracksIterator = tracksToDisplay.iterator();
+
+                    while (tracksIterator.hasNext()) {
+                        track = tracksIterator.next();
+                        list[c++] = track.getTrackTitle();
+                    }
+
+                    builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                            Track track = tracksToDisplay.get(which);
+
+                            if (isChecked) {
+                                selectedTracks.add(track);
+                            } else if (selectedTracks.contains(track)) {
+                                selectedTracks.remove(track);
+                            }
                         }
-                    }
-                });
+                    });
 
-                builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        if(!selectedTracks.isEmpty()) {
-                            //Add track to selected playlists
-                            MediaPlayerDAO dao = new MediaPlayerDAO(getContext());
-                            dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
+                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            MediaPlayerDAO dao = null;
 
-                            //Updating list view adapter
-                            updatePlaylistsAdapter();
+                            if(!selectedTracks.isEmpty()) {
+                                try {
+                                    dao = new MediaPlayerDAO(getContext());
 
-                            //Removing added tracks from tracksInLibrary
-                            tracksToDisplay.removeAll(selectedTracks);
+                                    //Add track to selected playlists
+                                    dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
+                                } catch(Exception e) {
+                                    Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                                } finally {
+                                    if(dao != null) {
+                                        dao.closeConnection();
+                                    }
+                                }
+
+                                //Updating list view adapter
+                                updatePlaylistsAdapter();
+
+                                //Removing added tracks from tracksInLibrary
+                                tracksToDisplay.removeAll(selectedTracks);
+                            }
                         }
-                    }
-                });
+                    });
 
-                builder.setNegativeButton(MediaPlayerConstants.CANCEL, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Do nothing
-                    }
-                });
+                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Do nothing
+                        }
+                    });
+                } else {
+                    builder.setMessage(MessageConstants.ERROR_NO_TRACK);
+                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Do nothing
+                        }
+                    });
+                }
             } else {
-                builder.setMessage(MessageConstants.ERROR_NO_TRACK);
+                builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
+                builder.setMessage(MessageConstants.ERROR_NO_TRACKS_ADDED);
                 builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -129,15 +156,12 @@ public class SelectTrackDialogFragment extends DialogFragment {
                     }
                 });
             }
-        } else {
-            builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
-            builder.setMessage(MessageConstants.ERROR_NO_TRACKS_ADDED);
-            builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    //Do nothing
-                }
-            });
+        } catch(Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+        } finally {
+            if(dao != null) {
+                dao.closeConnection();
+            }
         }
 
         return builder.create();
