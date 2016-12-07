@@ -40,10 +40,8 @@ import com.mediaplayer.utilities.MessageConstants;
 import com.mediaplayer.utilities.SQLConstants;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
-import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 
 public class HomeActivity extends AppCompatActivity {
     private int position;
@@ -52,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
     private static Playlist favouritesPlaylist;
     private FragmentManager supportFragmentManager;
     private static Context context;
-    private static String LOG_TAG = "HomeActivity";
+    private final static String LOG_TAG = "HomeActivity";
     private boolean isBackPressed;
 
     @Override

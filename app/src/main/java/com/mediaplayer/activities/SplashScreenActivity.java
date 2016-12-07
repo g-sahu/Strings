@@ -14,7 +14,7 @@ import com.mediaplayer.R;
 import com.mediaplayer.services.MediaManagerService;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    private static String LOG_TAG = "SplashScreenActivity";
+    private static final String LOG_TAG = "SplashScreenActivity";
     private Intent intent;
 
     //Storage Permissions

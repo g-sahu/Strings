@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">Strings</string>
-    <string name="play">Play</string>
-    <string name="stop">Stop</string>
-    <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="album_art">Album Art</string>
     <string name="track_title">Track Title</string>
     <string name="artist_name">Artist Name</string>

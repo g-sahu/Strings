@@ -17,7 +17,6 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,29 +35,23 @@ import java.util.Random;
 
 public class MediaPlayerActivity extends AppCompatActivity
         implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
-    private static String LOG_TAG = "MediaPlayerActivity";
+    private static final String LOG_TAG = "MediaPlayerActivity";
     private static MediaPlayer mp;
-    private ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
     private static Track selectedTrack;
     private static String selectedPlaylist;
     private static SeekBar songProgressBar;
-    private TextView titleBar, artistBar, albumBar, trackDuration, playingFrom;
     private static TextView timeElapsed;
-    private ImageView albumArt, albumArtThumbnail;
-    private static String songTitle, albumName, artistName, songDuration;
-    private static Handler mHandler = new Handler();
+    private static final Handler mHandler = new Handler();
+
+    private ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
     private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
-    private boolean isPaused = false, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false;
-    private int currentIndex;
-    private int playlistSize;
-    private byte data[];
+    private boolean isPaused = false, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false, mBound = false;
+    private int currentIndex, playlistSize, width;
     private Bitmap bm;
     private Toast toast;
     private Context context;
     private String toastText, origin, playlistName;
     private MediaPlayerService mService;
-    private boolean mBound = false;
-    private int width, height;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,9 +63,6 @@ public class MediaPlayerActivity extends AppCompatActivity
         Point size = new Point();
         display.getSize(size);
         width = size.x;
-        height = size.y;
-        Log.d("Width", String.valueOf(width));
-        Log.d("Height", String.valueOf(height));
 
         context = getApplicationContext();
         Intent intent = getIntent();
@@ -283,7 +273,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         toast.show();
     }
 
-    public void initializePlayer(Track requestedTrack) {
+    private void initializePlayer(Track requestedTrack) {
         Log.d(LOG_TAG, "Initializing Media Player...");
 
         playButton = (ImageButton) findViewById(R.id.playButton);
@@ -292,18 +282,18 @@ public class MediaPlayerActivity extends AppCompatActivity
         repeatButton = (ImageButton) findViewById(R.id.repeatButton);
         shuffleButton = (ImageButton) findViewById(R.id.shuffleButton);
         songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
-        titleBar = (TextView) findViewById(R.id.titleBar);
-        artistBar = (TextView) findViewById(R.id.artistBar);
-        albumBar = (TextView) findViewById(R.id.albumBar);
-        playingFrom = (TextView) findViewById(R.id.playingFrom);
+        TextView titleBar = (TextView) findViewById(R.id.titleBar);
+        TextView artistBar = (TextView) findViewById(R.id.artistBar);
+        TextView albumBar = (TextView) findViewById(R.id.albumBar);
+        TextView playingFrom = (TextView) findViewById(R.id.playingFrom);
         timeElapsed = (TextView) findViewById(R.id.timeElapsed);
-        trackDuration = (TextView) findViewById(R.id.trackDuration);
-        albumArt = (ImageView) findViewById(R.id.albumArt);
-        albumArtThumbnail = (ImageView) findViewById(R.id.albumArtThumbnail);
-        songTitle = requestedTrack.getTrackTitle();
-        albumName = requestedTrack.getAlbumName();
-        artistName = requestedTrack.getArtistName();
-        songDuration = String.valueOf(requestedTrack.getTrackDuration());
+        TextView trackDuration = (TextView) findViewById(R.id.trackDuration);
+        ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
+        ImageView albumArtThumbnail = (ImageView) findViewById(R.id.albumArtThumbnail);
+        String songTitle = requestedTrack.getTrackTitle();
+        String albumName = requestedTrack.getAlbumName();
+        String artistName = requestedTrack.getArtistName();
+        String songDuration = String.valueOf(requestedTrack.getTrackDuration());
 
         switch(selectedPlaylist) {
             case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
@@ -316,7 +306,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 break;
         }
 
-        data = requestedTrack.getAlbumArt();
+        byte[] data = requestedTrack.getAlbumArt();
         songProgressBar.setProgress(SQLConstants.ZERO);
         songProgressBar.setMax(SQLConstants.HUNDRED);
 
@@ -348,7 +338,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Media Player initialized");
     }
 
-    public void playSong(Track selectedTrack) {
+    private void playSong(Track selectedTrack) {
         Log.d(LOG_TAG, "START: The playSong() event");
 
         Intent intent = new Intent(this, MediaPlayerService.class);
@@ -383,7 +373,7 @@ public class MediaPlayerActivity extends AppCompatActivity
     }
 
     //Update timer on seekbar
-    public void updateProgressBar() {
+    private void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 10);
     }
 
@@ -427,7 +417,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         updateProgressBar();
     }
 
-    public int getNextIndex() {
+    private int getNextIndex() {
         boolean isPlayed;
         tracksCompleted.add(currentIndex);
         int nextIndex = 0;

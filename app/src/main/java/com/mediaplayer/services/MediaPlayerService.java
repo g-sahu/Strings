@@ -27,7 +27,7 @@ import java.io.IOException;
 import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class MediaPlayerService extends IntentService {
-    private static String LOG_TAG = "MediaPlayerService";
+    private static final String LOG_TAG = "MediaPlayerService";
     private static MediaPlayer mp;
     public static boolean isServiceRunning;
     public static boolean isServiceBound;

@@ -128,7 +128,6 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     });
                 }
             } else {
-                //TODO: 23-Aug-16 Update this dialog's design. Add a button to create playlist
                 builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
                 builder.setMessage(MessageConstants.ERROR_NO_PLAYLIST_CREATED);
                 builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {

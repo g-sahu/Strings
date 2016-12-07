@@ -24,7 +24,7 @@ import java.util.Iterator;
 import static com.mediaplayer.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class MediaLibraryManager {
-    private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+    private final static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
     private static ArrayList<Track> trackInfoList;
     private static ArrayList<Track> selectedPlaylist;
     private static ArrayList<Playlist> playlistInfoList;
@@ -456,7 +456,6 @@ public class MediaLibraryManager {
         byte data[];
         int c = -1;
 
-        ArrayList<Track> renamedTracksList = new ArrayList<Track>();            // TODO: 13-Oct-16
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
         try {
