@@ -8,7 +8,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Environment;
 import android.util.Log;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;

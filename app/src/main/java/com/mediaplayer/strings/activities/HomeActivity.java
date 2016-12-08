@@ -20,7 +20,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.HomePagerAdapter;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.adapters.SongsListAdapter;

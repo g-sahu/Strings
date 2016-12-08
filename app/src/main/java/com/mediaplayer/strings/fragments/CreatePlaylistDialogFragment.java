@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;

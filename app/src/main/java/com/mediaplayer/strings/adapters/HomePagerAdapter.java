@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.mediaplayer.strings.fragments.SongsFragment;
 import com.mediaplayer.strings.fragments.PlaylistsFragment;
+import com.mediaplayer.strings.fragments.SongsFragment;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 
 public class HomePagerAdapter extends FragmentPagerAdapter {

@@ -6,7 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
+
 
 public class AboutUsDialogFragment extends DialogFragment {
     @NonNull

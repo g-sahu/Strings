@@ -4,7 +4,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '25.0.1'
     defaultConfig {
-        applicationId "com.mediaplayer"
+        applicationId "com.mediaplayer.strings"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1

@@ -11,7 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
 
 import java.util.ArrayList;

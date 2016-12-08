@@ -10,7 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.services.MediaManagerService;
 
 public class SplashScreenActivity extends AppCompatActivity {

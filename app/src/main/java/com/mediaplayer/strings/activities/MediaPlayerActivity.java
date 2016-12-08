@@ -21,7 +21,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.services.MediaPlayerService;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;

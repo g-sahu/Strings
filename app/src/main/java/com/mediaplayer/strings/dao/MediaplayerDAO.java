@@ -14,9 +14,9 @@ import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
+import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.Iterator;

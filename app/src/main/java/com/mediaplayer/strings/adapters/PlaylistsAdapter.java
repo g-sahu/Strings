@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.utilities.Utilities;
 

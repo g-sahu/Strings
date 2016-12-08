@@ -16,7 +16,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.mediaplayer.R;
+import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
