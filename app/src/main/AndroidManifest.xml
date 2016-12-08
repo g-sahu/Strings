@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <activity android:name=".activities.SplashScreenActivity"
+        <activity android:name=".strings.activities.SplashScreenActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,22 +21,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.HomeActivity" />
+        <activity android:name=".strings.activities.HomeActivity" />
         <activity
-            android:name=".activities.MediaPlayerActivity"
+            android:name=".strings.activities.MediaPlayerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" />
-        <activity android:name=".activities.PlaylistActivity" />
+        <activity android:name=".strings.activities.PlaylistActivity" />
 
         <service
-            android:name=".services.MediaPlayerService"
+            android:name=".strings.services.MediaPlayerService"
             android:exported="false" />
         <service
-            android:name=".services.MediaManagerService"
+            android:name=".strings.services.MediaManagerService"
             android:exported="false" />
 
         <receiver
-            android:name=".services.MediaPlayerReceiver"
+            android:name=".strings.services.MediaPlayerReceiver"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
