@@ -8,6 +8,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
@@ -83,8 +84,11 @@ public class MediaLibraryManager {
             playlistInfoList = dao.getPlaylists();
             sortPlaylists();
         } catch(Exception e) {
-            e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -211,8 +215,11 @@ public class MediaLibraryManager {
                 tracklistSize = 0;
             }
         } catch(Exception e) {
-            e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         } finally {
             if(mmr != null) {
                 mmr.release();
@@ -221,9 +228,12 @@ public class MediaLibraryManager {
             if(stream != null) {
                 try {
                     stream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch(IOException e) {
                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+                    FirebaseCrash.log(e.getMessage());
+                    FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                    FirebaseCrash.report(e);
                 }
             }
         }
@@ -599,8 +609,11 @@ public class MediaLibraryManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         } finally {
             mmr.release();
         }

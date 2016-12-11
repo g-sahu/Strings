@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
@@ -91,8 +92,10 @@ public class MediaPlayerService extends IntentService {
             mp.prepare();
             mp.start();
             Log.d(LOG_TAG, "Now Playing: " + selectedTrack.getTrackTitle());
-        } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
+        } catch(IOException | IllegalStateException e) {
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         }
 
         Log.d(LOG_TAG, "END: The playSong() event");
@@ -206,8 +209,11 @@ public class MediaPlayerService extends IntentService {
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(SQLConstants.ONE, notification);
         } catch(Exception e) {
-            e.printStackTrace();
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         }
 
         Log.d(LOG_TAG, "Notification created");

@@ -1,27 +1,35 @@
 {
   "project_info": {
-    "project_number": "912018414884",
-    "firebase_url": "https://mediaplayer-project-d71a6.firebaseio.com",
-    "project_id": "mediaplayer-project-d71a6",
-    "storage_bucket": "mediaplayer-project-d71a6.appspot.com"
+    "project_number": "922107198912",
+    "firebase_url": "https://strings-19bc9.firebaseio.com",
+    "project_id": "strings-19bc9",
+    "storage_bucket": "strings-19bc9.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:912018414884:android:41bff670a1c56a03",
+        "mobilesdk_app_id": "1:922107198912:android:f9a3ba082433a275",
         "android_client_info": {
-          "package_name": "com.mediaplayer"
+          "package_name": "com.mediaplayer.strings"
         }
       },
       "oauth_client": [
         {
-          "client_id": "912018414884-jckf6val23jkkn9ikjh93bn5ukevfku1.apps.googleusercontent.com",
+          "client_id": "922107198912-2vnqpnrcp8gudlf8keftoso7ibs4d8mi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mediaplayer.strings",
+            "certificate_hash": "CE817E728A3686BFD999D048900A44019C7BD253"
+          }
+        },
+        {
+          "client_id": "922107198912-idarp2jl6kv2m6ph7f29maa3r27qv94s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBYezdyIwiAav_j-2vXwkeLjp007c5HMpM"
+          "current_key": "AIzaSyAP7-ZDCdUP48lYEyjdio09TW6ZWqqIhjU"
         }
       ],
       "services": {
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "922107198912-idarp2jl6kv2m6ph7f29maa3r27qv94s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

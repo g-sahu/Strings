@@ -14,7 +14,7 @@ public class MessageConstants {
     public static final String ADDED_TO_FAVOURITES = "Added to Favourites.";
     public static final String REMOVED_FROM_PLAYLIST = "Removed from playlist.";
     public static final String REMOVED_FROM_FAVOURITES = "Removed from Favourites.";
-    public static final String REMOVED_FROM_LIBRARY = "Removed from Library.";
+    public static final String REMOVED_FROM_LIBRARY = "Removed from Music Library.";
     public static final String PLAYLIST_CREATED = "Playlist created.";
     public static final String PLAYLIST_RENAMED = "Playlist renamed.";
     public static final String PLAYLIST_DELETED = "Playlist deleted.";
@@ -30,5 +30,4 @@ public class MessageConstants {
     public static final String ERROR_PLAYLIST_TITLE_FAVOURITES = "Playlist 'Favourites' already exists. Please enter a new name!";
     public static final String ERROR_PLAYLIST_TITLE = "A playlist with this name already exists. Please enter a new name!";
     public static final String ERROR_404 = "Could not find app on Google Play Store!";
-    public static final String APP_DESC = "Strings - Music Player";
 }

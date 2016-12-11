@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
+import com.mediaplayer.strings.utilities.SQLConstants;
 import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class PlaylistsAdapter extends BaseAdapter {
         View rowView = inflater.inflate(R.layout.item_playlist, null);
         Playlist playlist = playlistInfoList.get(position);
         int playlistSize = playlist.getPlaylistSize();
-        String text = (playlistSize == 1) ? " song,\t" : " songs,\t";
+        String text = (playlistSize == SQLConstants.ONE) ? " song, " : " songs, ";
         String infoText = playlistSize + text + Utilities.milliSecondsToTimer(playlist.getPlaylistDuration());
 
         holder.playlistTitle = (TextView) rowView.findViewById(R.id.playlistTitle);

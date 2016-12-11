@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -74,6 +75,10 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.createPlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+
+                                        FirebaseCrash.log(e.getMessage());
+                                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                                        FirebaseCrash.report(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -145,6 +150,10 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.renamePlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+
+                                        FirebaseCrash.log(e.getMessage());
+                                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                                        FirebaseCrash.report(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -162,8 +171,12 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                     }
                 });
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         }
 
         return playlistDialog;

@@ -12,10 +12,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
+import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 
 import java.util.ArrayList;
 
@@ -52,8 +54,11 @@ public class SongsFragment extends Fragment {
                 trackListView.setAdapter(songsListAdapter);
             }
         } catch(Exception e) {
-            e.printStackTrace();
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         }
 
         return view;
