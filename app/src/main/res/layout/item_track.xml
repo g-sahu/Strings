@@ -48,7 +48,6 @@
             android:layout_alignBottom="@+id/albumThumbnail"
             android:layout_alignStart="@+id/trackTitle"
             android:maxLines="1"
-            android:maxLength="35"
             android:ellipsize="end"/>
     </RelativeLayout>
 
