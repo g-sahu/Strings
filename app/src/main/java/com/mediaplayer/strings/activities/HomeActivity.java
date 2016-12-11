@@ -18,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -289,7 +291,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateSongsListAdapter() {
-        SongsListAdapter adapter = new SongsListAdapter(this, MediaLibraryManager.getTrackInfoList());
+        ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
+
+        if(trackList.isEmpty()) {
+            RelativeLayout emptyLibraryMessage = (RelativeLayout) findViewById(R.id.emptyLibraryMessage);
+            emptyLibraryMessage.setVisibility(View.VISIBLE);
+        }
+
+        SongsListAdapter adapter = new SongsListAdapter(this, trackList);
         ListView listView = SongsFragment.trackListView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();

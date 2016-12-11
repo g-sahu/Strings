@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
@@ -36,18 +36,18 @@ public class SongsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = null;
-        TextView textView;
+        RelativeLayout emptyLibraryMessage;
         ArrayList<Track> trackInfoList;
         ListAdapter songsListAdapter;
 
         try {
             view = inflater.inflate(R.layout.fragment_songs, container, false);
-            textView = (TextView) view.findViewById(R.id.emptyLibraryMessage);
+            emptyLibraryMessage = (RelativeLayout) view.findViewById(R.id.emptyLibraryMessage);
             trackListView = (ListView) view.findViewById(R.id.listView);
             trackInfoList = MediaLibraryManager.getTrackInfoList();
 
             if(trackInfoList == null || trackInfoList.isEmpty()) {
-                textView.setVisibility(View.VISIBLE);
+                emptyLibraryMessage.setVisibility(View.VISIBLE);
                 trackListView.setVisibility(View.GONE);
             } else {
                 songsListAdapter = new SongsListAdapter(context, trackInfoList);

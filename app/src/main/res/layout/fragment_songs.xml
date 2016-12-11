@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/songsFragment"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/emptyLibraryMessage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/empty_library"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"/>
+        android:layout_centerInParent="true"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/emptyLibraryMessage_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_library_message_1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/emptyLibraryMessage_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_library_message_2"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/emptyLibraryMessage_1"
+            android:layout_marginTop="10dp"/>
+
+    </RelativeLayout>
 
     <ListView android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
 
-</LinearLayout>
+</RelativeLayout>
