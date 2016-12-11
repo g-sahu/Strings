@@ -107,6 +107,11 @@
                 android:typeface="sans" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:width="7dp"/>
+
+            <TextView
                 android:id="@+id/playingFrom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
