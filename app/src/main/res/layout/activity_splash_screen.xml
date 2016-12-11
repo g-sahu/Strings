@@ -6,6 +6,11 @@
     android:background="#0099cc"
     android:fitsSystemWindows="true" >
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
     <TextView
         android:id="@+id/appName"
         android:layout_width="wrap_content"
@@ -14,9 +19,7 @@
         android:text="@string/app_name"
         android:textColor="#ffffff"
         android:textSize="50sp"
-        android:layout_marginTop="230dp"
-        android:layout_marginBottom="20dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginBottom="10dp" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -24,7 +27,9 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:indeterminateTint="#ffffff"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/appName" />
+        android:layout_below="@+id/appName"
+        android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
