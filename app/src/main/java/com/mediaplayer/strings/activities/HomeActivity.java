@@ -65,7 +65,7 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         if(intent.getBooleanExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, false)) {
-            Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, MessageConstants.LIBRARY_UPDATED, Toast.LENGTH_LONG);
             toast.show();
         }
 
