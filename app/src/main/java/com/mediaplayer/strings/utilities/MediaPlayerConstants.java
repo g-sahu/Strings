@@ -58,4 +58,5 @@ public class MediaPlayerConstants {
 
     public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
     public static final String ACTION_SERVICE_BROADCAST = "com.mediaplayer.SERVICE_BROADCAST";
+    public static final String VERSION = "Version";
 }
