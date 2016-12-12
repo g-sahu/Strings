@@ -3,7 +3,7 @@
     tools:context="com.mediaplayer.strings.activities.SplashScreenActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#059DF1"
     android:fitsSystemWindows="true" >
 
     <RelativeLayout
@@ -11,24 +11,21 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-    <TextView
-        android:id="@+id/appName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:keepScreenOn="true"
-        android:text="@string/app_name"
-        android:textColor="#ffffff"
-        android:textSize="50sp"
-        android:layout_marginBottom="10dp" />
+        <ImageView
+            android:id="@+id/appName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/app_logo" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:indeterminateTint="#ffffff"
-        android:layout_below="@+id/appName"
-        android:layout_centerHorizontal="true"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="#ffffff"
+            android:layout_below="@+id/appName"
+            android:layout_centerHorizontal="true"/>
 
     </RelativeLayout>
 
