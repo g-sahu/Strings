@@ -31,8 +31,6 @@ public class MediaLibraryManager {
     private static ArrayList<Playlist> playlistInfoList;
     private static int tracklistSize;
 
-    public MediaLibraryManager(){}
-
     public static boolean init(Context context) {
         HashMap<String, ArrayList<Track>> map;
         ArrayList<Track> trackList, newTracksList = null, deletedTracksList = null;

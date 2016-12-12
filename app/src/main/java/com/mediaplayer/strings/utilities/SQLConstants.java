@@ -188,9 +188,4 @@ public final class SQLConstants {
             "DELETE FROM " + MediaPlayerContract.PlaylistDetail.TABLE_NAME +
                     " WHERE " + MediaPlayerContract.PlaylistDetail.PLAYLIST_ID + " = ?" +
                     " AND " + MediaPlayerContract.PlaylistDetail.TRACK_ID + " = ?";
-
-    //Drop table queries
-    public static final String SQL_DELETE_TRACKS = "DROP TABLE IF EXISTS " + MediaPlayerContract.Tracks.TABLE_NAME;
-    public static final String SQL_DELETE_PLAYLISTS = "DROP TABLE IF EXISTS " + MediaPlayerContract.Playlists.TABLE_NAME;
-    public static final String SQL_DELETE_PLAYLIST_DETAIL = "DROP TABLE IF EXISTS " + MediaPlayerContract.PlaylistDetail.TABLE_NAME;
 }
