@@ -6,8 +6,6 @@ public final class MediaPlayerContract {
     static final String DATABASE_NAME = "Strings";
     static final int DATABASE_VERSION = 1;
 
-    public MediaPlayerContract() {}
-
     public static abstract class Tracks implements BaseColumns {
         public static final String TABLE_NAME = "tracks";
         public static final String TRACK_ID = "track_id";
