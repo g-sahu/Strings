@@ -14,7 +14,7 @@ public class MediaPlayerReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d("MediaPlayerReceiver", "Broadcast received");
         intent.setClass(context, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 }

@@ -34,41 +34,28 @@ public class SplashScreenActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "Starting MediaManagerService...");
             startService(intent);
             Log.d(LOG_TAG, "Exiting SplashScreenActivity");
+        } else {
+            //Request read/write storage permission from the user
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
     }
 
     private boolean hasPermissions() {
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if(permission != PackageManager.PERMISSION_GRANTED) {
-            // Request for permission from the user
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-            return false;
-        } else {
-            return true;
-        }
+        return permission == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
+        switch(requestCode) {
             case REQUEST_EXTERNAL_STORAGE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(LOG_TAG, "Starting MediaManagerService...");
                     startService(intent);
-
-                    /*intent = new Intent(this, SplashScreenActivity.class);
-                    startActivity(intent);*/
                 } else {
                     finish();
                 }
             }
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "SplashScreenActivity destroyed");
     }
 }

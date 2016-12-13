@@ -46,20 +46,20 @@ import java.util.ArrayList;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class HomeActivity extends AppCompatActivity {
-    private int position;
+    private final static String LOG_TAG = "HomeActivity";
     private static Track selectedTrack;
-    private static Playlist selectedPlaylist;
-    private static Playlist favouritesPlaylist;
+    private static Playlist selectedPlaylist, favouritesPlaylist;
     private FragmentManager supportFragmentManager;
     private static Context context;
-    private final static String LOG_TAG = "HomeActivity";
     private boolean isBackPressed;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Log.d(LOG_TAG, "HomeActivity created");
+
         context = this;
         Intent intent = getIntent();
 
