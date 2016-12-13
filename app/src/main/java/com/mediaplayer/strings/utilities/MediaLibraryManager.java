@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -104,33 +105,44 @@ public class MediaLibraryManager {
         HashMap<String, Object> song;
         String fileName, filePath;
         long fileSize;
+        int musicFilesCount = 0;
 
-        //Getting all the files at the given path
-        File[] fileList = path.listFiles();
+        try {
+            //Getting all the files at the given path
+            File[] fileList = path.listFiles();
 
-        if(fileList != null && (fileList.length > 0)) {
-            Log.d("Files in the directory", String.valueOf(fileList.length));
-            tracklist = new ArrayList<HashMap<String, Object>>();
+            if(fileList != null && (fileList.length > 0)) {
+                Log.d("Files in the directory", String.valueOf(fileList.length));
+                tracklist = new ArrayList<HashMap<String, Object>>();
 
-            //Iterate through the directory to search for .mp3 files
-            for(File file : fileList) {
-                //Check if file extension is .mp3
-                if(isExtensionValid(file)) {
-                    song = new HashMap<String, Object>();
-                    fileName = file.getName().split("[.]")[0];
-                    filePath = file.getAbsolutePath();
-                    fileSize = file.length();
+                //Iterate through the directory to search for .mp3 files
+                for(File file : fileList) {
+                    //Check if file extension is .mp3
+                    if(isExtensionValid(file)) {
+                        song = new HashMap<String, Object>();
+                        fileName = file.getName().split("[.]")[0];
+                        filePath = file.getAbsolutePath();
+                        fileSize = file.length();
 
-                    song.put(MediaPlayerConstants.FILE_NAME, fileName);
-                    song.put(MediaPlayerConstants.FILE_PATH, filePath);
-                    song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
+                        song.put(MediaPlayerConstants.FILE_NAME, fileName);
+                        song.put(MediaPlayerConstants.FILE_PATH, filePath);
+                        song.put(MediaPlayerConstants.FILE_SIZE, fileSize);
 
-                    tracklist.add(song);
+                        tracklist.add(song);
+                    }
                 }
-            }
 
-            Log.d("Music files fetched", String.valueOf(tracklist.size()));
+                musicFilesCount = tracklist.size();
+            }
+        } catch(Exception e) {
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            FirebaseCrash.log(e.getMessage());
+            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            FirebaseCrash.report(e);
         }
+
+        Log.d("Music files fetched", String.valueOf(musicFilesCount));
 
         return tracklist;
     }
