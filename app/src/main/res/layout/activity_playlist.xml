@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginBottom="5dp"
-        android:background="@color/colorPrimary"
+        android:background="#059DF1"
         android:layout_weight="0.01">
 
         <TextView
