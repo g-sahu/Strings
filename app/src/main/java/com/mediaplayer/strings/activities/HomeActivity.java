@@ -51,7 +51,6 @@ public class HomeActivity extends AppCompatActivity {
     private static Playlist selectedPlaylist, favouritesPlaylist;
     private FragmentManager supportFragmentManager;
     private static Context context;
-    private boolean isBackPressed;
     private int position;
 
     @Override
@@ -350,20 +349,16 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Log.d(LOG_TAG, "Back button pressed");
-        isBackPressed = true;
-        finish();
+        moveTaskToBack(false);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if(!isBackPressed) {
-            MediaPlayerActivity.stopProgressBar();
-
-            Intent intent = new Intent(this, MediaPlayerService.class);
-            stopService(intent);
-        }
+        MediaPlayerActivity.stopProgressBar();
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        stopService(intent);
 
         Log.d(LOG_TAG, "HomeActivity destroyed");
     }
