@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
+import com.mediaplayer.strings.utilities.MediaLibraryManager;
 
 import java.util.ArrayList;
 
@@ -27,23 +28,36 @@ public class SongsListAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
-        View rowView = inflater.inflate(R.layout.item_track, null);
-        byte data[] = trackInfoList.get(position).getAlbumArt();
+        Holder holder;
+        View rowView;
         Bitmap albumArt = null;
+        Track track = trackInfoList.get(position);
+        System.out.println("getview:" + position + " " + convertView);
 
-        holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
-        holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
-        holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
-        holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreTrackOptionsButton);
+        if(convertView == null) {
+            holder = new Holder();
+            rowView = inflater.inflate(R.layout.item_track, null);
+
+            holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
+            holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
+            holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
+            holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreTrackOptionsButton);
+
+            rowView.setTag(holder);
+        } else {
+            rowView = convertView;
+            holder = (Holder) rowView.getTag();
+        }
+
+        byte data[] = track.getAlbumArt();
 
         if(data != null) {
             albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
         }
 
         holder.albumArt.setImageBitmap(albumArt);
-        holder.trackTitle.setText(trackInfoList.get(position).getTrackTitle());
-        holder.artistName.setText(trackInfoList.get(position).getArtistName());
+        holder.trackTitle.setText(track.getTrackTitle());
+        holder.artistName.setText(track.getArtistName());
 
         return rowView;
     }
@@ -55,7 +69,7 @@ public class SongsListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return trackInfoList.get(position);
     }
 
     @Override
