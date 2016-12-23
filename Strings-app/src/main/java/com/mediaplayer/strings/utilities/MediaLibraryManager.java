@@ -6,10 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
@@ -85,9 +83,9 @@ public class MediaLibraryManager {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -137,9 +135,9 @@ public class MediaLibraryManager {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         }
 
         Log.d("Music files fetched", String.valueOf(musicFilesCount));
@@ -227,9 +225,9 @@ public class MediaLibraryManager {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(mmr != null) {
                 mmr.release();
@@ -241,9 +239,9 @@ public class MediaLibraryManager {
                 } catch(IOException e) {
                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-                    FirebaseCrash.log(e.getMessage());
+                    /*FirebaseCrash.log(e.getMessage());
                     FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                    FirebaseCrash.report(e);
+                    FirebaseCrash.report(e);*/
                 }
             }
         }
@@ -621,9 +619,9 @@ public class MediaLibraryManager {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             mmr.release();
         }

@@ -12,7 +12,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
@@ -56,9 +55,9 @@ public class SongsFragment extends Fragment {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         }
 
         return view;

@@ -17,7 +17,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
@@ -90,9 +89,9 @@ public class PlaylistActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -159,9 +158,9 @@ public class PlaylistActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -191,9 +190,9 @@ public class PlaylistActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -221,9 +220,9 @@ public class PlaylistActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();

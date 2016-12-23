@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
@@ -24,6 +23,8 @@ import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
 
 import java.io.IOException;
+
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class MediaPlayerService extends IntentService {
     private static final String LOG_TAG = "MediaPlayerService";
@@ -93,9 +94,11 @@ public class MediaPlayerService extends IntentService {
             mp.start();
             Log.d(LOG_TAG, "Now Playing: " + selectedTrack.getTrackTitle());
         } catch(IOException | IllegalStateException e) {
-            FirebaseCrash.log(e.getMessage());
+            e.printStackTrace();
+
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         }
 
         Log.d(LOG_TAG, "END: The playSong() event");
@@ -209,11 +212,11 @@ public class MediaPlayerService extends IntentService {
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(SQLConstants.ONE, notification);
         } catch(Exception e) {
-            Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         }
 
         Log.d(LOG_TAG, "Notification created");

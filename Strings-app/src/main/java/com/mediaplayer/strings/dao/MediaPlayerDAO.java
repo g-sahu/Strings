@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
@@ -112,17 +111,17 @@ public class MediaPlayerDAO {
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
 
-            FirebaseCrash.log(sqle.getMessage());
+            /*FirebaseCrash.log(sqle.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-            FirebaseCrash.report(sqle);
+            FirebaseCrash.report(sqle);*/
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -189,9 +188,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -273,9 +272,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -312,9 +311,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(updateStmt != null) {
                 updateStmt.close();
@@ -354,9 +353,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -387,9 +386,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -447,9 +446,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -530,17 +529,17 @@ public class MediaPlayerDAO {
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, sqle.getMessage());
 
-            FirebaseCrash.log(sqle.getMessage());
+            /*FirebaseCrash.log(sqle.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-            FirebaseCrash.report(sqle);
+            FirebaseCrash.report(sqle);*/
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -585,9 +584,9 @@ public class MediaPlayerDAO {
             } catch(SQLException sqle) {
                 Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
 
-                FirebaseCrash.log(sqle.getMessage());
+                /*FirebaseCrash.log(sqle.getMessage());
                 FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                FirebaseCrash.report(sqle);
+                FirebaseCrash.report(sqle);*/
             }
         }
 
@@ -649,9 +648,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(playlistsCursor != null) {
                 playlistsCursor.close();
@@ -682,9 +681,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -782,9 +781,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -823,9 +822,9 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(tracksCursor != null) {
                 tracksCursor.close();

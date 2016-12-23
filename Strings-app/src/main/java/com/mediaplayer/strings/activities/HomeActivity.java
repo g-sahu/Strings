@@ -21,7 +21,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.HomePagerAdapter;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
@@ -140,9 +139,9 @@ public class HomeActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -163,9 +162,9 @@ public class HomeActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -186,9 +185,9 @@ public class HomeActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -253,9 +252,9 @@ public class HomeActivity extends AppCompatActivity {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -324,9 +323,11 @@ public class HomeActivity extends AppCompatActivity {
         try {
             startActivity(myAppLinkToMarket);
         } catch(ActivityNotFoundException e) {
-            FirebaseCrash.log(e.getMessage());
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
 
             Toast.makeText(this, MessageConstants.ERROR_404, Toast.LENGTH_LONG).show();
         }

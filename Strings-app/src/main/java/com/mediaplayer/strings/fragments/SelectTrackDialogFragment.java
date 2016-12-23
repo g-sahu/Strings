@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.ListView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.activities.HomeActivity;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -116,9 +115,9 @@ public class SelectTrackDialogFragment extends DialogFragment {
                                 } catch(Exception e) {
                                     Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-                                    FirebaseCrash.log(e.getMessage());
+                                    /*FirebaseCrash.log(e.getMessage());
                                     FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    FirebaseCrash.report(e);
+                                    FirebaseCrash.report(e);*/
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
@@ -162,9 +161,9 @@ public class SelectTrackDialogFragment extends DialogFragment {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(dao != null) {
                 dao.closeConnection();

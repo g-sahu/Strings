@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
@@ -89,9 +88,9 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                     } catch(SQLException sqle) {
                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
 
-                        FirebaseCrash.log(sqle.getMessage());
+                        /*FirebaseCrash.log(sqle.getMessage());
                         FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                        FirebaseCrash.report(sqle);
+                        FirebaseCrash.report(sqle);*/
                     }
                 }
 
@@ -100,9 +99,9 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
 
-            FirebaseCrash.log(e.getMessage());
+            /*FirebaseCrash.log(e.getMessage());
             FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            FirebaseCrash.report(e);*/
         } finally {
             if(insertStmt != null) {
                 insertStmt.close();
