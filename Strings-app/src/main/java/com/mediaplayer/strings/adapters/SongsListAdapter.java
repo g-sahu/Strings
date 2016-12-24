@@ -32,7 +32,7 @@ public class SongsListAdapter extends BaseAdapter {
         View rowView;
         Bitmap albumArt = null;
         Track track = trackInfoList.get(position);
-        System.out.println("getview:" + position + " " + convertView);
+        byte data[] = track.getAlbumArt();
 
         if(convertView == null) {
             holder = new Holder();
@@ -41,15 +41,12 @@ public class SongsListAdapter extends BaseAdapter {
             holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
             holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
             holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
-            holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreTrackOptionsButton);
 
             rowView.setTag(holder);
         } else {
             rowView = convertView;
             holder = (Holder) rowView.getTag();
         }
-
-        byte data[] = track.getAlbumArt();
 
         if(data != null) {
             albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -81,6 +78,5 @@ public class SongsListAdapter extends BaseAdapter {
         ImageView albumArt;
         TextView trackTitle;
         TextView artistName;
-        ImageButton moreOptions;
     }
 }
