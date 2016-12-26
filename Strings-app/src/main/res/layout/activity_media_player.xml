@@ -242,7 +242,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.20"
                 android:contentDescription="@string/play_button"
-                android:onClick="play"/>
+                android:onClick="play" />
 
             <ImageButton
                 android:id="@+id/nextButton"

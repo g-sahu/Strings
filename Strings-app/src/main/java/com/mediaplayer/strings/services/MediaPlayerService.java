@@ -68,7 +68,6 @@ public class MediaPlayerService extends IntentService {
         Track selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
         String selectedPlaylist = intent.getStringExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
         playSong(selectedTrack);
-        //Notification notification = createNotification(selectedTrack);
         Notification notification = createNotification(selectedTrack, selectedPlaylist);
         startForeground(1, notification);
         Log.d(LOG_TAG, "Is foreground?: true");

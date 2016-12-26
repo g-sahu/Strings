@@ -268,9 +268,10 @@ public class HomeActivity extends AppCompatActivity {
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY,  position);
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
+        intent.setAction(MediaPlayerConstants.PLAY);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
-        intent.setAction(MediaPlayerConstants.PLAY);
+        intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE, MediaPlayerConstants.TITLE_LIBRARY);
         intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
         startActivity(intent);
     }
