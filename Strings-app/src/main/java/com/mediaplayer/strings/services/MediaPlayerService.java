@@ -20,6 +20,7 @@ import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
+import com.mediaplayer.strings.utilities.MediaPlayerStateManager;
 import com.mediaplayer.strings.utilities.SQLConstants;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class MediaPlayerService extends IntentService {
     private static MediaPlayer mp;
     public static boolean isServiceRunning;
     public static boolean isServiceBound;
+    private MediaPlayerStateManager mManager;
     private IBinder mBinder = new MyBinder();
 
     public MediaPlayerService() {
@@ -49,6 +51,7 @@ public class MediaPlayerService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.d(LOG_TAG, "Service created");
+        mManager = ((MediaPlayerStateManager) getApplicationContext());
     }
 
     @Override
@@ -91,6 +94,7 @@ public class MediaPlayerService extends IntentService {
             mp.setDataSource(filePath);
             mp.prepare();
             mp.start();
+            mManager.setPaused(false);
             Log.d(LOG_TAG, "Now Playing: " + selectedTrack.getTrackTitle());
         } catch(IOException | IllegalStateException e) {
             e.printStackTrace();
@@ -144,7 +148,8 @@ public class MediaPlayerService extends IntentService {
             Intent pauseIntent = new Intent(this, MediaPlayerActivity.class);
             Intent playIntent = new Intent(this, MediaPlayerActivity.class);
             Intent nextIntent = new Intent(this, MediaPlayerActivity.class);
-            Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
+            //Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
+            Intent deleteIntent = new Intent(this, MediaPlayerService.class);
 
             //Setting actions and extras for intents
             prevIntent.setAction(MediaPlayerConstants.PREVIOUS)
@@ -170,7 +175,8 @@ public class MediaPlayerService extends IntentService {
             PendingIntent pausePendingIntent = PendingIntent.getActivity(this, zero, pauseIntent, flag);
             PendingIntent playPendingIntent = PendingIntent.getActivity(this, zero, playIntent, flag);
             PendingIntent nextPendingIntent = PendingIntent.getActivity(this, zero, nextIntent, flag);
-            PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
+            //PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
+            PendingIntent deletePendingIntent = PendingIntent.getService(this, zero, deleteIntent, flag);
 
             //Checking OS build version for notification compatibility
             if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
