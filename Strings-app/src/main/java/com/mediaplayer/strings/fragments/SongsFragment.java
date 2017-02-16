@@ -2,7 +2,6 @@ package com.mediaplayer.strings.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 
 import java.util.ArrayList;
 
@@ -54,10 +52,7 @@ public class SongsFragment extends Fragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         }
 
         return view;

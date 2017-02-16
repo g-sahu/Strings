@@ -1,5 +1,9 @@
 package com.mediaplayer.strings.utilities;
 
+import android.util.Log;
+
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -71,5 +75,11 @@ public class Utilities {
         SimpleDateFormat df = new SimpleDateFormat(SQLConstants.DD_MM_YYYY);
 
         return df.format(c.getTime());
+    }
+
+    public static void reportCrash(Exception e) {
+        FirebaseCrash.log(e.getMessage());
+        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+        FirebaseCrash.report(e);
     }
 }

@@ -98,10 +98,7 @@ public class MediaPlayerService extends IntentService {
             Log.d(LOG_TAG, "Now Playing: " + selectedTrack.getTrackTitle());
         } catch(IOException | IllegalStateException e) {
             e.printStackTrace();
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         }
 
         Log.d(LOG_TAG, "END: The playSong() event");
@@ -218,10 +215,7 @@ public class MediaPlayerService extends IntentService {
             mNotificationManager.notify(SQLConstants.ONE, notification);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         }
 
         Log.d(LOG_TAG, "Notification created");

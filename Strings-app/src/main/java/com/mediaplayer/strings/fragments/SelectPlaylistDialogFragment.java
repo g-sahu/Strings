@@ -119,10 +119,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                                     dao.addToPlaylists(selectedPlaylists, selectedTrack);
                                 } catch(Exception e) {
                                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-                                    /*FirebaseCrash.log(e.getMessage());
-                                    FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    FirebaseCrash.report(e);*/
+                                    //Utilities.reportCrash(e);
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
@@ -166,10 +163,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();

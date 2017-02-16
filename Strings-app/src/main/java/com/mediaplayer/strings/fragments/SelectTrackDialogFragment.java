@@ -115,10 +115,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                                     dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
                                 } catch(Exception e) {
                                     Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-                                    /*FirebaseCrash.log(e.getMessage());
-                                    FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    FirebaseCrash.report(e);*/
+                                    //Utilities.reportCrash(e);
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
@@ -161,10 +158,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();

@@ -87,10 +87,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                         ++tracksInserted;
                     } catch(SQLException sqle) {
                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-
-                        /*FirebaseCrash.log(sqle.getMessage());
-                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                        FirebaseCrash.report(sqle);*/
+                        //Utilities.reportCrash(e);
                     }
                 }
 
@@ -98,10 +95,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            /*FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);*/
+            //Utilities.reportCrash(e);
         } finally {
             if(insertStmt != null) {
                 insertStmt.close();
