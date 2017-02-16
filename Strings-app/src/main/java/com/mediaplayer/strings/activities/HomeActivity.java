@@ -3,6 +3,7 @@ package com.mediaplayer.strings.activities;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -59,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "HomeActivity created");
 
         context = this;
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         Intent intent = getIntent();
 
         if(intent.getBooleanExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, false)) {
