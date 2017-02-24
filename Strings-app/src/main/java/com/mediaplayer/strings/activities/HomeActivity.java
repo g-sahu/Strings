@@ -174,16 +174,14 @@ public class HomeActivity extends AppCompatActivity {
 
         try {
             dao = new MediaPlayerDAO(this);
-            dao.removeFromLibrary(selectedTrack);
-
-            //Updating list view adapter
-            updateSongsListAdapter();
+            MediaPlayerDAO.UpdateTracksTask task = new MediaPlayerDAO.UpdateTracksTask(this);
+            task.execute(selectedTrack);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
-                dao.closeConnection();
+                //dao.closeConnection();
             }
         }
     }
@@ -276,20 +274,6 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, playlistID);
         intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, position);
         startActivity(intent);
-    }
-
-    private void updateSongsListAdapter() {
-        ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
-
-        if(trackList.isEmpty()) {
-            RelativeLayout emptyLibraryMessage = (RelativeLayout) findViewById(R.id.emptyLibraryMessage);
-            emptyLibraryMessage.setVisibility(View.VISIBLE);
-        }
-
-        SongsListAdapter adapter = new SongsListAdapter(this, trackList);
-        ListView listView = SongsFragment.trackListView;
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
 
     private void updatePlaylistsAdapter() {

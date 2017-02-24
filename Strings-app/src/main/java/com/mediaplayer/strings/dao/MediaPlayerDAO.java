@@ -1,17 +1,25 @@
 package com.mediaplayer.strings.dao;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.mediaplayer.strings.R;
+import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
+import com.mediaplayer.strings.fragments.SongsFragment;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
@@ -22,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MediaPlayerDAO {
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
     private MediaPlayerDBHelper mDbHelper;
     private Context context;
 
@@ -192,93 +200,9 @@ public class MediaPlayerDAO {
         toast.show();
     }
 
-    public void removeFromLibrary(Track selectedTrack) {
-        SQLiteStatement updateStmt, deleteStmt;
-        String toastText;
-        int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, trackDuration;
-        Playlist playlist;
-        Cursor cursor = null;
-
-        try {
-            trackID = selectedTrack.getTrackID();
-            trackDuration = selectedTrack.getTrackDuration();
-            String args[] = {String.valueOf(trackID)};
-
-            //Fetching existing values for selected playlist
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
-            cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
-            updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
-            cursor.moveToFirst();
-
-            while(!cursor.isAfterLast()) {
-                playlist = MediaLibraryManager.getPlaylistByIndex(cursor.getInt(0));
-                playlistID = playlist.getPlaylistID();
-                playlistSize = playlist.getPlaylistSize();
-                playlistDuration = playlist.getPlaylistDuration();
-
-                //Calculating new values for selected playlist
-                newPlaylistSize = playlistSize - 1;
-                newPlaylistDuration = playlistDuration - trackDuration;
-
-                //Updating table 'Playlists' for the selected playlist with new values of 'playlistSize' and 'playlistDuration'
-                updateStmt.clearBindings();
-                updateStmt.bindLong(1, newPlaylistSize);
-                updateStmt.bindLong(2, newPlaylistDuration);
-                updateStmt.bindString(3, Utilities.getCurrentDate());
-                updateStmt.bindLong(4, playlistID);
-                Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
-                updateStmt.execute();
-
-                //Setting new values for 'playlistSize' and 'playlistDuration' for selected playlist
-                playlist.setPlaylistSize(newPlaylistSize);
-                playlist.setPlaylistDuration(newPlaylistDuration);
-                MediaLibraryManager.getPlaylistInfoList().set(playlist.getPlaylistIndex(), playlist);
-
-                cursor.moveToNext();
-            }
-
-            //Deleting track from table 'Playlist_Detail'
-            deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST_DETAIL);
-            deleteStmt.bindLong(1, trackID);
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
-            deleteStmt.execute();
-
-            //Deleting track from table 'Tracks'
-            deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
-            deleteStmt.bindLong(1, trackID);
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
-            deleteStmt.execute();
-
-            //Removing selected track from the list of tracks
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
-
-            //Sorting the list of tracks to update track indices
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
-
-            //Updating track indices in db
-            updateTrackIndices();
-
-            //Setting success toast message
-            toastText = MessageConstants.REMOVED_FROM_LIBRARY;
-        } catch(Exception e) {
-            Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            //Utilities.reportCrash(e);
-
-            //Setting error toast message
-            toastText = MessageConstants.ERROR;
-        } finally {
-            if(cursor != null) {
-                cursor.close();
-            }
-        }
-
-        //Displaying toast message to user
-        Toast toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
-    public void updateTrackIndices() {
+    public static int updateTrackIndices() {
         SQLiteStatement updateStmt = null;
+        int tracksUpdated = 0;
 
         try {
             updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
@@ -295,6 +219,7 @@ public class MediaPlayerDAO {
                 Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
                 updateStmt.execute();
                 updateStmt.clearBindings();
+                tracksUpdated++;
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
@@ -304,6 +229,8 @@ public class MediaPlayerDAO {
                 updateStmt.close();
             }
         }
+
+        return tracksUpdated;
     }
 
     public void createPlaylist(Playlist playlist) {
@@ -788,5 +715,121 @@ public class MediaPlayerDAO {
 
         Log.d("Tracks fetched from db", String.valueOf(trackListSize));
         return trackList;
+    }
+
+    public static class UpdateTracksTask extends AsyncTask<Track, Void, Integer> {
+        private Activity activity;
+
+        public UpdateTracksTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected Integer doInBackground(Track... selectedTracks) {
+            SQLiteStatement updateStmt, deleteStmt;
+            String toastText;
+            int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, trackDuration, tracksUpdated = 0;
+            Playlist playlist;
+            Cursor cursor = null;
+            Track selectedTrack = selectedTracks[0];
+
+            try {
+                trackID = selectedTrack.getTrackID();
+                trackDuration = selectedTrack.getTrackDuration();
+                String args[] = {String.valueOf(trackID)};
+                String currentDate = Utilities.getCurrentDate();
+
+                //Fetching existing values for selected playlist
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
+                cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
+                updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
+                cursor.moveToFirst();
+
+                while(!cursor.isAfterLast()) {
+                    playlist = MediaLibraryManager.getPlaylistByIndex(cursor.getInt(SQLConstants.ZERO));
+                    playlistID = playlist.getPlaylistID();
+                    playlistSize = playlist.getPlaylistSize();
+                    playlistDuration = playlist.getPlaylistDuration();
+
+                    //Calculating new values for selected playlist
+                    newPlaylistSize = playlistSize - SQLConstants.ONE;
+                    newPlaylistDuration = playlistDuration - trackDuration;
+
+                    //Updating table 'Playlists' for the selected playlist with new values of 'playlistSize' and 'playlistDuration'
+                    updateStmt.clearBindings();
+                    updateStmt.bindLong(1, newPlaylistSize);
+                    updateStmt.bindLong(2, newPlaylistDuration);
+                    updateStmt.bindString(3, currentDate);
+                    updateStmt.bindLong(4, playlistID);
+                    Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
+                    updateStmt.execute();
+
+                    //Setting new values for 'playlistSize' and 'playlistDuration' for selected playlist
+                    playlist.setPlaylistSize(newPlaylistSize);
+                    playlist.setPlaylistDuration(newPlaylistDuration);
+                    MediaLibraryManager.getPlaylistInfoList().set(playlist.getPlaylistIndex(), playlist);
+
+                    cursor.moveToNext();
+                }
+
+                //Deleting track from table 'Playlist_Detail'
+                deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST_DETAIL);
+                deleteStmt.bindLong(1, trackID);
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
+                deleteStmt.execute();
+
+                //Deleting track from table 'Tracks'
+                deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
+                deleteStmt.bindLong(1, trackID);
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
+                deleteStmt.execute();
+
+                //Removing selected track from the list of tracks
+                MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
+
+                //Sorting the list of tracks to update track indices
+                MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+
+                //Updating track indices in db
+                tracksUpdated = updateTrackIndices();
+
+                //Setting success toast message
+                toastText = MessageConstants.REMOVED_FROM_LIBRARY;
+            } catch(Exception e) {
+                Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                //Utilities.reportCrash(e);
+
+                //Setting error toast message
+                toastText = MessageConstants.ERROR;
+            } finally {
+                if(cursor != null) {
+                    cursor.close();
+                }
+            }
+
+            return tracksUpdated;
+        }
+
+        protected void onPostExecute(Integer result) {
+            //Updating songs list view adapter
+            updateSongsListAdapter();
+
+            Toast toast = Toast.makeText(activity, "Tracks updated", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+        private void updateSongsListAdapter() {
+            ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
+
+            if(trackList.isEmpty()) {
+                RelativeLayout emptyLibraryMessage = (RelativeLayout) activity.findViewById(R.id.emptyLibraryMessage);
+                emptyLibraryMessage.setVisibility(View.VISIBLE);
+            }
+
+            SongsListAdapter adapter = new SongsListAdapter(activity, trackList);
+            ListView listView = SongsFragment.trackListView;
+            listView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 }
