@@ -22,7 +22,7 @@ public class MediaManagerService extends IntentService {
 
         //Sending broadcast indicating that MediaManagerService has finished initiliasing/updating the library
         Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(MediaPlayerConstants.ACTION_SERVICE_BROADCAST);
+        broadcastIntent.setAction(MediaPlayerConstants.ACTION_INIT_COMPLETE);
         broadcastIntent.putExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, isChanged);
         sendBroadcast(broadcastIntent);
     }
