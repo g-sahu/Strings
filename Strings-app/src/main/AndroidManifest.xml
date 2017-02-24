@@ -41,7 +41,7 @@
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.mediaplayer.SERVICE_BROADCAST" />
+                <action android:name="com.mediaplayer.strings.action.INIT_COMPLETE" />
             </intent-filter>
         </receiver>
     </application>
