@@ -103,6 +103,8 @@ public class MediaLibraryManager {
         int musicFilesCount = 0;
 
         try {
+            Log.d("Scanning the directory", path.toString());
+
             //Getting all the files at the given path
             File[] fileList = path.listFiles();
 
