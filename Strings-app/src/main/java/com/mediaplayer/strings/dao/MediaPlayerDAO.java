@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -827,8 +828,9 @@ public class MediaPlayerDAO {
             }
 
             SongsListAdapter adapter = new SongsListAdapter(activity, trackList);
-            ListView listView = SongsFragment.trackListView;
-            listView.setAdapter(adapter);
+
+            RecyclerView recyclerView = SongsFragment.trackListView;
+            recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
     }

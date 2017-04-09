@@ -13,19 +13,17 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.HomePagerAdapter;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
-import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
@@ -95,11 +93,11 @@ public class HomeActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_song_options, menu);
         MenuItem menuItem = menu.findItem(R.id.addToFavourites);
 
-        ListView listView = SongsFragment.trackListView;
-        position = listView.getPositionForView(view);
+        RecyclerView recyclerView = SongsFragment.trackListView;
+        position = recyclerView.getChildLayoutPosition(view);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, position);
 
-        //Checking if song is added to defualt playlist 'Favourites'
+        //Checking if song is added to default playlist 'Favourites'
         if(selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
             menuItem.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
         }
@@ -195,8 +193,8 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem renamePlaylist = menu.findItem(R.id.renamePlaylist);
         MenuItem deletePlaylist = menu.findItem(R.id.deletePlaylist);
 
-        ListView listView = PlaylistsFragment.listView;
-        position = listView.getPositionForView(view);
+        RecyclerView listView = PlaylistsFragment.recyclerView;
+        position = listView.getChildLayoutPosition(view);
         selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(position);
 
         if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
@@ -251,8 +249,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void callMediaplayerActivity(View view) {
-        ListView listView = SongsFragment.trackListView;
-        position = listView.getPositionForView(view);
+        RecyclerView recyclerView = SongsFragment.trackListView;
+        position = recyclerView.getChildLayoutPosition(view);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY,  position);
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
@@ -265,8 +263,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void callPlaylistActivity(View view) {
-        ListView listView = PlaylistsFragment.listView;
-        position = listView.getPositionForView(view);
+        RecyclerView listView = PlaylistsFragment.recyclerView;
+        position = listView.getChildLayoutPosition(view);
         selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(position);
         int playlistID = selectedPlaylist.getPlaylistID();
 
@@ -278,7 +276,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(this, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

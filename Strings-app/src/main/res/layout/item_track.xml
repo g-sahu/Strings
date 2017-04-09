@@ -3,13 +3,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    android:onClick="callMediaplayerActivity">
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_item_height"
-        android:onClick="callMediaplayerActivity">
+        android:layout_height="@dimen/list_item_height">
 
         <ImageView
             android:id="@+id/albumThumbnail"

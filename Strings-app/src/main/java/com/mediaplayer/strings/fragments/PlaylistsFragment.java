@@ -6,11 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
@@ -20,7 +20,7 @@ import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 public class PlaylistsFragment extends Fragment {
     private View playlistsView;
     private Context context;
-    public static ListView listView;
+    public static RecyclerView recyclerView;
 
     // Store instance variables based on arguments passed
     @Override
@@ -33,9 +33,11 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         playlistsView = inflater.inflate(R.layout.fragment_playlists, container, false);
-        listView = (ListView) playlistsView.findViewById(R.id.listView);
-        ListAdapter playlistsAdapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        listView.setAdapter(playlistsAdapter);
+        recyclerView = (RecyclerView) playlistsView.findViewById(R.id.recycler_view);
+
+        RecyclerView.Adapter playlistsAdapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
+        recyclerView.setAdapter(playlistsAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         return playlistsView;
     }

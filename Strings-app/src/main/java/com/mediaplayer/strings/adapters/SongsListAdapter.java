@@ -3,21 +3,19 @@ package com.mediaplayer.strings.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
-import com.mediaplayer.strings.utilities.MediaLibraryManager;
 
 import java.util.ArrayList;
 
-public class SongsListAdapter extends BaseAdapter {
+public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Holder> {
     private ArrayList<Track> trackInfoList;
     private static LayoutInflater inflater = null;
 
@@ -27,26 +25,16 @@ public class SongsListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        Holder holder;
-        View rowView;
+    public SongsListAdapter.Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rowView = inflater.inflate(R.layout.item_track, parent, false);
+        return new SongsListAdapter.Holder(rowView);
+    }
+
+    @Override
+    public void onBindViewHolder(SongsListAdapter.Holder holder, int position) {
         Bitmap albumArt = null;
         Track track = trackInfoList.get(position);
         byte data[] = track.getAlbumArt();
-
-        if(convertView == null) {
-            holder = new Holder();
-            rowView = inflater.inflate(R.layout.item_track, null);
-
-            holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
-            holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
-            holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
-
-            rowView.setTag(holder);
-        } else {
-            rowView = convertView;
-            holder = (Holder) rowView.getTag();
-        }
 
         if(data != null) {
             albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -55,18 +43,6 @@ public class SongsListAdapter extends BaseAdapter {
         holder.albumArt.setImageBitmap(albumArt);
         holder.trackTitle.setText(track.getTrackTitle());
         holder.artistName.setText(track.getArtistName());
-
-        return rowView;
-    }
-
-    @Override
-    public int getCount() {
-        return trackInfoList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return trackInfoList.get(position);
     }
 
     @Override
@@ -74,9 +50,21 @@ public class SongsListAdapter extends BaseAdapter {
         return position;
     }
 
-    private class Holder {
+    @Override
+    public int getItemCount() {
+        return trackInfoList.size();
+    }
+
+    class Holder extends RecyclerView.ViewHolder {
         ImageView albumArt;
-        TextView trackTitle;
-        TextView artistName;
+        TextView trackTitle, artistName;
+
+        Holder(View itemView) {
+            super(itemView);
+
+            albumArt = (ImageView) itemView.findViewById(R.id.albumThumbnail);
+            trackTitle = (TextView) itemView.findViewById(R.id.trackTitle);
+            artistName = (TextView) itemView.findViewById(R.id.artistName);
+        }
     }
 }

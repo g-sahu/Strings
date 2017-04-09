@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ListView;
 
 import com.mediaplayer.strings.activities.HomeActivity;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
@@ -170,7 +170,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
 
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

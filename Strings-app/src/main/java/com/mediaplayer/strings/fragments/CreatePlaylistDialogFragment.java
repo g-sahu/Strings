@@ -7,12 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
@@ -199,7 +199,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

@@ -3,12 +3,12 @@ package com.mediaplayer.strings.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.mediaplayer.strings.R;
@@ -22,7 +22,7 @@ import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXC
 
 public class SongsFragment extends Fragment {
     private Context context;
-    public static ListView trackListView;
+    public static RecyclerView trackListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,12 +35,12 @@ public class SongsFragment extends Fragment {
         View view = null;
         RelativeLayout emptyLibraryMessage;
         ArrayList<Track> trackInfoList;
-        ListAdapter songsListAdapter;
+        RecyclerView.Adapter songsListAdapter;
 
         try {
             view = inflater.inflate(R.layout.fragment_songs, container, false);
             emptyLibraryMessage = (RelativeLayout) view.findViewById(R.id.emptyLibraryMessage);
-            trackListView = (ListView) view.findViewById(R.id.listView);
+            trackListView = (RecyclerView) view.findViewById(R.id.recycler_view);
             trackInfoList = MediaLibraryManager.getTrackInfoList();
 
             if(trackInfoList == null || trackInfoList.isEmpty()) {
@@ -49,6 +49,7 @@ public class SongsFragment extends Fragment {
             } else {
                 songsListAdapter = new SongsListAdapter(context, trackInfoList);
                 trackListView.setAdapter(songsListAdapter);
+                trackListView.setLayoutManager(new LinearLayoutManager(context));
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
