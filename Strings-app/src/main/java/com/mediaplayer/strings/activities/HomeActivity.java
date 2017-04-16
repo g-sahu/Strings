@@ -94,7 +94,8 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem menuItem = menu.findItem(R.id.addToFavourites);
 
         RecyclerView recyclerView = SongsFragment.trackListView;
-        position = recyclerView.getChildLayoutPosition(view);
+        View parent = (View) view.getParent();
+        position = recyclerView.getChildLayoutPosition(parent);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, position);
 
         //Checking if song is added to default playlist 'Favourites'
@@ -194,7 +195,8 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem deletePlaylist = menu.findItem(R.id.deletePlaylist);
 
         RecyclerView listView = PlaylistsFragment.recyclerView;
-        position = listView.getChildLayoutPosition(view);
+        View parent = (View) view.getParent();
+        position = listView.getChildLayoutPosition(parent);
         selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(position);
 
         if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
