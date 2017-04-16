@@ -61,7 +61,6 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
 
         Holder(View itemView) {
             super(itemView);
-
             albumArt = (ImageView) itemView.findViewById(R.id.albumThumbnail);
             trackTitle = (TextView) itemView.findViewById(R.id.trackTitle);
             artistName = (TextView) itemView.findViewById(R.id.artistName);
