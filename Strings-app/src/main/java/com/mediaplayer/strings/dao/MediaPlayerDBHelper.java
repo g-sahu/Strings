@@ -1,7 +1,6 @@
 package com.mediaplayer.strings.dao;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -18,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 class MediaPlayerDBHelper extends SQLiteOpenHelper {
-    private Resources resources;
+    private Context context;
 
     MediaPlayerDBHelper(Context context) {
         super(context, MediaPlayerContract.DATABASE_NAME, null, MediaPlayerContract.DATABASE_VERSION);
-        resources = context.getResources();
+        this.context = context;
     }
 
     @Override
@@ -56,7 +55,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             insertStmt.execute();
 
             //Fetching tracks from storage
-            trackList = MediaLibraryManager.populateTrackInfoList(resources);
+            trackList = MediaLibraryManager.populateTrackInfoList(context);
 
             //Inserting tracks in table 'Tracks'
             insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);

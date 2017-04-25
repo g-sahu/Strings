@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -488,24 +487,21 @@ public class MediaPlayerDAO {
         Log.d("Tracks added to library", String.valueOf(tracksAdded));
     }
 
-    public void deleteTracksFromLibrary(@NonNull ArrayList<Track> deletedTracksList) {
-        Track track;
-        long trackID;
-        int tracksDeleted = 0;
+    public void deleteTracksFromLibrary(@NonNull ArrayList<String> deletedTracksList) {
+        int tracksDeleted;
+        Iterator<String> deletedTracksIterator = deletedTracksList.iterator();
+        StringBuilder fileNames = new StringBuilder();
 
-        SQLiteStatement deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
-        Iterator<Track> deletedTracksListIterator = deletedTracksList.iterator();
+        while(deletedTracksIterator.hasNext()) {
+            fileNames.append(SQLConstants.DOUBLE_QUOTE).append(deletedTracksIterator.next()).append(SQLConstants.DOUBLE_QUOTE);
 
-        while(deletedTracksListIterator.hasNext()) {
-            track = deletedTracksListIterator.next();
-            trackID = track.getTrackID();
-            deleteStmt.bindLong(SQLConstants.ONE, trackID);
-
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_DELETE_FROM_TRACKS);
-            deleteStmt.executeUpdateDelete();
-            deleteStmt.clearBindings();
-            ++tracksDeleted;
+            if(deletedTracksIterator.hasNext()) {
+                fileNames.append(SQLConstants.COMMA_SEP);
+            }
         }
+
+        SQLiteStatement deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FOR_FILENAME + fileNames + ")");
+        tracksDeleted = deleteStmt.executeUpdateDelete();
 
         Log.d("Tracks deleted", String.valueOf(tracksDeleted));
     }
@@ -523,7 +519,7 @@ public class MediaPlayerDAO {
 
             while(!playlistsCursor.isAfterLast()) {
                 Track track = new Track();
-                c = 0;
+                c = SQLConstants.ZERO;
 
                 track.setTrackID(playlistsCursor.getInt(c++));
                 track.setTrackTitle(playlistsCursor.getString(c++));
@@ -617,14 +613,14 @@ public class MediaPlayerDAO {
 
         Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_TRACKS);
         Cursor tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACKS, null);
-        tracksCursor.moveToFirst();
 
         if(tracksCursor.getCount() > 0) {
+            tracksCursor.moveToFirst();
             trackInfoList = new ArrayList<Track>();
 
             while(!tracksCursor.isAfterLast()) {
                 track = new Track();
-                c = 0;
+                c = SQLConstants.ZERO;
 
                 track.setTrackID(tracksCursor.getInt(c++));
                 track.setTrackTitle(tracksCursor.getString(c++));
@@ -663,7 +659,7 @@ public class MediaPlayerDAO {
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
-                    playlist.add(cursor.getInt(0));
+                    playlist.add(cursor.getInt(SQLConstants.ZERO));
                     cursor.moveToNext();
                 }
             }
@@ -679,31 +675,25 @@ public class MediaPlayerDAO {
         return playlist;
     }
 
-    public ArrayList<Track> getTracksFromLibrary() {
-        ArrayList<Track> trackList = null;
-        Track track;
+    public ArrayList<String> getFileNamesFromLibrary() {
+        ArrayList<String> fileNamesList = null;
         Cursor tracksCursor =  null;
-        int c, trackListSize = 0;
+        int fileNamesListSize = 0;
 
         try {
             Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
             tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
 
             if(tracksCursor != null && tracksCursor.getCount() > 0) {
-                trackList = new ArrayList<Track>();
+                fileNamesList = new ArrayList<String>();
                 tracksCursor.moveToFirst();
 
                 while(!tracksCursor.isAfterLast()) {
-                    c = SQLConstants.ZERO;
-                    track = new Track();
-                    track.setTrackID(tracksCursor.getInt(c++));
-                    track.setFileName(tracksCursor.getString(c));
-
-                    trackList.add(track);
+                    fileNamesList.add(tracksCursor.getString(SQLConstants.ZERO));
                     tracksCursor.moveToNext();
                 }
 
-                trackListSize = trackList.size();
+                fileNamesListSize = fileNamesList.size();
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
@@ -714,8 +704,8 @@ public class MediaPlayerDAO {
             }
         }
 
-        Log.d("Tracks fetched from db", String.valueOf(trackListSize));
-        return trackList;
+        Log.d("File names fetched", String.valueOf(fileNamesListSize));
+        return fileNamesList;
     }
 
     public static class UpdateTracksTask extends AsyncTask<Track, Void, Integer> {
