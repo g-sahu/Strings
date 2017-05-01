@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
 
@@ -18,9 +19,11 @@ import java.util.ArrayList;
 public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Holder> {
     private ArrayList<Track> trackInfoList;
     private static LayoutInflater inflater = null;
+    private Context context;
 
     public SongsListAdapter(Context context, ArrayList<Track> trackInfoList) {
         this.trackInfoList = trackInfoList;
+        this.context = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -32,15 +35,10 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
 
     @Override
     public void onBindViewHolder(SongsListAdapter.Holder holder, int position) {
-        Bitmap albumArt = null;
         Track track = trackInfoList.get(position);
         byte data[] = track.getAlbumArt();
 
-        if(data != null) {
-            albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
-        }
-
-        holder.albumArt.setImageBitmap(albumArt);
+        Glide.with(context).load(data).into(holder.albumArt);
         holder.trackTitle.setText(track.getTrackTitle());
         holder.artistName.setText(track.getArtistName());
     }

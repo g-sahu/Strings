@@ -206,7 +206,7 @@ public class MediaLibraryManager {
         Track track;
         Bitmap albumArt;
         String filePath;
-        ByteArrayOutputStream stream = null;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         MediaMetadataRetriever mmr = null;
         ArrayList<Track> trackList = null;
 
@@ -234,13 +234,13 @@ public class MediaLibraryManager {
                         mmr.setDataSource(filePath);
                         data = mmr.getEmbeddedPicture();
 
-                        if (data != null) {
+                        if (data != null && data.length > SQLConstants.ZERO) {
                             track.setAlbumArt(data);
                         } else {
                             albumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_album_art);
-                            stream = new ByteArrayOutputStream();
                             albumArt.compress(Bitmap.CompressFormat.PNG, SQLConstants.HUNDRED, stream);
                             track.setAlbumArt(stream.toByteArray());
+                            stream.reset();
                         }
 
                         trackList.add(track);
@@ -260,13 +260,11 @@ public class MediaLibraryManager {
                 mmr.release();
             }
 
-            if(stream != null) {
-                try {
-                    stream.close();
-                } catch(IOException e) {
-                    Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                    //Utilities.reportCrash(e);
-                }
+            try {
+                stream.close();
+            } catch(IOException e) {
+                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                //Utilities.reportCrash(e);
             }
         }
 
