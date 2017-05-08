@@ -128,7 +128,7 @@ public class HomeActivity extends AppCompatActivity {
     //Add to favourites menu option
     private void addToFavourites() {
         MediaPlayerDAO dao = null;
-        ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
+        ArrayList<Playlist> selectedPlaylists = new ArrayList<>();
 
         try {
             selectedPlaylists.add(favouritesPlaylist);
@@ -329,7 +329,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        MediaPlayerActivity.stopProgressBar();
         Intent intent = new Intent(this, MediaPlayerService.class);
         stopService(intent);
 

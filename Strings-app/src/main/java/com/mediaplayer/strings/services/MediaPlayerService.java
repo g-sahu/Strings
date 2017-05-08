@@ -20,7 +20,6 @@ import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
-import com.mediaplayer.strings.utilities.MediaPlayerStateManager;
 import com.mediaplayer.strings.utilities.SQLConstants;
 
 import java.io.IOException;
@@ -31,8 +30,6 @@ public class MediaPlayerService extends IntentService {
     private static final String LOG_TAG = "MediaPlayerService";
     private static MediaPlayer mp;
     public static boolean isServiceRunning;
-    public static boolean isServiceBound;
-    private MediaPlayerStateManager mManager;
     private IBinder mBinder = new MyBinder();
 
     public MediaPlayerService() {
@@ -51,7 +48,6 @@ public class MediaPlayerService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.d(LOG_TAG, "Service created");
-        mManager = ((MediaPlayerStateManager) getApplicationContext());
     }
 
     @Override
@@ -74,9 +70,6 @@ public class MediaPlayerService extends IntentService {
         Notification notification = createNotification(selectedTrack, selectedPlaylist);
         startForeground(1, notification);
         Log.d(LOG_TAG, "Is foreground?: true");
-        isServiceBound = true;
-
-        Log.d("isServiceBound: ", String.valueOf(isServiceBound));
         Log.d(LOG_TAG, "Service bound to activity");
         return mBinder;
     }
@@ -94,7 +87,6 @@ public class MediaPlayerService extends IntentService {
             mp.setDataSource(filePath);
             mp.prepare();
             mp.start();
-            mManager.setPaused(false);
             Log.d(LOG_TAG, "Now Playing: " + selectedTrack.getTrackTitle());
         } catch(IOException | IllegalStateException e) {
             e.printStackTrace();
@@ -147,6 +139,7 @@ public class MediaPlayerService extends IntentService {
             Intent nextIntent = new Intent(this, MediaPlayerActivity.class);
             //Intent deleteIntent = new Intent(this, MediaPlayerActivity.class);
             Intent deleteIntent = new Intent(this, MediaPlayerService.class);
+            Intent openIntent = new Intent(this, MediaPlayerActivity.class);
 
             //Setting actions and extras for intents
             prevIntent.setAction(MediaPlayerConstants.PREVIOUS)
@@ -166,6 +159,10 @@ public class MediaPlayerService extends IntentService {
                     .putExtra(keySelectedPlaylist, selectedPlaylist)
                     .putExtra(keyTrackOrigin, origin);
             deleteIntent.setAction(MediaPlayerConstants.STOP);
+            openIntent.setAction(MediaPlayerConstants.OPEN)
+                    .putExtra(keySelectedTrack, selectedTrack)
+                    .putExtra(keySelectedPlaylist, selectedPlaylist)
+                    .putExtra(keyTrackOrigin, origin);
 
             //Creating pending intents
             PendingIntent prevPendingIntent = PendingIntent.getActivity(this, zero, prevIntent, flag);
@@ -174,6 +171,7 @@ public class MediaPlayerService extends IntentService {
             PendingIntent nextPendingIntent = PendingIntent.getActivity(this, zero, nextIntent, flag);
             //PendingIntent deletePendingIntent = PendingIntent.getActivity(this, zero, deleteIntent, flag);
             PendingIntent deletePendingIntent = PendingIntent.getService(this, zero, deleteIntent, flag);
+            PendingIntent openPendingIntent = PendingIntent.getActivity(this, zero, openIntent, flag);
 
             //Checking OS build version for notification compatibility
             if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
@@ -208,6 +206,8 @@ public class MediaPlayerService extends IntentService {
 
             builder.addAction(nextAction);
             builder.setDeleteIntent(deletePendingIntent);
+            builder.setOngoing(true);
+            builder.setContentIntent(openPendingIntent);
 
             //Building notification
             notification = builder.build();
@@ -220,19 +220,6 @@ public class MediaPlayerService extends IntentService {
 
         Log.d(LOG_TAG, "Notification created");
         return notification;
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        Log.d(LOG_TAG, "Service rebound");
-        isServiceBound = true;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.d(LOG_TAG, "Service unbound");
-        isServiceBound = false;
-        return true;
     }
 
     @Override

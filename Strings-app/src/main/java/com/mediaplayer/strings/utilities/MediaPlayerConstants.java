@@ -9,6 +9,13 @@ public class MediaPlayerConstants {
     public static final String PLAY = "PLAY";
     public static final String PAUSE = "PAUSE";
     public static final String STOP = "STOP";
+    public static final String OPEN = "OPEN";
+    public static final String PLAYING = "PLAYING";
+    public static final String PAUSED = "PAUSED";
+    public static final String STOPPED = "STOPPED";
+    public static final String REPEAT_CURRENT = "REPEAT_CURRENT";
+    public static final String REPEAT_PLAYLIST = "REPEAT_PLAYLIST";
+    public static final String REPEAT_OFF = "REPEAT_OFF";
     static final String FILE_NAME = "FILE_NAME";
     static final String FILE_PATH = "FILE_PATH";
     static final String FILE_SIZE = "FILE_SIZE";
