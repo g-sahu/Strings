@@ -522,9 +522,6 @@ public class MediaPlayerActivity extends AppCompatActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        //Restoring media player state from MediaPlayerStateManager
-        restoreMediaPlayerState();
-
         String action = intent.getAction();
         origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
 
@@ -561,8 +558,8 @@ public class MediaPlayerActivity extends AppCompatActivity
         super.onStart();
         Log.d(LOG_TAG, "Mediaplayer activity started");
 
-        //Restoring media player state from MediaPlayerStateManager
-        restoreMediaPlayerState();
+        //Updating progress bar
+        updateProgressBar();
     }
 
     @Override
