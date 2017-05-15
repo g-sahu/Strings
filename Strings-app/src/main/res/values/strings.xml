@@ -27,7 +27,7 @@
     <string name="rate_app">Rate</string>
     <string name="about_us">About</string>
     <string name="share_app">Share</string>
-    <string name="playing_from">Playing from:</string>
+    <string name="playing_from">Current Playlist:</string>
     <string name="music_library">Music Library</string>
     <string name="created_by">Created by:</string>
     <string name="developer_name">Gaurav Sahu</string>
