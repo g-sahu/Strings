@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mediaplayer.strings.R;
@@ -813,12 +814,11 @@ public class MediaPlayerDAO {
             ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
 
             if(trackList.isEmpty()) {
-                RelativeLayout emptyLibraryMessage = (RelativeLayout) activity.findViewById(R.id.emptyLibraryMessage);
+                TextView emptyLibraryMessage = (TextView) activity.findViewById(R.id.emptyLibraryMessage);
                 emptyLibraryMessage.setVisibility(View.VISIBLE);
             }
 
             SongsListAdapter adapter = new SongsListAdapter(activity, trackList);
-
             RecyclerView recyclerView = SongsFragment.trackListView;
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
