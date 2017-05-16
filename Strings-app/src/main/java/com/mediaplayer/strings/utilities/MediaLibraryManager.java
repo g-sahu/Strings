@@ -237,7 +237,7 @@ public class MediaLibraryManager {
                         if (data != null && data.length > SQLConstants.ZERO) {
                             track.setAlbumArt(data);
                         } else {
-                            albumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_album_art);
+                            albumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.img_default_album_art);
                             albumArt.compress(Bitmap.CompressFormat.PNG, SQLConstants.HUNDRED, stream);
                             track.setAlbumArt(stream.toByteArray());
                             stream.reset();

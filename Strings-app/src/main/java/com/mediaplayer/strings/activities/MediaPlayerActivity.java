@@ -147,7 +147,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                             //If already playing, pause the current track
                             mp.pause();
                             mpState = MediaPlayerConstants.PAUSED;
-                            playButton.setImageResource(R.drawable.play_button);
+                            playButton.setImageResource(R.drawable.btn_play);
 
                             //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
                             if(mpService == null) {
@@ -170,7 +170,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                     //Else, if paused, resume current track
                     mp.start();
                     mpState = MediaPlayerConstants.PLAYING;
-                    playButton.setImageResource(R.drawable.pause_button);
+                    playButton.setImageResource(R.drawable.btn_pause);
 
                     //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
                     if(mpService == null) {
@@ -215,7 +215,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 selectedTrack = MediaLibraryManager.getFirstTrack(selectedPlaylist);
             } else {
                 //Else, stop playback
-                playButton.setImageResource(R.drawable.play_button);
+                playButton.setImageResource(R.drawable.btn_play);
 
                 //Showing message to the user
                 showToastMessage(MessageConstants.END_OF_PLAYLIST);
@@ -256,7 +256,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 selectedTrack = MediaLibraryManager.getLastTrack(selectedPlaylist);
             } else {
                 //Else, stop playback
-                playButton.setImageResource(R.drawable.play_button);
+                playButton.setImageResource(R.drawable.btn_play);
                 mpState = MediaPlayerConstants.STOPPED;
 
                 //Showing message to the user
@@ -430,7 +430,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         }
 
         mpState = MediaPlayerConstants.PLAYING;
-        playButton.setImageResource(R.drawable.pause_button);
+        playButton.setImageResource(R.drawable.btn_pause);
         Log.d(LOG_TAG, "END: The playSong() event");
     }
 
@@ -681,7 +681,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 } else {
                     //Else, stop playback
                     mp.reset();
-                    playButton.setImageResource(R.drawable.play_button);
+                    playButton.setImageResource(R.drawable.btn_play);
                     stopProgressBar();
                     mpState = MediaPlayerConstants.STOPPED;
                     mpService.stopForeground(false);
@@ -715,13 +715,13 @@ public class MediaPlayerActivity extends AppCompatActivity
         //Updating play button
         switch (mpState) {
             case MediaPlayerConstants.PLAYING:
-                playButton.setImageResource(R.drawable.pause_button);
+                playButton.setImageResource(R.drawable.btn_pause);
                 break;
 
             case MediaPlayerConstants.PAUSED:
 
             case MediaPlayerConstants.STOPPED:
-                playButton.setImageResource(R.drawable.play_button);
+                playButton.setImageResource(R.drawable.btn_play);
                 break;
         }
 

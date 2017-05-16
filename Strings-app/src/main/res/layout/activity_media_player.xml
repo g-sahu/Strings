@@ -157,7 +157,7 @@
                 android:id="@+id/songProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:thumb="@drawable/thumb"
+                android:thumb="@drawable/ic_thumb"
                 android:splitTrack="false"
                 android:progressDrawable="@drawable/seekbar_progress"
                 android:paddingLeft="0dp"
@@ -224,7 +224,7 @@
 
             <ImageButton
                 android:id="@+id/previousButton"
-                android:src="@drawable/previous_button"
+                android:src="@drawable/btn_previous"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -235,7 +235,7 @@
 
             <ImageButton
                 android:id="@+id/playButton"
-                android:src="@drawable/play_button"
+                android:src="@drawable/btn_play"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -246,7 +246,7 @@
 
             <ImageButton
                 android:id="@+id/nextButton"
-                android:src="@drawable/next_button"
+                android:src="@drawable/btn_next"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
