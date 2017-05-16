@@ -19,8 +19,7 @@
     <string name="add_to_playlist">Add to playlist</string>
     <string name="add_to_favourites">Add to Favourites</string>
     <string name="remove_from_library">Remove from Library</string>
-    <string name="empty_library_message_1">No music files in Music Library.</string>
-    <string name="empty_library_message_2">Try adding files to your \'Music\' folder.</string>
+    <string name="empty_library_message_1">No music files found.</string>
     <string name="playlist_name">Playlist name</string>
     <string name="album_art_thumbnail">Album Art Thumbnail</string>
     <string name="album_name">Album Name</string>
