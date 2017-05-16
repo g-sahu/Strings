@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
@@ -33,13 +34,13 @@ public class SongsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = null;
-        RelativeLayout emptyLibraryMessage;
+        TextView emptyLibraryMessage;
         ArrayList<Track> trackInfoList;
         RecyclerView.Adapter songsListAdapter;
 
         try {
             view = inflater.inflate(R.layout.fragment_songs, container, false);
-            emptyLibraryMessage = (RelativeLayout) view.findViewById(R.id.emptyLibraryMessage);
+            emptyLibraryMessage = (TextView) view.findViewById(R.id.emptyLibraryMessage);
             trackListView = (RecyclerView) view.findViewById(R.id.recycler_view);
             trackInfoList = MediaLibraryManager.getTrackInfoList();
 
