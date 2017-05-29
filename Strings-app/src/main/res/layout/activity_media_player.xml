@@ -23,7 +23,7 @@
             android:layout_weight="0.7">
 
             <LinearLayout
-                android:id="@+id/albumArtTNLayout"
+                android:id="@+id/albumArtThumbLayout"
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:orientation="vertical"
@@ -35,7 +35,8 @@
                     android:id="@+id/albumArtThumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/album_art_thumbnail" />
+                    android:contentDescription="@string/album_art_thumbnail"
+                    android:src="@drawable/img_default_album_art_thumb"/>
 
             </LinearLayout>
 
@@ -137,7 +138,8 @@
             android:id="@+id/albumArt"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="@string/album_art" />
+            android:contentDescription="@string/album_art"
+            android:src="@drawable/img_default_album_art"/>
 
     </LinearLayout>
 
@@ -157,7 +159,7 @@
                 android:id="@+id/songProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:thumb="@drawable/ic_thumb"
+                android:thumb="@drawable/ic_seekbar_thumb_red_18dp"
                 android:splitTrack="false"
                 android:progressDrawable="@drawable/seekbar_progress"
                 android:paddingLeft="0dp"
@@ -213,7 +215,7 @@
 
             <ImageButton
                 android:id="@+id/repeatButton"
-                android:src="@drawable/ic_repeat_black_18dp"
+                android:src="@drawable/ic_repeat_off_black_24dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -224,7 +226,7 @@
 
             <ImageButton
                 android:id="@+id/previousButton"
-                android:src="@drawable/btn_previous"
+                android:src="@drawable/ic_skip_previous_black_48dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -235,7 +237,7 @@
 
             <ImageButton
                 android:id="@+id/playButton"
-                android:src="@drawable/btn_play"
+                android:src="@drawable/ic_play_circle_outline_black_48dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -246,7 +248,7 @@
 
             <ImageButton
                 android:id="@+id/nextButton"
-                android:src="@drawable/btn_next"
+                android:src="@drawable/ic_skip_next_black_48dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -257,7 +259,7 @@
 
             <ImageButton
                 android:id="@+id/shuffleButton"
-                android:src="@drawable/ic_shuffle_black_18dp"
+                android:src="@drawable/ic_shuffle_off_black_24dp"
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

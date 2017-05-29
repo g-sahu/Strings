@@ -17,7 +17,7 @@
             android:id="@+id/appLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"
+            android:src="@mipmap/ic_launcher"
             android:contentDescription="@string/app_logo"
             android:layout_marginEnd="10dp" />
 

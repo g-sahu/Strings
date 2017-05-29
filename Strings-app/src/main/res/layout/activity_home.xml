@@ -28,7 +28,7 @@
         android:id="@+id/moreAppOptionsButton"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/list_item_height"
-        android:src="@drawable/ic_more_vert_white_18dp"
+        android:src="@drawable/ic_more_vert_white_24dp"
         android:contentDescription="@string/more_options"
         android:background="@null"
         android:adjustViewBounds="false"

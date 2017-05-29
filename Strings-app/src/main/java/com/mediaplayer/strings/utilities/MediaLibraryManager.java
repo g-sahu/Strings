@@ -3,20 +3,15 @@ package com.mediaplayer.strings.utilities;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -193,28 +188,25 @@ public class MediaLibraryManager {
         Cursor cursors[] = getAllTracksFromProvider(context);
 
         //Creating track list from cursors
-        trackInfoList = createTrackListFromCursor(cursors, context);
+        trackInfoList = createTrackListFromCursor(cursors);
         tracklistSize = (trackInfoList != null && !trackInfoList.isEmpty()) ? trackInfoList.size() : 0;
 
         sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
         return trackInfoList;
     }
 
-    private static ArrayList<Track> createTrackListFromCursor(Cursor cursors[], Context context) {
+    private static ArrayList<Track> createTrackListFromCursor(Cursor cursors[]) {
         int c;
         byte data[];
         Track track;
-        Bitmap albumArt;
         String filePath;
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         MediaMetadataRetriever mmr = null;
         ArrayList<Track> trackList = null;
 
         try {
             for(Cursor tracksCursor : cursors) {
-                tracksCursor.moveToFirst();
-
                 if(tracksCursor.getCount() > SQLConstants.ZERO) {
+                    tracksCursor.moveToFirst();
                     mmr = new MediaMetadataRetriever();
                     trackList = new ArrayList<Track>();
 
@@ -234,13 +226,10 @@ public class MediaLibraryManager {
                         mmr.setDataSource(filePath);
                         data = mmr.getEmbeddedPicture();
 
-                        if (data != null && data.length > SQLConstants.ZERO) {
+                        if(data != null && data.length > SQLConstants.ZERO) {
                             track.setAlbumArt(data);
                         } else {
-                            albumArt = BitmapFactory.decodeResource(context.getResources(), R.drawable.img_default_album_art);
-                            albumArt.compress(Bitmap.CompressFormat.PNG, SQLConstants.HUNDRED, stream);
-                            track.setAlbumArt(stream.toByteArray());
-                            stream.reset();
+                            track.setAlbumArt(new byte[SQLConstants.ZERO]);
                         }
 
                         trackList.add(track);
@@ -250,21 +239,12 @@ public class MediaLibraryManager {
                     tracksCursor.close();
                 }
             }
-
-            sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
         } finally {
             if(mmr != null) {
                 mmr.release();
-            }
-
-            try {
-                stream.close();
-            } catch(IOException e) {
-                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                //Utilities.reportCrash(e);
             }
         }
 
@@ -508,7 +488,7 @@ public class MediaLibraryManager {
                 if(!newFileNamesList.isEmpty()) {
                     //Creating list of new tracks from new file name list
                     cursors = getNewTracksFromProvider(context, newFileNamesList);
-                    newTracksList = createTrackListFromCursor(cursors, context);
+                    newTracksList = createTrackListFromCursor(cursors);
                 }
             } else {
                 deletedFileNamesList = libraryFileNamesList;

@@ -1,8 +1,6 @@
 package com.mediaplayer.strings.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +36,12 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
         Track track = trackInfoList.get(position);
         byte data[] = track.getAlbumArt();
 
-        Glide.with(context).load(data).into(holder.albumArt);
+        if(data.length != 0) {
+            Glide.with(context).load(data).into(holder.albumArt);
+        } else {
+            Glide.with(context).load(R.drawable.img_default_album_art_thumb).into(holder.albumArt);
+        }
+
         holder.trackTitle.setText(track.getTrackTitle());
         holder.artistName.setText(track.getArtistName());
     }

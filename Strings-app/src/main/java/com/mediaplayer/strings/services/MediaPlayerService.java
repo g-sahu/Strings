@@ -129,7 +129,7 @@ public class MediaPlayerService extends IntentService {
             builder.setSubText(selectedTrack.getAlbumName());
             builder.setLargeIcon(bm);
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-            builder.setSmallIcon(R.drawable.ic_launcher);
+            builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setShowWhen(false);
 
             //Creating intents
@@ -177,16 +177,16 @@ public class MediaPlayerService extends IntentService {
             if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
                     android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
                 //Creating notification actions
-                prevAction = new Notification.Action.Builder(R.drawable.ic_skip_previous_white_24dp, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
-                pauseAction = new Notification.Action.Builder(R.drawable.ic_pause_white_24dp, MediaPlayerConstants.PAUSE, pausePendingIntent).build();
-                playAction = new Notification.Action.Builder(R.drawable.ic_play_arrow_white_24dp, MediaPlayerConstants.PLAY, playPendingIntent).build();
-                nextAction = new Notification.Action.Builder(R.drawable.ic_skip_next_white_24dp, MediaPlayerConstants.NEXT, nextPendingIntent).build();
+                prevAction = new Notification.Action.Builder(R.drawable.ic_skip_previous_white_36dp, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
+                pauseAction = new Notification.Action.Builder(R.drawable.ic_pause_white_36dp, MediaPlayerConstants.PAUSE, pausePendingIntent).build();
+                playAction = new Notification.Action.Builder(R.drawable.ic_play_arrow_white_36dp, MediaPlayerConstants.PLAY, playPendingIntent).build();
+                nextAction = new Notification.Action.Builder(R.drawable.ic_skip_next_white_36dp, MediaPlayerConstants.NEXT, nextPendingIntent).build();
             } else if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
                 //Creating Icons for actions
-                Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_24dp);
-                Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_24dp);
-                Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_24dp);
-                Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_24dp);
+                Icon prevIcon = Icon.createWithResource(this, R.drawable.ic_skip_previous_white_36dp);
+                Icon pauseIcon = Icon.createWithResource(this, R.drawable.ic_pause_white_36dp);
+                Icon playIcon = Icon.createWithResource(this, R.drawable.ic_play_arrow_white_36dp);
+                Icon nextIcon = Icon.createWithResource(this, R.drawable.ic_skip_next_white_36dp);
 
                 //Creating notification actions
                 prevAction = new Notification.Action.Builder(prevIcon, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();

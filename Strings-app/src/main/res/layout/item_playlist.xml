@@ -40,7 +40,7 @@
         android:id="@+id/morePlaylistOptionsButton"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/list_item_height"
-        android:src="@drawable/ic_more_vert_black_18dp"
+        android:src="@drawable/ic_more_vert_black_24dp"
         android:contentDescription="@string/more_options"
         android:background="@null"
         android:adjustViewBounds="false"
