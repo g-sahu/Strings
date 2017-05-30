@@ -99,7 +99,7 @@ public class MediaPlayerService extends IntentService {
     public Notification createNotification(Track selectedTrack, String selectedPlaylist) {
         Notification notification = null;
         Notification.Action prevAction = null, pauseAction = null, playAction = null, nextAction = null;
-        Bitmap bm = null;
+        Bitmap bm;
         int zero = SQLConstants.ZERO;
         int flag = PendingIntent.FLAG_CANCEL_CURRENT;
         String keySelectedTrack = MediaPlayerConstants.KEY_SELECTED_TRACK;
@@ -125,7 +125,6 @@ public class MediaPlayerService extends IntentService {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setShowWhen(false);
-
 
             if(data.length != 0) {
                 bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
@@ -209,13 +208,14 @@ public class MediaPlayerService extends IntentService {
 
             if(mp.isPlaying()) {
                 builder.addAction(pauseAction);
+                builder.setOngoing(true);
             } else {
                 builder.addAction(playAction);
+                builder.setOngoing(false);
             }
 
             builder.addAction(nextAction);
             builder.setDeleteIntent(deletePendingIntent);
-            builder.setOngoing(true);
             builder.setContentIntent(openPendingIntent);
 
             //Building notification
