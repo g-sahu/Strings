@@ -384,8 +384,7 @@ public class MediaPlayerActivity extends AppCompatActivity
 
             if(bm != null) {
                 int size = width / 2;
-                //albumArt.setImageBitmap(Bitmap.createScaledBitmap(bm, size, size, false));
-                albumArt.setImageBitmap(bm);
+                albumArt.setImageBitmap(Bitmap.createScaledBitmap(bm, size, size, false));
                 albumArtThumbnail.setImageBitmap(bm);
             } else {
                 albumArt.setImageResource(R.drawable.img_default_album_art);
