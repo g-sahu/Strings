@@ -106,14 +106,9 @@ public class MediaPlayerService extends IntentService {
         String keySelectedPlaylist = MediaPlayerConstants.KEY_SELECTED_PLAYLIST;
         String keyTrackOrigin = MediaPlayerConstants.KEY_TRACK_ORIGIN;
         String origin = MediaPlayerConstants.TAG_NOTIFICATION;
+        byte data[] = selectedTrack.getAlbumArt();
 
         try {
-            byte data[] = selectedTrack.getAlbumArt();
-
-            if(data != null) {
-                bm = BitmapFactory.decodeByteArray(data, zero, data.length);
-            }
-
             Notification.Builder builder = new Notification.Builder(this);
             Notification.MediaStyle mediaStyle = new Notification.MediaStyle();
             MediaSession mMediaSession = new MediaSession(this, MediaPlayerConstants.TAG_MEDIA_SESSION);
@@ -127,10 +122,24 @@ public class MediaPlayerService extends IntentService {
             builder.setContentTitle(selectedTrack.getTrackTitle());
             builder.setContentText(selectedTrack.getArtistName());
             builder.setSubText(selectedTrack.getAlbumName());
-            builder.setLargeIcon(bm);
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setShowWhen(false);
+
+
+            if(data.length != 0) {
+                bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
+
+                if(bm != null) {
+                    builder.setLargeIcon(bm);
+                } else {
+                    bm = BitmapFactory.decodeResource(getResources(), R.drawable.img_default_album_art_thumb);
+                    builder.setLargeIcon(bm);
+                }
+            } else {
+                bm = BitmapFactory.decodeResource(getResources(), R.drawable.img_default_album_art_thumb);
+                builder.setLargeIcon(bm);
+            }
 
             //Creating intents
             Intent prevIntent = new Intent(this, MediaPlayerActivity.class);
