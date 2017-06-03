@@ -166,19 +166,36 @@ public class MediaPlayerActivity extends AppCompatActivity
                     break;
 
                 case MediaPlayerConstants.PAUSED:
-                    //Else, if paused, resume current track
-                    mp.start();
-                    mpState = MediaPlayerConstants.PLAYING;
-                    playButton.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
+                    switch(origin) {
+                        case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
 
-                    //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
-                    if(mpService == null) {
-                        Intent serviceIntent = new Intent(this, MediaPlayerService.class);
-                        serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-                        serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
-                        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-                    } else {
-                        mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                        case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
+
+                        case MediaPlayerConstants.TAG_NOTIFICATION:
+
+                        case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
+                            //Else, if paused, resume current track
+                            mp.start();
+                            mpState = MediaPlayerConstants.PLAYING;
+                            playButton.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
+
+                            //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
+                            if(mpService == null) {
+                                Intent serviceIntent = new Intent(this, MediaPlayerService.class);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
+                                bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+                            } else {
+                                mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                            }
+
+                            break;
                     }
 
                     break;
@@ -461,7 +478,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 progressHandler.postDelayed(this, 5);
             } catch(Exception e) {
                 Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                //Utilities.reportCrash(e);
+                Utilities.reportCrash(e);
             }
         }
     };
