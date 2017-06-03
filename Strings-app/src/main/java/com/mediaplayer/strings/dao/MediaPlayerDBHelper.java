@@ -58,9 +58,8 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             trackList = MediaLibraryManager.populateTrackInfoList(context);
 
             //Inserting tracks in table 'Tracks'
-            insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
-
             if(trackList != null && !trackList.isEmpty()) {
+                insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
                 trackIterator = trackList.iterator();
 
                 while(trackIterator.hasNext()) {

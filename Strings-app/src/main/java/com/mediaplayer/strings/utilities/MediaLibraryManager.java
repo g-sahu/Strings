@@ -27,8 +27,8 @@ public class MediaLibraryManager {
 
     public static boolean init(Context context) {
         HashMap<String, ArrayList<?>> map = null;
-        ArrayList<Track> newTracksList = null;
-        ArrayList<String> fileNamesList, deletedTracksList = null;
+        ArrayList<Track> newTracksList;
+        ArrayList<String> fileNamesList, deletedTracksList;
         MediaPlayerDAO dao = null;
         boolean isChanged = false;
 
@@ -40,32 +40,34 @@ public class MediaLibraryManager {
                 //Get all filenames from db and store in an ArrayList
                 fileNamesList = dao.getFileNamesFromLibrary();
 
-                //Get all mp3 files from storage
-                map = getUpdatedTracks(fileNamesList, context);
+                if(fileNamesList != null) {
+                    //Get all mp3 files from storage
+                    map = getUpdatedTracks(fileNamesList, context);
 
-                //Check if map is not null. If null, it means there has been no change to the songs library
-                if (map != null) {
-                    newTracksList = (ArrayList<Track>) map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
-                    deletedTracksList = (ArrayList<String>) map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
-                    isChanged = true;
-                }
+                    //Check if map is not null. If null, it means there has been no change to the songs library
+                    if (map != null) {
+                        newTracksList = (ArrayList<Track>) map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
+                        deletedTracksList = (ArrayList<String>) map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+                        isChanged = true;
 
-                //Insert new tracks in db
-                if (newTracksList != null && !newTracksList.isEmpty()) {
-                    dao.addTracksToLibrary(newTracksList);
-                }
+                        //Insert new tracks in db
+                        if (newTracksList != null && !newTracksList.isEmpty()) {
+                            dao.addTracksToLibrary(newTracksList);
+                        }
 
-                //Delete deleted tracks from db
-                if (deletedTracksList != null && !deletedTracksList.isEmpty()) {
-                    dao.deleteTracksFromLibrary(deletedTracksList);
+                        //Delete deleted tracks from db
+                        if (deletedTracksList != null && !deletedTracksList.isEmpty()) {
+                            dao.deleteTracksFromLibrary(deletedTracksList);
+                        }
+                    }
                 }
             }
 
             //Getting list of all tracks from db
             trackInfoList = dao.getTracks();
-            sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
 
             if(trackInfoList != null) {
+                sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
                 tracklistSize = trackInfoList.size();
 
                 if (map != null) {
@@ -189,9 +191,14 @@ public class MediaLibraryManager {
 
         //Creating track list from cursors
         trackInfoList = createTrackListFromCursor(cursors);
-        tracklistSize = (trackInfoList != null && !trackInfoList.isEmpty()) ? trackInfoList.size() : 0;
 
-        sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+        if(trackInfoList != null) {
+            tracklistSize = trackInfoList.size();
+            sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+        } else {
+            tracklistSize = 0;
+        }
+
         return trackInfoList;
     }
 
