@@ -1,5 +1,9 @@
 package com.mediaplayer.strings.utilities;
 
+import android.util.Log;
+
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -81,34 +85,9 @@ public class Utilities {
         return df.format(c.getTime());
     }
 
-    /*public static void reportCrash(Exception e) {
+    public static void reportCrash(Exception e) {
         FirebaseCrash.log(e.getMessage());
         FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
         FirebaseCrash.report(e);
-    }*/
-
-    /*public void copyDBToSD() {
-        //Copying the db to sd card
-        try {
-            File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
-
-            if (sd.canWrite()) {
-                String currentDBPath = "/data/data/" + context.getPackageName() + "/databases/Strings";
-                String backupDBPath = "Strings_bk.db";
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
-
-                if(currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
-                }
-            }
-        } catch (Exception e) {
-            Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-        }
-    }*/
+    }
 }

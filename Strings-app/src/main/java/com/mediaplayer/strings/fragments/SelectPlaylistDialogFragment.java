@@ -18,6 +18,7 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
+import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -119,7 +120,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                                     dao.addToPlaylists(selectedPlaylists, selectedTrack);
                                 } catch(Exception e) {
                                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                                    //Utilities.reportCrash(e);
+                                    Utilities.reportCrash(e);
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
@@ -163,7 +164,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            //Utilities.reportCrash(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();

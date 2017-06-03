@@ -15,6 +15,7 @@ import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
+import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 
@@ -53,7 +54,7 @@ public class SongsFragment extends Fragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            //Utilities.reportCrash(e);
+            Utilities.reportCrash(e);
         }
 
         return view;
