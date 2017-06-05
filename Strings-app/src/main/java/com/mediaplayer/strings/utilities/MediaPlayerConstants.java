@@ -9,6 +9,13 @@ public class MediaPlayerConstants {
     public static final String PLAY = "PLAY";
     public static final String PAUSE = "PAUSE";
     public static final String STOP = "STOP";
+    public static final String OPEN = "OPEN";
+    public static final String PLAYING = "PLAYING";
+    public static final String PAUSED = "PAUSED";
+    public static final String STOPPED = "STOPPED";
+    public static final String REPEAT_CURRENT = "REPEAT_CURRENT";
+    public static final String REPEAT_PLAYLIST = "REPEAT_PLAYLIST";
+    public static final String REPEAT_OFF = "REPEAT_OFF";
     static final String FILE_NAME = "FILE_NAME";
     static final String FILE_PATH = "FILE_PATH";
     static final String FILE_SIZE = "FILE_SIZE";
@@ -57,6 +64,6 @@ public class MediaPlayerConstants {
     static final String KEY_DELETED_TRACKS_LIST = "DELETED_TRACKS_LIST";
 
     public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
-    public static final String ACTION_SERVICE_BROADCAST = "com.mediaplayer.SERVICE_BROADCAST";
-    public static final String VERSION = "Version";
+    public static final String ACTION_INIT_COMPLETE = "com.mediaplayer.strings.action.INIT_COMPLETE";
+    public static final String VERSION = "version";
 }

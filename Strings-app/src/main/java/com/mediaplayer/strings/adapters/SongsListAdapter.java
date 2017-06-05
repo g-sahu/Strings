@@ -1,61 +1,49 @@
 package com.mediaplayer.strings.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
 
 import java.util.ArrayList;
 
-public class SongsListAdapter extends BaseAdapter {
+public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Holder> {
     private ArrayList<Track> trackInfoList;
     private static LayoutInflater inflater = null;
+    private Context context;
 
     public SongsListAdapter(Context context, ArrayList<Track> trackInfoList) {
         this.trackInfoList = trackInfoList;
+        this.context = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
-        View rowView = inflater.inflate(R.layout.item_track, null);
-        byte data[] = trackInfoList.get(position).getAlbumArt();
-        Bitmap albumArt = null;
+    public SongsListAdapter.Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rowView = inflater.inflate(R.layout.item_track, parent, false);
+        return new SongsListAdapter.Holder(rowView);
+    }
 
-        holder.albumArt = (ImageView) rowView.findViewById(R.id.albumThumbnail);
-        holder.trackTitle = (TextView) rowView.findViewById(R.id.trackTitle);
-        holder.artistName = (TextView) rowView.findViewById(R.id.artistName);
-        holder.moreOptions = (ImageButton) rowView.findViewById(R.id.moreTrackOptionsButton);
+    @Override
+    public void onBindViewHolder(SongsListAdapter.Holder holder, int position) {
+        Track track = trackInfoList.get(position);
+        byte data[] = track.getAlbumArt();
 
-        if(data != null) {
-            albumArt = BitmapFactory.decodeByteArray(data, 0, data.length);
+        if(data.length != 0) {
+            Glide.with(context).load(data).into(holder.albumArt);
+        } else {
+            Glide.with(context).load(R.drawable.img_default_album_art_thumb).into(holder.albumArt);
         }
 
-        holder.albumArt.setImageBitmap(albumArt);
-        holder.trackTitle.setText(trackInfoList.get(position).getTrackTitle());
-        holder.artistName.setText(trackInfoList.get(position).getArtistName());
-
-        return rowView;
-    }
-
-    @Override
-    public int getCount() {
-        return trackInfoList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return position;
+        holder.trackTitle.setText(track.getTrackTitle());
+        holder.artistName.setText(track.getArtistName());
     }
 
     @Override
@@ -63,10 +51,20 @@ public class SongsListAdapter extends BaseAdapter {
         return position;
     }
 
-    private class Holder {
+    @Override
+    public int getItemCount() {
+        return trackInfoList.size();
+    }
+
+    class Holder extends RecyclerView.ViewHolder {
         ImageView albumArt;
-        TextView trackTitle;
-        TextView artistName;
-        ImageButton moreOptions;
+        TextView trackTitle, artistName;
+
+        Holder(View itemView) {
+            super(itemView);
+            albumArt = (ImageView) itemView.findViewById(R.id.albumThumbnail);
+            trackTitle = (TextView) itemView.findViewById(R.id.trackTitle);
+            artistName = (TextView) itemView.findViewById(R.id.artistName);
+        }
     }
 }

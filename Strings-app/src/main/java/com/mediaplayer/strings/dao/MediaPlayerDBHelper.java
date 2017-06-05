@@ -1,14 +1,12 @@
 package com.mediaplayer.strings.dao;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
@@ -19,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 class MediaPlayerDBHelper extends SQLiteOpenHelper {
-    private Resources resources;
+    private Context context;
 
     MediaPlayerDBHelper(Context context) {
         super(context, MediaPlayerContract.DATABASE_NAME, null, MediaPlayerContract.DATABASE_VERSION);
-        resources = context.getResources();
+        this.context = context;
     }
 
     @Override
@@ -57,12 +55,11 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             insertStmt.execute();
 
             //Fetching tracks from storage
-            trackList = MediaLibraryManager.populateTrackInfoList(resources);
+            trackList = MediaLibraryManager.populateTrackInfoList(context);
 
             //Inserting tracks in table 'Tracks'
-            insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
-
             if(trackList != null && !trackList.isEmpty()) {
+                insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
                 trackIterator = trackList.iterator();
 
                 while(trackIterator.hasNext()) {
@@ -88,10 +85,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                         ++tracksInserted;
                     } catch(SQLException sqle) {
                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-
-                        FirebaseCrash.log(sqle.getMessage());
-                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                        FirebaseCrash.report(sqle);
+                        Utilities.reportCrash(sqle);
                     }
                 }
 
@@ -99,10 +93,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(insertStmt != null) {
                 insertStmt.close();

@@ -7,17 +7,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class PlaylistActivity extends AppCompatActivity {
-    private ListView listView;
+    private RecyclerView recyclerView;
     private FragmentManager supportFragmentManager;
     private Track selectedTrack;
     private Context homeContext;
@@ -83,16 +82,14 @@ public class PlaylistActivity extends AppCompatActivity {
             if(trackList.isEmpty()) {
                 emptyPlaylistMessage.setVisibility(View.VISIBLE);
             } else {
-                listView = (ListView) findViewById(R.id.listView);
-                ListAdapter playlistAdapter = new SongsListAdapter(this, trackList);
-                listView.setAdapter(playlistAdapter);
+                RecyclerView.Adapter playlistAdapter = new SongsListAdapter(this, trackList);
+                recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                recyclerView.setAdapter(playlistAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -107,8 +104,8 @@ public class PlaylistActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_song_options, menu);
         MenuItem optionTwo = menu.findItem(R.id.addToFavourites);
         MenuItem optionThree = menu.findItem(R.id.removeSong);
-
-        int position = listView.getPositionForView(view);
+        View parent = (View) view.getParent();
+        int position = recyclerView.getChildLayoutPosition(parent);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
@@ -158,10 +155,7 @@ public class PlaylistActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -190,10 +184,7 @@ public class PlaylistActivity extends AppCompatActivity {
             updateSongsListAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -220,10 +211,7 @@ public class PlaylistActivity extends AppCompatActivity {
             updateSongsListAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -233,7 +221,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     private void updateSongsListAdapter() {
         SongsListAdapter adapter = new SongsListAdapter(this, MediaLibraryManager.getSelectedPlaylist());
-        listView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
@@ -249,13 +237,13 @@ public class PlaylistActivity extends AppCompatActivity {
         playlistInfo.setText(getPlaylistDetails());
 
         PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
     public void callMediaplayerActivity(View view) {
-        int position = listView.getPositionForView(view);
+        int position = recyclerView.getChildLayoutPosition(view);
         Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 

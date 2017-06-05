@@ -3,6 +3,7 @@ package com.mediaplayer.strings.activities;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -12,20 +13,17 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.HomePagerAdapter;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
-import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
@@ -40,6 +38,7 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
+import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 
@@ -60,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "HomeActivity created");
 
         context = this;
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         Intent intent = getIntent();
 
         if(intent.getBooleanExtra(MediaPlayerConstants.FLAG_LIBRARY_CHANGED, false)) {
@@ -94,11 +94,12 @@ public class HomeActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_song_options, menu);
         MenuItem menuItem = menu.findItem(R.id.addToFavourites);
 
-        ListView listView = SongsFragment.trackListView;
-        position = listView.getPositionForView(view);
+        RecyclerView recyclerView = SongsFragment.trackListView;
+        View parent = (View) view.getParent();
+        position = recyclerView.getChildLayoutPosition(parent);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, position);
 
-        //Checking if song is added to defualt playlist 'Favourites'
+        //Checking if song is added to default playlist 'Favourites'
         if(selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
             menuItem.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
         }
@@ -128,7 +129,7 @@ public class HomeActivity extends AppCompatActivity {
     //Add to favourites menu option
     private void addToFavourites() {
         MediaPlayerDAO dao = null;
-        ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
+        ArrayList<Playlist> selectedPlaylists = new ArrayList<>();
 
         try {
             selectedPlaylists.add(favouritesPlaylist);
@@ -139,10 +140,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -162,10 +160,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -179,19 +174,14 @@ public class HomeActivity extends AppCompatActivity {
 
         try {
             dao = new MediaPlayerDAO(this);
-            dao.removeFromLibrary(selectedTrack);
-
-            //Updating list view adapter
-            updateSongsListAdapter();
+            MediaPlayerDAO.UpdateTracksTask task = new MediaPlayerDAO.UpdateTracksTask(this);
+            task.execute(selectedTrack);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
-                dao.closeConnection();
+                //dao.closeConnection();
             }
         }
     }
@@ -205,8 +195,9 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem renamePlaylist = menu.findItem(R.id.renamePlaylist);
         MenuItem deletePlaylist = menu.findItem(R.id.deletePlaylist);
 
-        ListView listView = PlaylistsFragment.listView;
-        position = listView.getPositionForView(view);
+        RecyclerView listView = PlaylistsFragment.recyclerView;
+        View parent = (View) view.getParent();
+        position = listView.getChildLayoutPosition(parent);
         selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(position);
 
         if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
@@ -252,10 +243,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -264,21 +252,22 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void callMediaplayerActivity(View view) {
-        ListView listView = SongsFragment.trackListView;
-        position = listView.getPositionForView(view);
+        RecyclerView recyclerView = SongsFragment.trackListView;
+        position = recyclerView.getChildLayoutPosition(view);
         selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY,  position);
 
         Intent intent = new Intent(this, MediaPlayerActivity.class);
+        intent.setAction(MediaPlayerConstants.PLAY);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
         intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
-        intent.setAction(MediaPlayerConstants.PLAY);
+        intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE, MediaPlayerConstants.TITLE_LIBRARY);
         intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
         startActivity(intent);
     }
 
     public void callPlaylistActivity(View view) {
-        ListView listView = PlaylistsFragment.listView;
-        position = listView.getPositionForView(view);
+        RecyclerView listView = PlaylistsFragment.recyclerView;
+        position = listView.getChildLayoutPosition(view);
         selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(position);
         int playlistID = selectedPlaylist.getPlaylistID();
 
@@ -288,23 +277,9 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void updateSongsListAdapter() {
-        ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
-
-        if(trackList.isEmpty()) {
-            RelativeLayout emptyLibraryMessage = (RelativeLayout) findViewById(R.id.emptyLibraryMessage);
-            emptyLibraryMessage.setVisibility(View.VISIBLE);
-        }
-
-        SongsListAdapter adapter = new SongsListAdapter(this, trackList);
-        ListView listView = SongsFragment.trackListView;
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(this, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
@@ -324,9 +299,8 @@ public class HomeActivity extends AppCompatActivity {
         try {
             startActivity(myAppLinkToMarket);
         } catch(ActivityNotFoundException e) {
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+            Utilities.reportCrash(e);
 
             Toast.makeText(this, MessageConstants.ERROR_404, Toast.LENGTH_LONG).show();
         }
@@ -356,7 +330,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        MediaPlayerActivity.stopProgressBar();
         Intent intent = new Intent(this, MediaPlayerService.class);
         stopService(intent);
 

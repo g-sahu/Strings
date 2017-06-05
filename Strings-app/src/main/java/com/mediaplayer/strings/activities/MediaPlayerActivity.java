@@ -26,6 +26,7 @@ import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.services.MediaPlayerService;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
+import com.mediaplayer.strings.utilities.MediaPlayerStateManager;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
 import com.mediaplayer.strings.utilities.Utilities;
@@ -33,25 +34,27 @@ import com.mediaplayer.strings.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MediaPlayerActivity extends AppCompatActivity
-        implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
-    private static final String LOG_TAG = "MediaPlayerActivity";
-    private static MediaPlayer mp;
-    private static Track selectedTrack;
-    private static String selectedPlaylist;
-    private static SeekBar songProgressBar;
-    private static TextView timeElapsed;
-    private static final Handler mHandler = new Handler();
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
-    private ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
-    private ArrayList<Integer> tracksCompleted = new ArrayList<Integer>();
-    private boolean isPaused = false, isRepeatingAll = false, isRepeatingCurrent = false, isShuffling = false, mBound = false;
-    private int currentIndex, playlistSize, width;
-    private Bitmap bm;
+public class MediaPlayerActivity extends AppCompatActivity
+        implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
+    private static final String LOG_TAG = "MediaPlayerActivity";
+
+    private MediaPlayer mp;
+    private Track selectedTrack;
+    private String selectedPlaylist;
+    private SeekBar songProgressBar;
+    private TextView timeElapsed;
     private Toast toast;
-    private Context context;
-    private String toastText, origin, playlistName;
-    private MediaPlayerService mService;
+    private MediaPlayerService mpService;
+    private MediaPlayerStateManager mpStateManager;
+    private int currentIndex, playlistSize, width;
+    private String origin, playlistName, mpState = MediaPlayerConstants.STOPPED, repeatMode = MediaPlayerConstants.REPEAT_OFF;
+    private ImageButton playButton, nextButton, previousButton, repeatButton, shuffleButton;
+    private boolean isBound, isShuffling;
+
+    private final Handler progressHandler = new Handler();
+    private ArrayList<Integer> tracksCompleted = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,23 +62,30 @@ public class MediaPlayerActivity extends AppCompatActivity
         setContentView(R.layout.activity_media_player);
         Log.d(LOG_TAG, "MediaPlayerActivity created");
 
+        //Fetching MediaPlayerStateManager instance
+        mpStateManager = ((MediaPlayerStateManager) getApplicationContext());
+
+        //Fetching device display width
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         width = size.x;
 
-        context = getApplicationContext();
+        //Extracting extra info from intent
         Intent intent = getIntent();
         String action = intent.getAction();
-
         selectedTrack = (Track) intent.getSerializableExtra(MediaPlayerConstants.KEY_SELECTED_TRACK);
         selectedPlaylist = intent.getStringExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
         playlistName = intent.getStringExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE);
         origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
+
+        //Initialising MediaPlayerActivity
         initializePlayer(selectedTrack);
 
-        //Setting SeekBar listener
-        songProgressBar.setOnSeekBarChangeListener(this);
+        if(mpStateManager.getMpState() != null) {
+            //Restoring media player state from MediaPlayerStateManager
+            restoreMediaPlayerState();
+        }
 
         if(action != null) {
             switch(action) {
@@ -84,12 +94,12 @@ public class MediaPlayerActivity extends AppCompatActivity
                     break;
 
                 case MediaPlayerConstants.PAUSE:
-                    playButton.setTag(R.id.playButton, MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY);
+                    playButton.setTag(R.id.playButton, origin);
                     playButton.performClick();
                     break;
 
                 case MediaPlayerConstants.PLAY:
-                    playButton.setTag(R.id.playButton, MediaPlayerConstants.TAG_SONGS_LIST_VIEW);
+                    playButton.setTag(R.id.playButton, origin);
                     playButton.performClick();
                     break;
 
@@ -103,64 +113,102 @@ public class MediaPlayerActivity extends AppCompatActivity
     }
 
     public void play(View view) {
-        Object tag;
+        Object tagObject;
         mp = MediaPlayerService.getMp();
 
         if(view != null) {
-            tag = view.getTag(R.id.playButton);
+            tagObject = view.getTag(R.id.playButton);
 
-            if(tag != null) {
-                origin = tag.toString();
-                view.setTag(R.id.playButton, null);
-            } else {
+            if(tagObject == null) {
                 origin = MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY;
             }
+
+            view.setTag(R.id.playButton, null);
         }
 
         if(mp != null) {
-            if(mp.isPlaying()) {
-                switch(origin) {
-                    case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
-                        mp.reset();
-                        playSong(selectedTrack);
-                        break;
+            switch(mpState) {
+                case MediaPlayerConstants.PLAYING:
+                    switch(origin) {
+                        case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
 
-                    case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
-                        mp.reset();
-                        playSong(selectedTrack);
-                        break;
+                        case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
 
-                    case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
-                        //If already playing, pause the current track
-                        mp.pause();
-                        isPaused = true;
-                        playButton.setImageResource(R.drawable.play_button);
+                        case MediaPlayerConstants.TAG_NOTIFICATION:
 
-                        if(mService == null) {
-                            Intent serviceIntent = new Intent(this, MediaPlayerService.class);
-                            serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-                            serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
-                            bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
-                        } else {
-                            mService.stopForeground(false);
-                            Log.d(LOG_TAG, "Is foreground?: false");
-                            mService.createNotification(selectedTrack, selectedPlaylist);
-                        }
+                        case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
+                            //If already playing, pause the current track
+                            mp.pause();
+                            mpState = MediaPlayerConstants.PAUSED;
+                            playButton.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
 
-                        break;
-                }
-            } else if(!isPaused) {
-                //Else, if stopped, start playback
-                playSong(selectedTrack);
-                isPaused = false;
-                songProgressBar.setProgress(SQLConstants.ZERO);
-                songProgressBar.setMax(SQLConstants.HUNDRED);
-            } else {
-                //Else, if paused, resume current track
-                mp.start();
-                isPaused = false;
-                playButton.setImageResource(R.drawable.pause_button);
-                mService.startForeground(SQLConstants.ONE, mService.createNotification(selectedTrack, selectedPlaylist));
+                            //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
+                            if(mpService == null) {
+                                Intent serviceIntent = new Intent(this, MediaPlayerService.class);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
+                                bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+                            } else {
+                                mpService.stopForeground(false);
+                                Log.d(LOG_TAG, "Is foreground?: false");
+                                mpService.createNotification(selectedTrack, selectedPlaylist);
+                            }
+
+                            break;
+                    }
+
+                    break;
+
+                case MediaPlayerConstants.PAUSED:
+                    switch(origin) {
+                        case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
+
+                        case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
+                            mp.reset();
+                            playSong(selectedTrack);
+                            break;
+
+                        case MediaPlayerConstants.TAG_NOTIFICATION:
+
+                        case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
+                            //Else, if paused, resume current track
+                            mp.start();
+                            mpState = MediaPlayerConstants.PLAYING;
+                            playButton.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
+
+                            //If MediaPlayerService object does not exists, it means service is not bound. Hence, bind the service
+                            if(mpService == null) {
+                                Intent serviceIntent = new Intent(this, MediaPlayerService.class);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+                                serviceIntent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, selectedPlaylist);
+                                bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+                            } else {
+                                mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                            }
+
+                            break;
+                    }
+
+                    break;
+
+                case MediaPlayerConstants.STOPPED:
+                    //Else, if stopped, start playback
+                    mp = MediaPlayerService.getMp();
+                    mp.reset();
+                    MediaPlayerService.setMp(mp);
+                    playSong(selectedTrack);
+                    songProgressBar.setProgress(SQLConstants.ZERO);
+                    songProgressBar.setMax(SQLConstants.HUNDRED);
+                    break;
             }
         }
     }
@@ -173,22 +221,27 @@ public class MediaPlayerActivity extends AppCompatActivity
         if(isShuffling) {
             //If shuffling is on, play a random song
             selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, getNextIndex());
-        } else if(isRepeatingCurrent) {
+        } else if(repeatMode.equals(MediaPlayerConstants.REPEAT_CURRENT)) {
             //Else, if repeating current is on, restart the same song
 
         } else if(MediaLibraryManager.isLastTrack(selectedPlaylist, currentIndex)) {
-            if(isRepeatingAll) {
+            if(repeatMode.equals(MediaPlayerConstants.REPEAT_PLAYLIST)) {
                 // Else, if repeating all is on and is currently playing the last song,
                 // play next song in the playlist
                 selectedTrack = MediaLibraryManager.getFirstTrack(selectedPlaylist);
             } else {
-                //Stop playback
-                playButton.setImageResource(R.drawable.play_button);
-                toastText = MessageConstants.END_OF_PLAYLIST;
-                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-                toast.show();
-                mService.stopForeground(false);
-                mService.createNotification(selectedTrack, selectedPlaylist);
+                //Else, stop playback
+                playButton.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
+
+                //Showing message to the user
+                showToastMessage(MessageConstants.END_OF_PLAYLIST);
+
+                //Setting mediaplayer state in MediaPlayerStateManager
+                mpState = MediaPlayerConstants.STOPPED;
+
+                //Stopping foreground service and progress bar and updating notification
+                mpService.stopForeground(false);
+                mpService.createNotification(selectedTrack, selectedPlaylist);
                 stopProgressBar();
                 return;
             }
@@ -209,22 +262,26 @@ public class MediaPlayerActivity extends AppCompatActivity
         if(isShuffling) {
             //If shuffling is on, play a random song
             selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, getNextIndex());
-        } else if(isRepeatingCurrent) {
+        } else if(repeatMode.equals(MediaPlayerConstants.REPEAT_CURRENT)) {
             //Else, if repeating current is on, restart the same song
 
         } else if(MediaLibraryManager.isFirstTrack(currentIndex)) {
-            if(isRepeatingAll) {
+            if(repeatMode.equals(MediaPlayerConstants.REPEAT_PLAYLIST)) {
                 // Else, if repeating all is on and is currently playing the first song,
                 // play last song in the playlist
                 selectedTrack = MediaLibraryManager.getLastTrack(selectedPlaylist);
             } else {
-                //Stop playback
-                playButton.setImageResource(R.drawable.play_button);
-                toastText = MessageConstants.BEG_OF_PLAYLIST;
-                toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-                toast.show();
-                mService.stopForeground(false);
-                mService.createNotification(selectedTrack, selectedPlaylist);
+                //Else, stop playback
+                playButton.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
+                mpState = MediaPlayerConstants.STOPPED;
+
+                //Showing message to the user
+                showToastMessage(MessageConstants.BEG_OF_PLAYLIST);
+
+                //Stopping foreground service and updating notification
+                mpService.stopForeground(false);
+                mpService.createNotification(selectedTrack, selectedPlaylist);
+
                 stopProgressBar();
                 return;
             }
@@ -240,37 +297,45 @@ public class MediaPlayerActivity extends AppCompatActivity
     public void shuffle(View view) {
         if(!isShuffling) {
             isShuffling = true;
-            shuffleButton.setImageResource(R.drawable.ic_shuffle_red_18dp);
-            toastText = MessageConstants.SHUFFLING_ON;
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_on_red_24dp);
+
+            //Showing message to the user
+            showToastMessage(MessageConstants.SHUFFLING_ON);
         } else {
             isShuffling = false;
-            shuffleButton.setImageResource(R.drawable.ic_shuffle_black_18dp);
-            toastText = MessageConstants.SHUFFLING_OFF;
-        }
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_off_black_24dp);
 
-        toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-        toast.show();
+            //Showing message to the user
+            showToastMessage(MessageConstants.SHUFFLING_OFF);
+        }
     }
 
     public void repeat(View view) {
-        if(!isRepeatingCurrent && !isRepeatingAll) {
-            isRepeatingCurrent = true;
-            repeatButton.setImageResource(R.drawable.ic_repeat_one_red_18dp);
-            toastText = MessageConstants.LOOPING_TRACK;
-        } else if (isRepeatingCurrent) {
-            isRepeatingAll = true;
-            isRepeatingCurrent = false;
-            repeatButton.setImageResource(R.drawable.ic_repeat_red_18dp);
-            toastText = MessageConstants.LOOPING_PLAYLIST;
-        } else {
-            isRepeatingCurrent = false;
-            isRepeatingAll = false;
-            repeatButton.setImageResource(R.drawable.ic_repeat_black_18dp);
-            toastText = MessageConstants.LOOPING_OFF;
-        }
+        switch(repeatMode) {
+            case MediaPlayerConstants.REPEAT_OFF:
+                repeatMode = MediaPlayerConstants.REPEAT_CURRENT;
+                repeatButton.setImageResource(R.drawable.ic_repeat_one_red_24dp);
 
-        toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-        toast.show();
+                //Showing message to the user
+                showToastMessage(MessageConstants.LOOPING_TRACK);
+                break;
+
+            case MediaPlayerConstants.REPEAT_CURRENT:
+                repeatMode = MediaPlayerConstants.REPEAT_PLAYLIST;
+                repeatButton.setImageResource(R.drawable.ic_repeat_all_red_24dp);
+
+                //Showing message to the user
+                showToastMessage(MessageConstants.LOOPING_PLAYLIST);
+                break;
+
+            case MediaPlayerConstants.REPEAT_PLAYLIST:
+                repeatMode = MediaPlayerConstants.REPEAT_OFF;
+                repeatButton.setImageResource(R.drawable.ic_repeat_off_black_24dp);
+
+                //Showing message to the user
+                showToastMessage(MessageConstants.LOOPING_OFF);
+                break;
+        }
     }
 
     private void initializePlayer(Track requestedTrack) {
@@ -294,6 +359,7 @@ public class MediaPlayerActivity extends AppCompatActivity
         String albumName = requestedTrack.getAlbumName();
         String artistName = requestedTrack.getArtistName();
         String songDuration = String.valueOf(requestedTrack.getTrackDuration());
+        byte[] data = requestedTrack.getAlbumArt();
 
         switch(selectedPlaylist) {
             case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
@@ -306,16 +372,23 @@ public class MediaPlayerActivity extends AppCompatActivity
                 break;
         }
 
-        byte[] data = requestedTrack.getAlbumArt();
+        //Setting SeekBar listener
+        songProgressBar.setOnSeekBarChangeListener(this);
         songProgressBar.setProgress(SQLConstants.ZERO);
         songProgressBar.setMax(SQLConstants.HUNDRED);
+
+        mp = MediaPlayerService.getMp();
 
         if(mp == null) {
             mp = new MediaPlayer();
             MediaPlayerService.setMp(mp);
         }
 
+        //Setting listener for track completion
         mp.setOnCompletionListener(this);
+
+        //Setting error listener
+        mp.setOnErrorListener(this);
 
         titleBar.setText(songTitle);
         artistBar.setText(artistName);
@@ -323,18 +396,22 @@ public class MediaPlayerActivity extends AppCompatActivity
         playingFrom.setText(playlistName);
         trackDuration.setText(Utilities.milliSecondsToTimer(Long.parseLong(songDuration)));
 
-        if(data != null) {
-            bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
+        if(data.length != 0) {
+            Bitmap bm = BitmapFactory.decodeByteArray(data, SQLConstants.ZERO, data.length);
 
             if(bm != null) {
                 int size = width / 2;
                 albumArt.setImageBitmap(Bitmap.createScaledBitmap(bm, size, size, false));
+                albumArtThumbnail.setImageBitmap(bm);
             } else {
-                albumArt.setImageBitmap(bm);
+                albumArt.setImageResource(R.drawable.img_default_album_art);
+                albumArtThumbnail.setImageResource(R.drawable.img_default_album_art_thumb);
             }
+        } else {
+            albumArt.setImageResource(R.drawable.img_default_album_art);
+            albumArtThumbnail.setImageResource(R.drawable.img_default_album_art_thumb);
         }
 
-        albumArtThumbnail.setImageBitmap(bm);
         Log.d(LOG_TAG, "Media Player initialized");
     }
 
@@ -348,50 +425,61 @@ public class MediaPlayerActivity extends AppCompatActivity
         //Checking if service is running
         if(MediaPlayerService.isServiceRunning) {
             //Checking if MediaplayerActivity is bound to service
-            if(!MediaPlayerService.isServiceBound) {
+            if(!isBound) {
                 //Binding to MediaPlayerService
-                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
             //Else, if service is running and bound and track is paused, resume playback
-            } else if(isPaused){
-                mService.playSong(selectedTrack);
-                mService.startForeground(SQLConstants.ONE, mService.createNotification(selectedTrack, selectedPlaylist));
+            } else if(mpState.equals(MediaPlayerConstants.PAUSED)){
+                if(mpService != null) {
+                    mpService.playSong(selectedTrack);
+                    mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                }
 
             //Else, if track is stoppped, play current track
             } else {
-                mService.playSong(selectedTrack);
-                mService.createNotification(selectedTrack, selectedPlaylist);
+                if(mpService != null) {
+                    mpService.playSong(selectedTrack);
+                    mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                }
             }
         } else {
             Log.d(LOG_TAG, "Service not running");
             startService(intent);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
 
-        playButton.setImageResource(R.drawable.pause_button);
+        mpState = MediaPlayerConstants.PLAYING;
+        playButton.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
         Log.d(LOG_TAG, "END: The playSong() event");
     }
 
     //Update timer on seekbar
     private void updateProgressBar() {
-        mHandler.postDelayed(mUpdateTimeTask, 10);
+        progressHandler.postDelayed(mUpdateTimeTask, 5);
     }
 
     //Background Runnable thread for updating progress bar
-    private static Runnable mUpdateTimeTask = new Runnable() {
+    private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            long totalDuration = mp.getDuration();
-            long currentDuration = mp.getCurrentPosition();
+            try {
+                mp = MediaPlayerService.getMp();
+                long totalDuration = mp.getDuration();
+                long currentDuration = mp.getCurrentPosition();
 
-            // Displaying time completed playing
-            timeElapsed.setText(Utilities.milliSecondsToTimer(currentDuration));
+                // Displaying time completed playing
+                timeElapsed.setText(Utilities.milliSecondsToTimer(currentDuration));
 
-            // Updating progress bar
-            int progress = Utilities.getProgressPercentage(currentDuration, totalDuration);
-            songProgressBar.setProgress(progress);
+                // Updating progress bar
+                int progress = Utilities.getProgressPercentage(currentDuration, totalDuration);
+                songProgressBar.setProgress(progress);
 
-            // Running this thread after 5 milliseconds
-            mHandler.postDelayed(this, 5);
+                // Running this thread after 5 milliseconds
+                progressHandler.postDelayed(this, 5);
+            } catch(Exception e) {
+                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                Utilities.reportCrash(e);
+            }
         }
     };
 
@@ -402,17 +490,14 @@ public class MediaPlayerActivity extends AppCompatActivity
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        // remove message Handler from updating progress bar
-        mHandler.removeCallbacks(mUpdateTimeTask);
+        progressHandler.removeCallbacks(mUpdateTimeTask);
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        mHandler.removeCallbacks(mUpdateTimeTask);
-
+        progressHandler.removeCallbacks(mUpdateTimeTask);
         int totalDuration = mp.getDuration();
         int currentPosition = Utilities.progressToTimer(seekBar.getProgress(), totalDuration);
-
         mp.seekTo(currentPosition);
         updateProgressBar();
     }
@@ -456,7 +541,9 @@ public class MediaPlayerActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+
         String action = intent.getAction();
+        origin = intent.getStringExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN);
 
         if(action != null) {
             switch(action) {
@@ -476,74 +563,72 @@ public class MediaPlayerActivity extends AppCompatActivity
                     nextButton.performClick();
                     break;
 
-                case MediaPlayerConstants.STOP:
+                /*case MediaPlayerConstants.STOP:
                     Log.d(LOG_TAG, "Delete intent received");
-                    mService.stopSelf();
-                    break;
+                    mpService.stopSelf();
+                    break;*/
             }
         }
 
         setIntent(intent);
-        Log.d(LOG_TAG, action);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "Mediaplayer activity resumed");
+    protected void onRestart() {
+        super.onStart();
+        Log.d(LOG_TAG, "Mediaplayer activity started");
+
+        //Updating progress bar
+        updateProgressBar();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        //Stopping progress bar and saving media player state
+        stopProgressBar();
+        saveMediaPlayerState();
+
         Log.d(LOG_TAG, "Mediaplayer activity stopped");
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        //Unbind from the service
-        if(mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-
-        Log.d(LOG_TAG, "Mediaplayer activity destroyed");
-    }
-
-    public static void stopProgressBar() {
-        mHandler.removeCallbacks(mUpdateTimeTask);
+    private void stopProgressBar() {
+        progressHandler.removeCallbacks(mUpdateTimeTask);
         timeElapsed.setText(Utilities.milliSecondsToTimer(SQLConstants.ZERO));
         songProgressBar.setProgress(SQLConstants.ZERO);
-
     }
 
     //Defines callbacks for service binding, passed to bindService()
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             MediaPlayerService.MyBinder binder = (MediaPlayerService.MyBinder) service;
-            mService = binder.getService();
-            Log.d(LOG_TAG, "Service connected: " + mService);
-            mBound = true;
+            mpService = binder.getService();
+            Log.d(LOG_TAG, "Service connected: " + mpService);
+            isBound = true;
 
             if(MediaPlayerService.isServiceRunning) {
                 switch(origin) {
                     case MediaPlayerConstants.TAG_SONGS_LIST_VIEW:
-                        mService.playSong(selectedTrack);
-                        mService.createNotification(selectedTrack, selectedPlaylist);
+                        mpService.playSong(selectedTrack);
+                        mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
                         break;
 
                     case MediaPlayerConstants.TAG_MEDIAPLAYER_ACTIVITY:
-                        mService.stopForeground(false);
+                        mpService.stopForeground(false);
                         Log.d(LOG_TAG, "Is foreground?: false");
-                        mService.createNotification(selectedTrack, selectedPlaylist);
+                        mpService.createNotification(selectedTrack, selectedPlaylist);
                         break;
 
                     case MediaPlayerConstants.TAG_NOTIFICATION:
-                        mService.playSong(selectedTrack);
-                        mService.createNotification(selectedTrack, selectedPlaylist);
+                        mpService.playSong(selectedTrack);
+                        mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
+                        break;
+
+                    case MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY:
+                        mpService.playSong(selectedTrack);
+                        mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
                         break;
 
                     default:
@@ -556,9 +641,14 @@ public class MediaPlayerActivity extends AppCompatActivity
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+            isBound = false;
         }
     };
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        return true;
+    }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
@@ -566,13 +656,13 @@ public class MediaPlayerActivity extends AppCompatActivity
 
         if(!mp.isPlaying()) {
             //Checking if track is on loop
-            if (isRepeatingCurrent) {
+            if(repeatMode.equals(MediaPlayerConstants.REPEAT_CURRENT)) {
                 mp.reset();
                 playSong(selectedTrack);
 
                 //Checking if it is not the last track in the playlist
-            } else if (!MediaLibraryManager.isLastTrack(selectedPlaylist, currentIndex)) {
-                if (isShuffling) {
+            } else if(!MediaLibraryManager.isLastTrack(selectedPlaylist, currentIndex)) {
+                if(isShuffling) {
                     // Play next random song in the playlist
                     currentIndex = getNextIndex();
                 } else {
@@ -586,8 +676,8 @@ public class MediaPlayerActivity extends AppCompatActivity
                 playSong(selectedTrack);
 
                 //Checking if playlist is on loop
-            } else if (isRepeatingAll) {
-                if (isShuffling) {
+            } else if(repeatMode.equals(MediaPlayerConstants.REPEAT_PLAYLIST)) {
+                if(isShuffling) {
                     // Play next random song in the playlist
                     currentIndex = getNextIndex();
                 } else {
@@ -602,22 +692,95 @@ public class MediaPlayerActivity extends AppCompatActivity
 
                 //Else, if looping is off and it is the last track in the playlist
             } else {
-                if (isShuffling) {
+                if(isShuffling) {
                     currentIndex = getNextIndex();
                     mp.reset();
                     selectedTrack = MediaLibraryManager.getTrackByIndex(selectedPlaylist, currentIndex);
                     initializePlayer(selectedTrack);
                     playSong(selectedTrack);
                 } else {
-                    //Stop playback
+                    //Else, stop playback
                     mp.reset();
-                    playButton.setImageResource(R.drawable.play_button);
+                    playButton.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
                     stopProgressBar();
-                    isPaused = false;
-                    mService.stopForeground(false);
-                    mService.createNotification(selectedTrack, selectedPlaylist);
+                    mpState = MediaPlayerConstants.STOPPED;
+                    mpService.stopForeground(false);
+                    mpService.createNotification(selectedTrack, selectedPlaylist);
                 }
             }
         }
+    }
+
+    private void showToastMessage(String toastText) {
+        if(toast != null) {
+            toast.cancel();
+        }
+
+        toast = Toast.makeText(this, toastText, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    private void saveMediaPlayerState() {
+        mpStateManager.setMpState(mpState);
+        mpStateManager.setRepeatMode(repeatMode);
+        mpStateManager.setShuffling(isShuffling);
+    }
+
+    private void restoreMediaPlayerState() {
+        mpState = mpStateManager.getMpState();
+        repeatMode = mpStateManager.getRepeatMode();
+        isShuffling = mpStateManager.isShuffling();
+        mp = MediaPlayerService.getMp();
+
+        //Updating play button
+        switch (mpState) {
+            case MediaPlayerConstants.PLAYING:
+                playButton.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
+                break;
+
+            case MediaPlayerConstants.PAUSED:
+
+            case MediaPlayerConstants.STOPPED:
+                playButton.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
+                break;
+        }
+
+        //Updating repeat button
+        switch (repeatMode) {
+            case MediaPlayerConstants.REPEAT_CURRENT:
+                repeatButton.setImageResource(R.drawable.ic_repeat_one_red_24dp);
+                break;
+
+            case MediaPlayerConstants.REPEAT_PLAYLIST:
+                repeatButton.setImageResource(R.drawable.ic_repeat_all_red_24dp);
+                break;
+
+            case MediaPlayerConstants.REPEAT_OFF:
+                repeatButton.setImageResource(R.drawable.ic_repeat_off_black_24dp);
+                break;
+        }
+
+        //Updating shuffle button
+        if (isShuffling) {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_on_red_24dp);
+        } else {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_off_black_24dp);
+        }
+
+        //Updating progress bar
+        updateProgressBar();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        //Unbinding from the service
+        if(isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
+
+        Log.d(LOG_TAG, "Mediaplayer activity destroyed");
     }
 }

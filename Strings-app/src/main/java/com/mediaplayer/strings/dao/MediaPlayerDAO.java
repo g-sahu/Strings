@@ -1,18 +1,25 @@
 package com.mediaplayer.strings.dao;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.mediaplayer.strings.R;
+import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
+import com.mediaplayer.strings.fragments.SongsFragment;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
@@ -23,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MediaPlayerDAO {
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
     private MediaPlayerDBHelper mDbHelper;
     private Context context;
 
@@ -111,18 +118,12 @@ public class MediaPlayerDAO {
             }
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-
-            FirebaseCrash.log(sqle.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-            FirebaseCrash.report(sqle);
+            Utilities.reportCrash(sqle);
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -188,10 +189,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -202,96 +200,9 @@ public class MediaPlayerDAO {
         toast.show();
     }
 
-    public void removeFromLibrary(Track selectedTrack) {
-        SQLiteStatement updateStmt, deleteStmt;
-        String toastText;
-        int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, trackDuration;
-        Playlist playlist;
-        Cursor cursor = null;
-
-        try {
-            trackID = selectedTrack.getTrackID();
-            trackDuration = selectedTrack.getTrackDuration();
-            String args[] = {String.valueOf(trackID)};
-
-            //Fetching existing values for selected playlist
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
-            cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
-            updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
-            cursor.moveToFirst();
-
-            while(!cursor.isAfterLast()) {
-                playlist = MediaLibraryManager.getPlaylistByIndex(cursor.getInt(0));
-                playlistID = playlist.getPlaylistID();
-                playlistSize = playlist.getPlaylistSize();
-                playlistDuration = playlist.getPlaylistDuration();
-
-                //Calculating new values for selected playlist
-                newPlaylistSize = playlistSize - 1;
-                newPlaylistDuration = playlistDuration - trackDuration;
-
-                //Updating table 'Playlists' for the selected playlist with new values of 'playlistSize' and 'playlistDuration'
-                updateStmt.clearBindings();
-                updateStmt.bindLong(1, newPlaylistSize);
-                updateStmt.bindLong(2, newPlaylistDuration);
-                updateStmt.bindString(3, Utilities.getCurrentDate());
-                updateStmt.bindLong(4, playlistID);
-                Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
-                updateStmt.execute();
-
-                //Setting new values for 'playlistSize' and 'playlistDuration' for selected playlist
-                playlist.setPlaylistSize(newPlaylistSize);
-                playlist.setPlaylistDuration(newPlaylistDuration);
-                MediaLibraryManager.getPlaylistInfoList().set(playlist.getPlaylistIndex(), playlist);
-
-                cursor.moveToNext();
-            }
-
-            //Deleting track from table 'Playlist_Detail'
-            deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST_DETAIL);
-            deleteStmt.bindLong(1, trackID);
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
-            deleteStmt.execute();
-
-            //Deleting track from table 'Tracks'
-            deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
-            deleteStmt.bindLong(1, trackID);
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
-            deleteStmt.execute();
-
-            //Removing selected track from the list of tracks
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
-
-            //Sorting the list of tracks to update track indices
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
-
-            //Updating track indices in db
-            updateTrackIndices();
-
-            //Setting success toast message
-            toastText = MessageConstants.REMOVED_FROM_LIBRARY;
-        } catch(Exception e) {
-            Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
-
-            //Setting error toast message
-            toastText = MessageConstants.ERROR;
-        } finally {
-            if(cursor != null) {
-                cursor.close();
-            }
-        }
-
-        //Displaying toast message to user
-        Toast toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
-    public void updateTrackIndices() {
+    public static int updateTrackIndices() {
         SQLiteStatement updateStmt = null;
+        int tracksUpdated = 0;
 
         try {
             updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
@@ -308,18 +219,18 @@ public class MediaPlayerDAO {
                 Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
                 updateStmt.execute();
                 updateStmt.clearBindings();
+                tracksUpdated++;
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(updateStmt != null) {
                 updateStmt.close();
             }
         }
+
+        return tracksUpdated;
     }
 
     public void createPlaylist(Playlist playlist) {
@@ -353,10 +264,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_CREATED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -386,10 +294,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_RENAMED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -446,10 +351,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_DELETED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -529,18 +431,12 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.ADDED_TRACKS;
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, sqle.getMessage());
-
-            FirebaseCrash.log(sqle.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-            FirebaseCrash.report(sqle);
+            Utilities.reportCrash(sqle);
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -584,34 +480,28 @@ public class MediaPlayerDAO {
                 ++tracksAdded;
             } catch(SQLException sqle) {
                 Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-
-                FirebaseCrash.log(sqle.getMessage());
-                FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                FirebaseCrash.report(sqle);
+                Utilities.reportCrash(sqle);
             }
         }
 
         Log.d("Tracks added to library", String.valueOf(tracksAdded));
     }
 
-    public void deleteTracksFromLibrary(@NonNull ArrayList<Track> deletedTracksList) {
-        Track track;
-        long trackID;
-        int tracksDeleted = 0;
+    public void deleteTracksFromLibrary(@NonNull ArrayList<String> deletedTracksList) {
+        int tracksDeleted;
+        Iterator<String> deletedTracksIterator = deletedTracksList.iterator();
+        StringBuilder fileNames = new StringBuilder();
 
-        SQLiteStatement deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
-        Iterator<Track> deletedTracksListIterator = deletedTracksList.iterator();
+        while(deletedTracksIterator.hasNext()) {
+            fileNames.append(SQLConstants.DOUBLE_QUOTE).append(deletedTracksIterator.next()).append(SQLConstants.DOUBLE_QUOTE);
 
-        while(deletedTracksListIterator.hasNext()) {
-            track = deletedTracksListIterator.next();
-            trackID = track.getTrackID();
-            deleteStmt.bindLong(SQLConstants.ONE, trackID);
-
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_DELETE_FROM_TRACKS);
-            deleteStmt.executeUpdateDelete();
-            deleteStmt.clearBindings();
-            ++tracksDeleted;
+            if(deletedTracksIterator.hasNext()) {
+                fileNames.append(SQLConstants.COMMA_SEP);
+            }
         }
+
+        SQLiteStatement deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FOR_FILENAME + fileNames + ")");
+        tracksDeleted = deleteStmt.executeUpdateDelete();
 
         Log.d("Tracks deleted", String.valueOf(tracksDeleted));
     }
@@ -629,7 +519,7 @@ public class MediaPlayerDAO {
 
             while(!playlistsCursor.isAfterLast()) {
                 Track track = new Track();
-                c = 0;
+                c = SQLConstants.ZERO;
 
                 track.setTrackID(playlistsCursor.getInt(c++));
                 track.setTrackTitle(playlistsCursor.getString(c++));
@@ -648,10 +538,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(playlistsCursor != null) {
                 playlistsCursor.close();
@@ -681,10 +568,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -729,14 +613,14 @@ public class MediaPlayerDAO {
 
         Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_TRACKS);
         Cursor tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACKS, null);
-        tracksCursor.moveToFirst();
 
         if(tracksCursor.getCount() > 0) {
+            tracksCursor.moveToFirst();
             trackInfoList = new ArrayList<Track>();
 
             while(!tracksCursor.isAfterLast()) {
                 track = new Track();
-                c = 0;
+                c = SQLConstants.ZERO;
 
                 track.setTrackID(tracksCursor.getInt(c++));
                 track.setTrackTitle(tracksCursor.getString(c++));
@@ -775,16 +659,13 @@ public class MediaPlayerDAO {
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
-                    playlist.add(cursor.getInt(0));
+                    playlist.add(cursor.getInt(SQLConstants.ZERO));
                     cursor.moveToNext();
                 }
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -794,45 +675,152 @@ public class MediaPlayerDAO {
         return playlist;
     }
 
-    public ArrayList<Track> getTracksFromLibrary() {
-        ArrayList<Track> trackList = null;
-        Track track;
+    public ArrayList<String> getFileNamesFromLibrary() {
+        ArrayList<String> fileNamesList = null;
         Cursor tracksCursor =  null;
-        int c, trackListSize = 0;
+        int fileNamesListSize = 0;
 
         try {
             Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
             tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
 
             if(tracksCursor != null && tracksCursor.getCount() > 0) {
-                trackList = new ArrayList<Track>();
+                fileNamesList = new ArrayList<String>();
                 tracksCursor.moveToFirst();
 
                 while(!tracksCursor.isAfterLast()) {
-                    c = SQLConstants.ZERO;
-                    track = new Track();
-                    track.setTrackID(tracksCursor.getInt(c++));
-                    track.setFileName(tracksCursor.getString(c));
-
-                    trackList.add(track);
+                    fileNamesList.add(tracksCursor.getString(SQLConstants.ZERO));
                     tracksCursor.moveToNext();
                 }
 
-                trackListSize = trackList.size();
+                fileNamesListSize = fileNamesList.size();
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(tracksCursor != null) {
                 tracksCursor.close();
             }
         }
 
-        Log.d("Tracks fetched from db", String.valueOf(trackListSize));
-        return trackList;
+        Log.d("File names fetched", String.valueOf(fileNamesListSize));
+        return fileNamesList;
+    }
+
+    public static class UpdateTracksTask extends AsyncTask<Track, Void, Integer> {
+        private Activity activity;
+
+        public UpdateTracksTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected Integer doInBackground(Track... selectedTracks) {
+            SQLiteStatement updateStmt, deleteStmt;
+            String toastText;
+            int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, trackDuration, tracksUpdated = 0;
+            Playlist playlist;
+            Cursor cursor = null;
+            Track selectedTrack = selectedTracks[0];
+
+            try {
+                trackID = selectedTrack.getTrackID();
+                trackDuration = selectedTrack.getTrackDuration();
+                String args[] = {String.valueOf(trackID)};
+                String currentDate = Utilities.getCurrentDate();
+
+                //Fetching existing values for selected playlist
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
+                cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
+                updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
+                cursor.moveToFirst();
+
+                while(!cursor.isAfterLast()) {
+                    playlist = MediaLibraryManager.getPlaylistByIndex(cursor.getInt(SQLConstants.ZERO));
+                    playlistID = playlist.getPlaylistID();
+                    playlistSize = playlist.getPlaylistSize();
+                    playlistDuration = playlist.getPlaylistDuration();
+
+                    //Calculating new values for selected playlist
+                    newPlaylistSize = playlistSize - SQLConstants.ONE;
+                    newPlaylistDuration = playlistDuration - trackDuration;
+
+                    //Updating table 'Playlists' for the selected playlist with new values of 'playlistSize' and 'playlistDuration'
+                    updateStmt.clearBindings();
+                    updateStmt.bindLong(1, newPlaylistSize);
+                    updateStmt.bindLong(2, newPlaylistDuration);
+                    updateStmt.bindString(3, currentDate);
+                    updateStmt.bindLong(4, playlistID);
+                    Log.d(MediaPlayerConstants.LOG_TAG_SQL, updateStmt.toString());
+                    updateStmt.execute();
+
+                    //Setting new values for 'playlistSize' and 'playlistDuration' for selected playlist
+                    playlist.setPlaylistSize(newPlaylistSize);
+                    playlist.setPlaylistDuration(newPlaylistDuration);
+                    MediaLibraryManager.getPlaylistInfoList().set(playlist.getPlaylistIndex(), playlist);
+
+                    cursor.moveToNext();
+                }
+
+                //Deleting track from table 'Playlist_Detail'
+                deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_TRACK_FROM_PLAYLIST_DETAIL);
+                deleteStmt.bindLong(1, trackID);
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
+                deleteStmt.execute();
+
+                //Deleting track from table 'Tracks'
+                deleteStmt = db.compileStatement(SQLConstants.SQL_DELETE_FROM_TRACKS);
+                deleteStmt.bindLong(1, trackID);
+                Log.d(MediaPlayerConstants.LOG_TAG_SQL, deleteStmt.toString());
+                deleteStmt.execute();
+
+                //Removing selected track from the list of tracks
+                MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY, selectedTrack.getTrackIndex());
+
+                //Sorting the list of tracks to update track indices
+                MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+
+                //Updating track indices in db
+                tracksUpdated = updateTrackIndices();
+
+                //Setting success toast message
+                toastText = MessageConstants.REMOVED_FROM_LIBRARY;
+            } catch(Exception e) {
+                Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                Utilities.reportCrash(e);
+
+                //Setting error toast message
+                toastText = MessageConstants.ERROR;
+            } finally {
+                if(cursor != null) {
+                    cursor.close();
+                }
+            }
+
+            return tracksUpdated;
+        }
+
+        protected void onPostExecute(Integer result) {
+            //Updating songs list view adapter
+            updateSongsListAdapter();
+
+            Toast toast = Toast.makeText(activity, "Tracks updated", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+        private void updateSongsListAdapter() {
+            ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
+
+            if(trackList.isEmpty()) {
+                TextView emptyLibraryMessage = (TextView) activity.findViewById(R.id.emptyLibraryMessage);
+                emptyLibraryMessage.setVisibility(View.VISIBLE);
+            }
+
+            SongsListAdapter adapter = new SongsListAdapter(activity, trackList);
+            RecyclerView recyclerView = SongsFragment.trackListView;
+            recyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 }

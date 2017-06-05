@@ -7,10 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ListView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
@@ -19,68 +18,87 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
+import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class SelectPlaylistDialogFragment extends DialogFragment {
-    private Context context;
+    private ArrayList<Playlist> playlistsInLibrary = MediaLibraryManager.getPlaylistInfoList();
     private ArrayList<Playlist> selectedPlaylists;
-    private ArrayList<Playlist> playlistInfoList = MediaLibraryManager.getPlaylistInfoList();
     private Track selectedTrack;
+    private Context context;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        context = getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        Bundle args = getArguments();
-        selectedTrack = (Track) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK);
-        ArrayList<Integer> addedPlaylists;
-        int size = playlistInfoList.size(), addedPlaylistsSize, c = 0, listLength;
+        AlertDialog.Builder builder = null;
+        MediaPlayerDAO dao = null;
+        ArrayList<Integer> addedToPlaylists;
+        final ArrayList<Playlist> playlistsToDisplay;
+        Iterator<Playlist> playlistsIterator;
         String list[];
         Playlist playlist;
-        int playlistID;
-        MediaPlayerDAO dao = null;
+        int playlistID, playlistCount = playlistsInLibrary.size(), addedToPlaylistsCount, c = 0, listLength;
 
         try {
-            //Checking if playlist size > 1 i.e. the user has created any custom playlist
-            if(size > 1) {
-                dao = new MediaPlayerDAO(context);
-                addedPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
+            context = getContext();
+            builder = new AlertDialog.Builder(getActivity());
+            Bundle args = getArguments();
+            selectedTrack = (Track) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK);
 
-                if (addedPlaylists != null) {
-                    addedPlaylistsSize = addedPlaylists.size();
+            //Checking if playlist count > 1 i.e. the user has created any custom playlist
+            if(playlistCount > 1) {
+                dao = new MediaPlayerDAO(context);
+
+                //Getting the playlists to which the track is already added
+                addedToPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
+
+                if(addedToPlaylists != null) {
+                    addedToPlaylistsCount = addedToPlaylists.size();
                 } else {
-                    addedPlaylistsSize = 0;
+                    addedToPlaylistsCount = 0;
+                }
+
+                playlistsToDisplay = new ArrayList<Playlist>();
+                playlistsIterator = playlistsInLibrary.iterator();
+
+                //Iterating playlists in library to remove playlists to which track is already added
+                while(playlistsIterator.hasNext()) {
+                    playlist = playlistsIterator.next();
+                    playlistID = playlist.getPlaylistID();
+
+                    if((playlistID != SQLConstants.PLAYLIST_ID_FAVOURITES) &&
+                            (addedToPlaylistsCount == SQLConstants.ZERO || !addedToPlaylists.contains(playlistID))) {
+                        playlistsToDisplay.add(playlist);
+                    }
                 }
 
                 selectedPlaylists = new ArrayList<Playlist>();
-                list = new String[size - addedPlaylistsSize - 1];
+                list = new String[playlistsToDisplay.size()];
                 listLength = list.length;
 
+                //Setting dialog box title
                 builder.setTitle(MediaPlayerConstants.TITLE_SELECT_PLAYLIST);
 
-                if (listLength != 0) {
-                    //Adding user created playlists from 'playlistInfoList' to multichoice items list in dialog
-                    for (int i = 0; i < size; i++) {
-                        playlist = playlistInfoList.get(i);
-                        playlistID = playlist.getPlaylistID();
+                if(listLength != 0) {
+                    playlistsIterator = playlistsToDisplay.iterator();
 
-                        //Skipping default playlist 'Favourites' and already added playlist from this list
-                        if (playlistID != SQLConstants.PLAYLIST_ID_FAVOURITES &&
-                                (addedPlaylistsSize == 0 || !addedPlaylists.contains(playlistID))) {
-                            list[c++] = playlist.getPlaylistName();
-                        }
+                    //Adding playlists to multichoice items list in dialog
+                    while(playlistsIterator.hasNext()) {
+                        playlist = playlistsIterator.next();
+                        list[c++] = playlist.getPlaylistName();
                     }
 
+                    //Setting multi-select list
                     builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                            Playlist playlist = playlistInfoList.get(which + 1);    //+1 for skipping default playlist 'Favourites'
+                            Playlist playlist = playlistsToDisplay.get(which);
 
-                            if (isChecked) {
+                            if(isChecked) {
                                 selectedPlaylists.add(playlist);
                             } else if (selectedPlaylists.contains(playlist)) {
                                 selectedPlaylists.remove(playlist);
@@ -88,6 +106,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                         }
                     });
 
+                    //Setting listener for 'OK' button
                     builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
@@ -101,22 +120,23 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                                     dao.addToPlaylists(selectedPlaylists, selectedTrack);
                                 } catch(Exception e) {
                                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-                                    FirebaseCrash.log(e.getMessage());
-                                    FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    FirebaseCrash.report(e);
+                                    Utilities.reportCrash(e);
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
                                     }
                                 }
 
-                                //Updating list view adapter
+                                //Updating playlist adapter
                                 updatePlaylistsAdapter();
+
+                                //Removing added playlists from playlistsInLibrary
+                                playlistsToDisplay.removeAll(selectedPlaylists);
                             }
                         }
                     });
 
+                    //Setting listener for 'Cancel' button
                     builder.setNegativeButton(MediaPlayerConstants.CANCEL, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
@@ -144,10 +164,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -159,7 +176,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
 
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

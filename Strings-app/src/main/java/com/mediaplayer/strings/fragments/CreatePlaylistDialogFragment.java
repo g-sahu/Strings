@@ -7,14 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -23,6 +22,7 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
+import com.mediaplayer.strings.utilities.Utilities;
 
 public class CreatePlaylistDialogFragment extends DialogFragment {
     private Context context;
@@ -75,10 +75,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.createPlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-                                        FirebaseCrash.log(e.getMessage());
-                                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                        FirebaseCrash.report(e);
+                                        Utilities.reportCrash(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -150,10 +147,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.renamePlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-                                        FirebaseCrash.log(e.getMessage());
-                                        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                        FirebaseCrash.report(e);
+                                        Utilities.reportCrash(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -173,10 +167,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-
-            FirebaseCrash.log(e.getMessage());
-            FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            FirebaseCrash.report(e);
+            Utilities.reportCrash(e);
         }
 
         return playlistDialog;
@@ -209,7 +200,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
     private void updatePlaylistsAdapter() {
         PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        ListView listView = PlaylistsFragment.listView;
+        RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

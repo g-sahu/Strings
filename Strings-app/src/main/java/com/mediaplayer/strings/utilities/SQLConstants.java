@@ -12,9 +12,11 @@ public final class SQLConstants {
     private static final String TEXT = " TEXT ";
     private static final String INTEGER = " INTEGER ";
     private static final String BLOB = " BLOB ";
-    private static final String COMMA_SEP = ", ";
+    public static final String COMMA_SEP = ", ";
     public static final String PLAYLIST_TITLE_FAVOURITES = "Favourites";
     static final String DD_MM_YYYY = "dd-MM-yyyy";
+    static final String AND = " AND ";
+    public static final String DOUBLE_QUOTE = "\"";
 
     public static final int PLAYLIST_ID_FAVOURITES = 1;
     public static final int PLAYLIST_INDEX_FAVOURITES = 0;
@@ -101,9 +103,13 @@ public final class SQLConstants {
                     " WHERE " + MediaPlayerContract.PlaylistDetail.PLAYLIST_ID + " = ?";
 
     public static final String SQL_SELECT_FILE_NAMES =
-            "SELECT " + MediaPlayerContract.Tracks.TRACK_ID + COMMA_SEP +
-                    MediaPlayerContract.Tracks.FILE_NAME +
-                    " FROM " + MediaPlayerContract.Tracks.TABLE_NAME;
+            "SELECT " + MediaPlayerContract.Tracks.FILE_NAME + " FROM " + MediaPlayerContract.Tracks.TABLE_NAME;
+
+    public static final String SQL_SELECT_TRACK_IDS_FOR_FILE_NAMES =
+            "SELECT " + MediaPlayerContract.Tracks.TRACK_ID +
+                    " FROM " + MediaPlayerContract.Tracks.TABLE_NAME +
+                    " WHERE " + MediaPlayerContract.Tracks.FILE_NAME;
+
 
     //Insert queries
     public static final String SQL_INSERT_TRACK =
@@ -171,6 +177,10 @@ public final class SQLConstants {
     public static final String SQL_DELETE_FROM_TRACKS =
             "DELETE FROM " + MediaPlayerContract.Tracks.TABLE_NAME +
                     " WHERE " + MediaPlayerContract.Tracks.TRACK_ID + " = ?";
+
+    public static final String SQL_DELETE_TRACK_FOR_FILENAME =
+            "DELETE FROM " + MediaPlayerContract.Tracks.TABLE_NAME +
+                    " WHERE " + MediaPlayerContract.Tracks.FILE_NAME + " IN (";
 
     public static final String SQL_DELETE_FROM_PLAYLISTS =
             "DELETE FROM " + MediaPlayerContract.Playlists.TABLE_NAME +

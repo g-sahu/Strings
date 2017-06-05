@@ -1,5 +1,9 @@
 package com.mediaplayer.strings.utilities;
 
+import android.util.Log;
+
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -11,11 +15,11 @@ public class Utilities {
      * */
     public static String milliSecondsToTimer(long milliseconds){
         String finalTimerString = "";
-        String secondsString;
+        String minutesString, secondsString;
 
         // Convert total duration into time
-        int hours = (int)( milliseconds / (1000*60*60));
-        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
+        int hours = (int) (milliseconds / (1000*60*60));
+        int minutes = (int) (milliseconds % (1000*60*60)) / (1000*60);
         int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
 
         // Add hours if there
@@ -23,13 +27,21 @@ public class Utilities {
             finalTimerString = hours + ":";
         }
 
+        // Prepending 0 to minutes if it is one digit
+        if(minutes < 10){
+            minutesString = "0" + minutes;
+        } else {
+            minutesString = "" + minutes;
+        }
+
         // Prepending 0 to seconds if it is one digit
         if(seconds < 10){
             secondsString = "0" + seconds;
-        }else{
-            secondsString = "" + seconds;}
+        } else {
+            secondsString = "" + seconds;
+        }
 
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
+        finalTimerString = finalTimerString + minutesString + ":" + secondsString;
 
         // return timer string
         return finalTimerString;
@@ -71,5 +83,11 @@ public class Utilities {
         SimpleDateFormat df = new SimpleDateFormat(SQLConstants.DD_MM_YYYY);
 
         return df.format(c.getTime());
+    }
+
+    public static void reportCrash(Exception e) {
+        FirebaseCrash.log(e.getMessage());
+        FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+        FirebaseCrash.report(e);
     }
 }

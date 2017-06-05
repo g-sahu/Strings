@@ -3,13 +3,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    android:onClick="callMediaplayerActivity">
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_item_height"
-        android:onClick="callMediaplayerActivity">
+        android:layout_height="@dimen/list_item_height">
 
         <ImageView
             android:id="@+id/albumThumbnail"
@@ -17,10 +17,10 @@
             android:layout_gravity="center"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/default_album_art"
-            android:layout_marginStart="10dp"
+            android:src="@drawable/img_default_album_art_thumb"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="5dp" />
 
         <TextView
@@ -55,7 +55,7 @@
         android:id="@+id/moreTrackOptionsButton"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/list_item_height"
-        android:src="@drawable/ic_more_vert_black_18dp"
+        android:src="@drawable/ic_more_vert_black_24dp"
         android:contentDescription="@string/more_options"
         android:background="@null"
         android:adjustViewBounds="false"
