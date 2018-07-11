@@ -71,7 +71,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     playlistID = playlist.getPlaylistID();
 
                     if((playlistID != SQLConstants.PLAYLIST_ID_FAVOURITES) &&
-                            (addedToPlaylistsCount == SQLConstants.ZERO || !addedToPlaylists.contains(playlistID))) {
+                       (addedToPlaylistsCount == SQLConstants.ZERO || !addedToPlaylists.contains(playlistID))) {
                         playlistsToDisplay.add(playlist);
                     }
                 }
