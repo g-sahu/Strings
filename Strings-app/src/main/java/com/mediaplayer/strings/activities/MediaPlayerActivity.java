@@ -429,14 +429,14 @@ public class MediaPlayerActivity extends AppCompatActivity
                 //Binding to MediaPlayerService
                 bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
-            //Else, if service is running and bound and track is paused, resume playback
+                //Else, if service is running and bound and track is paused, resume playback
             } else if(mpState.equals(MediaPlayerConstants.PAUSED)){
                 if(mpService != null) {
                     mpService.playSong(selectedTrack);
                     mpService.startForeground(SQLConstants.ONE, mpService.createNotification(selectedTrack, selectedPlaylist));
                 }
 
-            //Else, if track is stoppped, play current track
+                //Else, if track is stoppped, play current track
             } else {
                 if(mpService != null) {
                     mpService.playSong(selectedTrack);
@@ -575,7 +575,7 @@ public class MediaPlayerActivity extends AppCompatActivity
 
     @Override
     protected void onRestart() {
-        super.onStart();
+        super.onRestart();
         Log.d(LOG_TAG, "Mediaplayer activity started");
 
         //Updating progress bar

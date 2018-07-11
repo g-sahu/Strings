@@ -104,14 +104,14 @@ public class MediaLibraryManager {
                 MediaStore.Audio.AudioColumns.ALBUM,
                 MediaStore.Audio.AudioColumns.ARTIST,
                 MediaStore.MediaColumns.DATA,
-        };
+                };
 
         String selection = MediaStore.Audio.AudioColumns.IS_MUSIC + " != 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.DURATION + " > 60000";
+                           MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.DURATION + " > 60000";
 
         Uri internalUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         Uri externalUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -130,11 +130,11 @@ public class MediaLibraryManager {
         };
 
         String selection = MediaStore.Audio.AudioColumns.IS_MUSIC + " != 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
-                MediaStore.Audio.AudioColumns.DURATION + " > 60000";
+                           MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
+                           MediaStore.Audio.AudioColumns.DURATION + " > 60000";
 
         Uri internalUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         Uri externalUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -156,7 +156,7 @@ public class MediaLibraryManager {
                 MediaStore.Audio.AudioColumns.ALBUM,
                 MediaStore.Audio.AudioColumns.ARTIST,
                 MediaStore.MediaColumns.DATA,
-        };
+                };
 
         Iterator<String> fileNamesIterator = fileNamesList.iterator();
         StringBuilder fileNames = new StringBuilder();
@@ -502,7 +502,7 @@ public class MediaLibraryManager {
             }
 
             if ((newTracksList != null && !newTracksList.isEmpty()) ||
-                    (deletedFileNamesList != null && !deletedFileNamesList.isEmpty())) {
+                (deletedFileNamesList != null && !deletedFileNamesList.isEmpty())) {
                 map = new HashMap<String, ArrayList<?>>();
                 map.put(MediaPlayerConstants.KEY_NEW_TRACKS_LIST, newTracksList);
                 map.put(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST, deletedFileNamesList);

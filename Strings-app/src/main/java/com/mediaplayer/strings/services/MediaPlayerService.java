@@ -152,26 +152,26 @@ public class MediaPlayerService extends IntentService {
 
             //Setting actions and extras for intents
             prevIntent.setAction(MediaPlayerConstants.PREVIOUS)
-                    .putExtra(keySelectedTrack, selectedTrack)
-                    .putExtra(keySelectedPlaylist, selectedPlaylist)
-                    .putExtra(keyTrackOrigin, origin);
+                      .putExtra(keySelectedTrack, selectedTrack)
+                      .putExtra(keySelectedPlaylist, selectedPlaylist)
+                      .putExtra(keyTrackOrigin, origin);
             pauseIntent.setAction(MediaPlayerConstants.PAUSE)
-                    .putExtra(keySelectedTrack, selectedTrack)
-                    .putExtra(keySelectedPlaylist, selectedPlaylist)
-                    .putExtra(keyTrackOrigin, origin);
+                       .putExtra(keySelectedTrack, selectedTrack)
+                       .putExtra(keySelectedPlaylist, selectedPlaylist)
+                       .putExtra(keyTrackOrigin, origin);
             playIntent.setAction(MediaPlayerConstants.PLAY)
-                    .putExtra(keySelectedTrack, selectedTrack)
-                    .putExtra(keySelectedPlaylist, selectedPlaylist)
-                    .putExtra(keyTrackOrigin, origin);
+                      .putExtra(keySelectedTrack, selectedTrack)
+                      .putExtra(keySelectedPlaylist, selectedPlaylist)
+                      .putExtra(keyTrackOrigin, origin);
             nextIntent.setAction(MediaPlayerConstants.NEXT)
-                    .putExtra(keySelectedTrack, selectedTrack)
-                    .putExtra(keySelectedPlaylist, selectedPlaylist)
-                    .putExtra(keyTrackOrigin, origin);
+                      .putExtra(keySelectedTrack, selectedTrack)
+                      .putExtra(keySelectedPlaylist, selectedPlaylist)
+                      .putExtra(keyTrackOrigin, origin);
             deleteIntent.setAction(MediaPlayerConstants.STOP);
             openIntent.setAction(MediaPlayerConstants.OPEN)
-                    .putExtra(keySelectedTrack, selectedTrack)
-                    .putExtra(keySelectedPlaylist, selectedPlaylist)
-                    .putExtra(keyTrackOrigin, origin);
+                      .putExtra(keySelectedTrack, selectedTrack)
+                      .putExtra(keySelectedPlaylist, selectedPlaylist)
+                      .putExtra(keyTrackOrigin, origin);
 
             //Creating pending intents
             PendingIntent prevPendingIntent = PendingIntent.getActivity(this, zero, prevIntent, flag);
@@ -184,7 +184,7 @@ public class MediaPlayerService extends IntentService {
 
             //Checking OS build version for notification compatibility
             if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
-                    android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
+               android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
                 //Creating notification actions
                 prevAction = new Notification.Action.Builder(R.drawable.ic_skip_previous_white_36dp, MediaPlayerConstants.PREVIOUS, prevPendingIntent).build();
                 pauseAction = new Notification.Action.Builder(R.drawable.ic_pause_white_36dp, MediaPlayerConstants.PAUSE, pausePendingIntent).build();
