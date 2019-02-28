@@ -4,10 +4,8 @@ import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import static android.support.v4.content.LocalBroadcastManager.*;
 import static android.support.v4.content.LocalBroadcastManager.getInstance;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.init;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.ACTION_INIT_COMPLETE;
