@@ -116,7 +116,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                                     dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
                                 } catch(Exception e) {
                                     Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    Utilities.reportCrash(e);
+                                    //Utilities.reportCrash(e);
                                 } finally {
                                     if(dao != null) {
                                         dao.closeConnection();
@@ -159,7 +159,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();

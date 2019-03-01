@@ -140,7 +140,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -160,7 +160,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -178,7 +178,7 @@ public class HomeActivity extends AppCompatActivity {
             task.execute(selectedTrack);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 //dao.closeConnection();
@@ -243,7 +243,7 @@ public class HomeActivity extends AppCompatActivity {
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -300,7 +300,7 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(myAppLinkToMarket);
         } catch(ActivityNotFoundException e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             Toast.makeText(this, MessageConstants.ERROR_404, Toast.LENGTH_LONG).show();
         }

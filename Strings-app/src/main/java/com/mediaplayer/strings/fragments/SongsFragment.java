@@ -54,7 +54,7 @@ public class SongsFragment extends Fragment {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         }
 
         return view;

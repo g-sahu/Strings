@@ -85,7 +85,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                         ++tracksInserted;
                     } catch(SQLException sqle) {
                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                        Utilities.reportCrash(sqle);
+                        //Utilities.reportCrash(sqle);
                     }
                 }
 
@@ -93,7 +93,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(insertStmt != null) {
                 insertStmt.close();

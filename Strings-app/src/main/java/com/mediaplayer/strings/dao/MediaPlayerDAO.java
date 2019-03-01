@@ -118,12 +118,12 @@ public class MediaPlayerDAO {
             }
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-            Utilities.reportCrash(sqle);
+            //Utilities.reportCrash(sqle);
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -189,7 +189,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -223,7 +223,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(updateStmt != null) {
                 updateStmt.close();
@@ -264,7 +264,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_CREATED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -294,7 +294,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_RENAMED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -351,7 +351,7 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.PLAYLIST_DELETED;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -431,12 +431,12 @@ public class MediaPlayerDAO {
             toastText = MessageConstants.ADDED_TRACKS;
         } catch(SQLiteConstraintException sqle) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, sqle.getMessage());
-            Utilities.reportCrash(sqle);
+            //Utilities.reportCrash(sqle);
 
             toastText = MessageConstants.ERROR_DUPLICATE_TRACK_FAVOURITES;
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_SQL, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
 
             //Setting error toast message
             toastText = MessageConstants.ERROR;
@@ -480,7 +480,7 @@ public class MediaPlayerDAO {
                 ++tracksAdded;
             } catch(SQLException sqle) {
                 Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, sqle.getMessage());
-                Utilities.reportCrash(sqle);
+                //Utilities.reportCrash(sqle);
             }
         }
 
@@ -538,7 +538,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(playlistsCursor != null) {
                 playlistsCursor.close();
@@ -568,7 +568,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -665,7 +665,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(cursor != null) {
                 cursor.close();
@@ -697,7 +697,7 @@ public class MediaPlayerDAO {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(tracksCursor != null) {
                 tracksCursor.close();
@@ -788,7 +788,7 @@ public class MediaPlayerDAO {
                 toastText = MessageConstants.REMOVED_FROM_LIBRARY;
             } catch(Exception e) {
                 Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                Utilities.reportCrash(e);
+                //Utilities.reportCrash(e);
 
                 //Setting error toast message
                 toastText = MessageConstants.ERROR;

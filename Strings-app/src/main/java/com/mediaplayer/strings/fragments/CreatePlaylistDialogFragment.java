@@ -75,7 +75,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.createPlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                        Utilities.reportCrash(e);
+                                        //Utilities.reportCrash(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -147,7 +147,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                                         dao.renamePlaylist(playlist);
                                     } catch(Exception e) {
                                         Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                        Utilities.reportCrash(e);
+                                        //Utilities.reportCrash(e);
                                     } finally {
                                         if(dao != null) {
                                             dao.closeConnection();
@@ -167,7 +167,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
             }
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         }
 
         return playlistDialog;

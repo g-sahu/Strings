@@ -81,7 +81,7 @@ public class MediaLibraryManager {
             sortPlaylists();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
                 dao.closeConnection();
@@ -248,7 +248,7 @@ public class MediaLibraryManager {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         } finally {
             if(mmr != null) {
                 mmr.release();
@@ -471,7 +471,7 @@ public class MediaLibraryManager {
                     }
                 } catch(Exception e) {
                     Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                    Utilities.reportCrash(e);
+                    //Utilities.reportCrash(e);
                 } finally {
                     cursor.close();
                 }
@@ -517,7 +517,7 @@ public class MediaLibraryManager {
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            Utilities.reportCrash(e);
+            //Utilities.reportCrash(e);
         }
 
         return map;

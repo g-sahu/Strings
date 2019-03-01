@@ -478,7 +478,7 @@ public class MediaPlayerActivity extends AppCompatActivity
                 progressHandler.postDelayed(this, 5);
             } catch(Exception e) {
                 Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                Utilities.reportCrash(e);
+                //Utilities.reportCrash(e);
             }
         }
     };
