@@ -58,7 +58,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                 }
 
                 //Creating list of tracks to display in multiselect dialog
-                tracksToDisplay = new ArrayList<Track>();
+                tracksToDisplay = new ArrayList<>();
 
                 //Iterating tracks in library to remove tracks already added to playlist
                 tracksIterator = tracksInLibrary.iterator();
@@ -72,7 +72,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                     }
                 }
 
-                selectedTracks = new ArrayList<Track>();
+                selectedTracks = new ArrayList<>();
                 list = new String[tracksToDisplay.size()];
                 listLength = list.length;
 

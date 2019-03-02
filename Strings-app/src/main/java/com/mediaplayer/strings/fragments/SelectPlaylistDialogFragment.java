@@ -60,7 +60,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     addedToPlaylistsCount = 0;
                 }
 
-                playlistsToDisplay = new ArrayList<Playlist>();
+                playlistsToDisplay = new ArrayList<>();
                 playlistsIterator = playlistsInLibrary.iterator();
 
                 //Iterating playlists in library to remove playlists to which track is already added
@@ -74,7 +74,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     }
                 }
 
-                selectedPlaylists = new ArrayList<Playlist>();
+                selectedPlaylists = new ArrayList<>();
                 list = new String[playlistsToDisplay.size()];
                 listLength = list.length;
 

@@ -491,7 +491,7 @@ public class MediaPlayerDAO {
     }
 
     public ArrayList<Track> getTracksForPlaylist(int playlistID) {
-        ArrayList<Track> trackList = new ArrayList<Track>();
+        ArrayList<Track> trackList = new ArrayList<>();
         String args[] = {String.valueOf(playlistID)};
         Cursor playlistsCursor = null;
 
@@ -542,7 +542,7 @@ public class MediaPlayerDAO {
             cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);
 
             if(cursor != null && cursor.getCount() > 0) {
-                trackList = new ArrayList<Integer>();
+                trackList = new ArrayList<>();
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -567,7 +567,7 @@ public class MediaPlayerDAO {
      * @return Sorted list of Playlists
      */
     public ArrayList<Playlist> getPlaylists() {
-        ArrayList<Playlist> playlistInfoList = new ArrayList<Playlist>();
+        ArrayList<Playlist> playlistInfoList = new ArrayList<>();
 
         Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS);
         Cursor playlistsCursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLISTS, null);
@@ -600,7 +600,7 @@ public class MediaPlayerDAO {
 
         if(tracksCursor.getCount() > 0) {
             tracksCursor.moveToFirst();
-            trackInfoList = new ArrayList<Track>();
+            trackInfoList = new ArrayList<>();
 
             while(!tracksCursor.isAfterLast()) {
                 track = new Track();
@@ -639,7 +639,7 @@ public class MediaPlayerDAO {
             cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK, args);
 
             if(cursor != null && cursor.getCount() > 0) {
-                playlist = new ArrayList<Integer>();
+                playlist = new ArrayList<>();
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
@@ -669,7 +669,7 @@ public class MediaPlayerDAO {
             tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
 
             if(tracksCursor != null && tracksCursor.getCount() > 0) {
-                fileNamesList = new ArrayList<String>();
+                fileNamesList = new ArrayList<>();
                 tracksCursor.moveToFirst();
 
                 while(!tracksCursor.isAfterLast()) {

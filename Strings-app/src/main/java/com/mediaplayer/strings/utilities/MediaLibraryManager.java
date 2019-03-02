@@ -214,7 +214,7 @@ public class MediaLibraryManager {
                 if(tracksCursor.getCount() > SQLConstants.ZERO) {
                     tracksCursor.moveToFirst();
                     mmr = new MediaMetadataRetriever();
-                    trackList = new ArrayList<Track>();
+                    trackList = new ArrayList<>();
 
                     while(!tracksCursor.isAfterLast()) {
                         track = new Track();
@@ -443,7 +443,7 @@ public class MediaLibraryManager {
     }
 
     private static HashMap<String, ArrayList<?>> getUpdatedTracks(ArrayList<String> libraryFileNamesList, Context context) {
-        ArrayList<String> storageFileNamesList = new ArrayList<String>();
+        ArrayList<String> storageFileNamesList = new ArrayList<>();
         ArrayList<String> newFileNamesList, deletedFileNamesList = null;
         ArrayList<Track> newTracksList = null;
         HashMap<String, ArrayList<?>> map = null;
@@ -475,11 +475,11 @@ public class MediaLibraryManager {
             if (!storageFileNamesList.isEmpty()) {
                 if (libraryFileNamesList != null && !libraryFileNamesList.isEmpty()) {
                     //Getting all newly added tracks
-                    newFileNamesList = new ArrayList<String>(storageFileNamesList);
+                    newFileNamesList = new ArrayList<>(storageFileNamesList);
                     newFileNamesList.removeAll(libraryFileNamesList);
 
                     //Getting all deleted tracks
-                    deletedFileNamesList = new ArrayList<String>(libraryFileNamesList);
+                    deletedFileNamesList = new ArrayList<>(libraryFileNamesList);
                     deletedFileNamesList.removeAll(storageFileNamesList);
                 } else {
                     newFileNamesList = storageFileNamesList;
@@ -497,7 +497,7 @@ public class MediaLibraryManager {
 
             if ((newTracksList != null && !newTracksList.isEmpty()) ||
                 (deletedFileNamesList != null && !deletedFileNamesList.isEmpty())) {
-                map = new HashMap<String, ArrayList<?>>();
+                map = new HashMap<>();
                 map.put(MediaPlayerConstants.KEY_NEW_TRACKS_LIST, newTracksList);
                 map.put(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST, deletedFileNamesList);
 

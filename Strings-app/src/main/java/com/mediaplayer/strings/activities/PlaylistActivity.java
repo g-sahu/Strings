@@ -143,7 +143,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     //Add to favourites menu option
     private void addToFavourites() {
-        ArrayList<Playlist> selectedPlaylists = new ArrayList<Playlist>();
+        ArrayList<Playlist> selectedPlaylists = new ArrayList<>();
         MediaPlayerDAO dao = null;
 
         try {
