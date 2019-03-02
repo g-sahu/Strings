@@ -341,20 +341,20 @@ public class MediaPlayerActivity extends AppCompatActivity
     private void initializePlayer(Track requestedTrack) {
         Log.d(LOG_TAG, "Initializing Media Player...");
 
-        playButton = (ImageButton) findViewById(R.id.playButton);
-        nextButton = (ImageButton) findViewById(R.id.nextButton);
-        previousButton = (ImageButton) findViewById(R.id.previousButton);
-        repeatButton = (ImageButton) findViewById(R.id.repeatButton);
-        shuffleButton = (ImageButton) findViewById(R.id.shuffleButton);
-        songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
-        TextView titleBar = (TextView) findViewById(R.id.titleBar);
-        TextView artistBar = (TextView) findViewById(R.id.artistBar);
-        TextView albumBar = (TextView) findViewById(R.id.albumBar);
-        TextView playingFrom = (TextView) findViewById(R.id.playingFrom);
-        timeElapsed = (TextView) findViewById(R.id.timeElapsed);
-        TextView trackDuration = (TextView) findViewById(R.id.trackDuration);
-        ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
-        ImageView albumArtThumbnail = (ImageView) findViewById(R.id.albumArtThumbnail);
+        playButton = findViewById(R.id.playButton);
+        nextButton = findViewById(R.id.nextButton);
+        previousButton = findViewById(R.id.previousButton);
+        repeatButton = findViewById(R.id.repeatButton);
+        shuffleButton = findViewById(R.id.shuffleButton);
+        songProgressBar = findViewById(R.id.songProgressBar);
+        TextView titleBar = findViewById(R.id.titleBar);
+        TextView artistBar = findViewById(R.id.artistBar);
+        TextView albumBar = findViewById(R.id.albumBar);
+        TextView playingFrom = findViewById(R.id.playingFrom);
+        timeElapsed = findViewById(R.id.timeElapsed);
+        TextView trackDuration = findViewById(R.id.trackDuration);
+        ImageView albumArt = findViewById(R.id.albumArt);
+        ImageView albumArtThumbnail = findViewById(R.id.albumArtThumbnail);
         String songTitle = requestedTrack.getTrackTitle();
         String albumName = requestedTrack.getAlbumName();
         String artistName = requestedTrack.getArtistName();

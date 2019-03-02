@@ -57,9 +57,9 @@ public class PlaylistActivity extends AppCompatActivity {
             homeContext = HomeActivity.getContext();
             supportFragmentManager = getSupportFragmentManager();
 
-            playlistName = (TextView) findViewById(R.id.playlistName);
-            playlistInfo = (TextView) findViewById(R.id.playlistDetails);
-            emptyPlaylistMessage = (TextView) findViewById(R.id.emptyPlaylistMessage);
+            playlistName = findViewById(R.id.playlistName);
+            playlistInfo = findViewById(R.id.playlistDetails);
+            emptyPlaylistMessage = findViewById(R.id.emptyPlaylistMessage);
 
             intent = getIntent();
             playlistID = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, 0);
@@ -83,7 +83,7 @@ public class PlaylistActivity extends AppCompatActivity {
                 emptyPlaylistMessage.setVisibility(View.VISIBLE);
             } else {
                 RecyclerView.Adapter playlistAdapter = new SongsListAdapter(this, trackList);
-                recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                recyclerView = findViewById(R.id.recycler_view);
                 recyclerView.setAdapter(playlistAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
             }
@@ -229,11 +229,11 @@ public class PlaylistActivity extends AppCompatActivity {
         TextView playlistInfo, emptyPlaylistMessage;
 
         if(MediaLibraryManager.isUserPlaylistEmpty()) {
-            emptyPlaylistMessage = (TextView) findViewById(R.id.emptyPlaylistMessage);
+            emptyPlaylistMessage = findViewById(R.id.emptyPlaylistMessage);
             emptyPlaylistMessage.setVisibility(View.VISIBLE);
         }
 
-        playlistInfo = (TextView) findViewById(R.id.playlistDetails);
+        playlistInfo = findViewById(R.id.playlistDetails);
         playlistInfo.setText(getPlaylistDetails());
 
         PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());

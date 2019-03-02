@@ -33,7 +33,7 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         playlistsView = inflater.inflate(R.layout.fragment_playlists, container, false);
-        recyclerView = (RecyclerView) playlistsView.findViewById(R.id.recycler_view);
+        recyclerView = playlistsView.findViewById(R.id.recycler_view);
 
         RecyclerView.Adapter playlistsAdapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
         recyclerView.setAdapter(playlistsAdapter);
@@ -45,7 +45,7 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton createPlaylistButton = (FloatingActionButton) playlistsView.findViewById(R.id.createPlaylistButton);
+        FloatingActionButton createPlaylistButton = playlistsView.findViewById(R.id.createPlaylistButton);
 
         // Click Listener for 'Create Playlist' button
         createPlaylistButton.setOnClickListener(view -> {

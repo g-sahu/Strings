@@ -97,7 +97,7 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                 final int oldPlaylistIndex = args.getInt(MediaPlayerConstants.KEY_PLAYLIST_INDEX);
 
                 //Setting old playlist title in the input text box
-                final EditText playlistTitleTextBox = (EditText) dialogView.findViewById(R.id.playlistTitle);
+                final EditText playlistTitleTextBox = dialogView.findViewById(R.id.playlistTitle);
                 playlistTitleTextBox.setText(oldPlaylistTitle);
 
                 //Setting values for dialog window

@@ -758,7 +758,7 @@ public class MediaPlayerDAO {
             ArrayList<Track> trackList = MediaLibraryManager.getTrackInfoList();
 
             if(trackList.isEmpty()) {
-                TextView emptyLibraryMessage = (TextView) activity.findViewById(R.id.emptyLibraryMessage);
+                TextView emptyLibraryMessage = activity.findViewById(R.id.emptyLibraryMessage);
                 emptyLibraryMessage.setVisibility(View.VISIBLE);
             }
 

@@ -38,8 +38,8 @@ public class SongsFragment extends Fragment {
 
         try {
             view = inflater.inflate(R.layout.fragment_songs, container, false);
-            emptyLibraryMessage = (TextView) view.findViewById(R.id.emptyLibraryMessage);
-            trackListView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            emptyLibraryMessage = view.findViewById(R.id.emptyLibraryMessage);
+            trackListView = view.findViewById(R.id.recycler_view);
             trackInfoList = MediaLibraryManager.getTrackInfoList();
 
             if(trackInfoList == null || trackInfoList.isEmpty()) {

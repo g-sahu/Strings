@@ -21,7 +21,7 @@ public class AboutUsDialogFragment extends DialogFragment {
         String versionName = MediaPlayerConstants.VERSION + " " + BuildConfig.VERSION_NAME;
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_about_us, null);
-        TextView versionNumber = (TextView) dialogView.findViewById(R.id.versionNumber);
+        TextView versionNumber = dialogView.findViewById(R.id.versionNumber);
         versionNumber.setText(versionName);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

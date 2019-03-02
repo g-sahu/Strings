@@ -66,12 +66,12 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         supportFragmentManager = getSupportFragmentManager();
-        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        ViewPager viewPager = findViewById(R.id.view_pager);
         FragmentPagerAdapter adapterViewPager = new HomePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapterViewPager);
 
         //Give the TabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         favouritesPlaylist = MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES);
     }
