@@ -197,12 +197,9 @@ public class MediaPlayerDAO {
     }
 
     public static int updateTrackIndices() {
-        SQLiteStatement updateStmt = null;
         int tracksUpdated = 0;
 
-        try {
-            updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
-
+        try (SQLiteStatement updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);) {
             //Updating the indices of all the tracks
             for(Track track: MediaLibraryManager.getTrackInfoList()) {
                 updateStmt.bindLong(1, track.getTrackIndex());
@@ -217,10 +214,6 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(updateStmt != null) {
-                updateStmt.close();
-            }
         }
 
         return tracksUpdated;
@@ -493,11 +486,9 @@ public class MediaPlayerDAO {
     public ArrayList<Track> getTracksForPlaylist(int playlistID) {
         ArrayList<Track> trackList = new ArrayList<>();
         String args[] = {String.valueOf(playlistID)};
-        Cursor playlistsCursor = null;
+        Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_ALL_TRACKS_FOR_PLAYLIST);
 
-        try {
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_ALL_TRACKS_FOR_PLAYLIST);
-            playlistsCursor = db.rawQuery(SQLConstants.SQL_SELECT_ALL_TRACKS_FOR_PLAYLIST, args);
+        try (Cursor playlistsCursor = db.rawQuery(SQLConstants.SQL_SELECT_ALL_TRACKS_FOR_PLAYLIST, args)) {
             playlistsCursor.moveToFirst();
             int c;
 
@@ -523,10 +514,6 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(playlistsCursor != null) {
-                playlistsCursor.close();
-            }
         }
 
         return trackList;
@@ -534,13 +521,10 @@ public class MediaPlayerDAO {
 
     public ArrayList<Integer> getTrackIDsForPlaylist(int playlistID) {
         ArrayList<Integer> trackList = null;
-        Cursor cursor = null;
         String args[] = {String.valueOf(playlistID)};
+        Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
 
-        try {
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
-            cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);
-
+        try (Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);) {
             if(cursor != null && cursor.getCount() > 0) {
                 trackList = new ArrayList<>();
                 cursor.moveToFirst();
@@ -553,10 +537,6 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(cursor != null) {
-                cursor.close();
-            }
         }
 
         return trackList;
@@ -629,15 +609,12 @@ public class MediaPlayerDAO {
 
     public ArrayList<Integer> getPlaylistsForTrack(int trackID) {
         ArrayList<Integer> playlist = null;
-        Cursor cursor = null;
+        String args[] = {String.valueOf(trackID)};
 
-        try {
-            String args[] = {String.valueOf(trackID)};
+        //Fetching existing values for selected playlist
+        Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
 
-            //Fetching existing values for selected playlist
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK);
-            cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK, args);
-
+        try (Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLISTS_FOR_TRACK, args);) {
             if(cursor != null && cursor.getCount() > 0) {
                 playlist = new ArrayList<>();
                 cursor.moveToFirst();
@@ -650,10 +627,6 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(cursor != null) {
-                cursor.close();
-            }
         }
 
         return playlist;
@@ -661,13 +634,11 @@ public class MediaPlayerDAO {
 
     public ArrayList<String> getFileNamesFromLibrary() {
         ArrayList<String> fileNamesList = null;
-        Cursor tracksCursor =  null;
         int fileNamesListSize = 0;
 
-        try {
-            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
-            tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);
+        Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_FILE_NAMES);
 
+        try (Cursor tracksCursor = db.rawQuery(SQLConstants.SQL_SELECT_FILE_NAMES, null);) {
             if(tracksCursor != null && tracksCursor.getCount() > 0) {
                 fileNamesList = new ArrayList<>();
                 tracksCursor.moveToFirst();
@@ -682,10 +653,6 @@ public class MediaPlayerDAO {
         } catch(Exception e) {
             Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(tracksCursor != null) {
-                tracksCursor.close();
-            }
         }
 
         Log.d("File names fetched", String.valueOf(fileNamesListSize));
@@ -705,18 +672,16 @@ public class MediaPlayerDAO {
             String toastText;
             int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, trackDuration, tracksUpdated = 0;
             Playlist playlist;
-            Cursor cursor = null;
             Track selectedTrack = selectedTracks[0];
+            trackID = selectedTrack.getTrackID();
+            trackDuration = selectedTrack.getTrackDuration();
+            String args[] = {String.valueOf(trackID)};
+            String currentDate = Utilities.getCurrentDate();
 
-            try {
-                trackID = selectedTrack.getTrackID();
-                trackDuration = selectedTrack.getTrackDuration();
-                String args[] = {String.valueOf(trackID)};
-                String currentDate = Utilities.getCurrentDate();
+            //Fetching existing values for selected playlist
+            Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
 
-                //Fetching existing values for selected playlist
-                Log.d(MediaPlayerConstants.LOG_TAG_SQL, SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK);
-                cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);
+            try (Cursor cursor = db.rawQuery(SQLConstants.SQL_SELECT_PLAYLIST_INDICES_FOR_TRACK, args);) {
                 updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST);
                 cursor.moveToFirst();
 
@@ -776,10 +741,6 @@ public class MediaPlayerDAO {
 
                 //Setting error toast message
                 toastText = MessageConstants.ERROR;
-            } finally {
-                if(cursor != null) {
-                    cursor.close();
-                }
             }
 
             return tracksUpdated;
