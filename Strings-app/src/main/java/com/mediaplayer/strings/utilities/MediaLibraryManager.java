@@ -7,7 +7,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
@@ -326,13 +325,8 @@ public class MediaLibraryManager {
     }
 
     public static Playlist getPlaylistByTitle(String title) {
-        Playlist playlist;
-        Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
-
-        while(playlistIterator.hasNext()) {
-            playlist = playlistIterator.next();
-
-            if(title.equals(playlist.getPlaylistName())) {
+        for (Playlist playlist : playlistInfoList) {
+            if (title.equals(playlist.getPlaylistName())) {
                 return playlist;
             }
         }

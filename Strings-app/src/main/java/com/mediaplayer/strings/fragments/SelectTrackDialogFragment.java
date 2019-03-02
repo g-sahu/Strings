@@ -9,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-
 import com.mediaplayer.strings.activities.HomeActivity;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -19,7 +18,6 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.Iterator;

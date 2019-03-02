@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -22,7 +21,6 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 public class CreatePlaylistDialogFragment extends DialogFragment {
     private Context context;

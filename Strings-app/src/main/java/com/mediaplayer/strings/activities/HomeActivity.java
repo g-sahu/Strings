@@ -20,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.HomePagerAdapter;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
@@ -38,7 +37,6 @@ import com.mediaplayer.strings.utilities.MediaLibraryManager;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.MessageConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 

@@ -15,13 +15,11 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.activities.MediaPlayerActivity;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaPlayerConstants;
 import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.io.IOException;
 

@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Playlist;
@@ -56,7 +55,6 @@ public class MediaPlayerDAO {
         SQLiteStatement insertStmt, updateStmt;
         String toastText;
         int trackID, playlistID, playlistSize, newPlaylistSize, playlistDuration, newPlaylistDuration, increment = SQLConstants.ONE;
-        Playlist playlist;
 
         try {
             insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_PLAYLIST_DETAIL);
@@ -64,10 +62,8 @@ public class MediaPlayerDAO {
             //Retrieving selected track from trackInfoList
             trackID = selectedTrack.getTrackID();
 
-            Iterator<Playlist> selectedPlaylistsIterator = selectedPlaylists.iterator();
-            while(selectedPlaylistsIterator.hasNext()) {
+            for(Playlist playlist: selectedPlaylists) {
                 //Fetching current values for the selected playlist
-                playlist = selectedPlaylistsIterator.next();
                 playlistID = playlist.getPlaylistID();
                 playlistSize = playlist.getPlaylistSize();
                 playlistDuration = playlist.getPlaylistDuration();
@@ -206,12 +202,9 @@ public class MediaPlayerDAO {
 
         try {
             updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_INDICES);
-            Iterator<Track> trackListIterator = MediaLibraryManager.getTrackInfoList().iterator();
 
             //Updating the indices of all the tracks
-            while(trackListIterator.hasNext()) {
-                Track track = trackListIterator.next();
-
+            for(Track track: MediaLibraryManager.getTrackInfoList()) {
                 updateStmt.bindLong(1, track.getTrackIndex());
                 updateStmt.bindString(2, Utilities.getCurrentDate());
                 updateStmt.bindLong(3, track.getTrackID());
@@ -308,11 +301,8 @@ public class MediaPlayerDAO {
     private void updatePlaylistIndices() {
         SQLiteStatement updateStmt;
         updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_PLAYLIST_INDICES);
-        Iterator<Playlist> playlistIterator = MediaLibraryManager.getPlaylistInfoList().iterator();
 
-        while(playlistIterator.hasNext()) {
-            Playlist playlist = playlistIterator.next();
-
+        for(Playlist playlist: MediaLibraryManager.getPlaylistInfoList()) {
             //Updating the indices of all the playlists
             updateStmt.bindLong(1, playlist.getPlaylistIndex());
             updateStmt.bindString(2, Utilities.getCurrentDate());
@@ -366,7 +356,6 @@ public class MediaPlayerDAO {
         SQLiteStatement insertStmt, updateStmt = null;
         String toastText;
         int trackID, trackDuration, trackIndex, playlistID, playlistIndex, playlistSize, playlistDuration;
-        Track track;
 
         try {
             //Retrieving current values for selected playlist
@@ -381,9 +370,7 @@ public class MediaPlayerDAO {
                 updateStmt = db.compileStatement(SQLConstants.SQL_UPDATE_TRACK_FAV_SW);
             }
 
-            Iterator<Track> trackIterator = selectedTracks.iterator();
-            while(trackIterator.hasNext()) {
-                track = trackIterator.next();
+            for(Track track: selectedTracks) {
                 trackID = track.getTrackID();
                 trackIndex = track.getTrackIndex();
                 trackDuration = track.getTrackDuration();
@@ -448,16 +435,13 @@ public class MediaPlayerDAO {
     }
 
     public void addTracksToLibrary(@NonNull ArrayList<Track> trackList) {
-        Track track;
         int c;
         long tracksAdded = 0;
 
         SQLiteStatement insertStmt = db.compileStatement(SQLConstants.SQL_INSERT_TRACK);
-        Iterator<Track> trackIterator = trackList.iterator();
 
         //Inserting tracks in table 'Tracks'
-        while(trackIterator.hasNext()) {
-            track = trackIterator.next();
+        for(Track track: trackList) {
             c = SQLConstants.ONE;
 
             insertStmt.bindString(c++, track.getTrackTitle());

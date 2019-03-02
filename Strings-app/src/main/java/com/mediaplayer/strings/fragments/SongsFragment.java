@@ -10,12 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 
