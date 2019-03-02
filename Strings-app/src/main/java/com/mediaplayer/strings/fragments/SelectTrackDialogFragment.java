@@ -88,71 +88,56 @@ public class SelectTrackDialogFragment extends DialogFragment {
                         list[c++] = track.getTrackTitle();
                     }
 
-                    builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                            Track track = tracksToDisplay.get(which);
+                    builder.setMultiChoiceItems(list, null, (dialog, which, isChecked) -> {
+                        Track track1 = tracksToDisplay.get(which);
 
-                            if(isChecked) {
-                                selectedTracks.add(track);
-                            } else if (selectedTracks.contains(track)) {
-                                selectedTracks.remove(track);
-                            }
+                        if(isChecked) {
+                            selectedTracks.add(track1);
+                        } else if (selectedTracks.contains(track1)) {
+                            selectedTracks.remove(track1);
                         }
                     });
 
-                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            MediaPlayerDAO dao = null;
+                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                        MediaPlayerDAO dao1 = null;
 
-                            if(!selectedTracks.isEmpty()) {
-                                try {
-                                    dao = new MediaPlayerDAO(getContext());
+                        if(!selectedTracks.isEmpty()) {
+                            try {
+                                dao1 = new MediaPlayerDAO(getContext());
 
-                                    //Add track to selected playlists
-                                    dao.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
-                                } catch(Exception e) {
-                                    Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
-                                    //Utilities.reportCrash(e);
-                                } finally {
-                                    if(dao != null) {
-                                        dao.closeConnection();
-                                    }
+                                //Add track to selected playlists
+                                dao1.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
+                            } catch(Exception e) {
+                                Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                                //Utilities.reportCrash(e);
+                            } finally {
+                                if(dao1 != null) {
+                                    dao1.closeConnection();
                                 }
-
-                                //Updating list view adapter
-                                updatePlaylistsAdapter();
-
-                                //Removing added tracks from tracksInLibrary
-                                tracksToDisplay.removeAll(selectedTracks);
                             }
+
+                            //Updating list view adapter
+                            updatePlaylistsAdapter();
+
+                            //Removing added tracks from tracksInLibrary
+                            tracksToDisplay.removeAll(selectedTracks);
                         }
                     });
 
-                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            //Do nothing
-                        }
+                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, (dialog, id) -> {
+                        //Do nothing
                     });
                 } else {
                     builder.setMessage(MessageConstants.ERROR_NO_TRACK);
-                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            //Do nothing
-                        }
+                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                        //Do nothing
                     });
                 }
             } else {
                 builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
                 builder.setMessage(MessageConstants.ERROR_NO_TRACKS_ADDED);
-                builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Do nothing
-                    }
+                builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    //Do nothing
                 });
             }
         } catch(Exception e) {

@@ -91,73 +91,58 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     }
 
                     //Setting multi-select list
-                    builder.setMultiChoiceItems(list, null, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                            Playlist playlist = playlistsToDisplay.get(which);
+                    builder.setMultiChoiceItems(list, null, (dialog, which, isChecked) -> {
+                        Playlist playlist1 = playlistsToDisplay.get(which);
 
-                            if(isChecked) {
-                                selectedPlaylists.add(playlist);
-                            } else if (selectedPlaylists.contains(playlist)) {
-                                selectedPlaylists.remove(playlist);
-                            }
+                        if(isChecked) {
+                            selectedPlaylists.add(playlist1);
+                        } else if (selectedPlaylists.contains(playlist1)) {
+                            selectedPlaylists.remove(playlist1);
                         }
                     });
 
                     //Setting listener for 'OK' button
-                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            MediaPlayerDAO dao = null;
+                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                        MediaPlayerDAO dao1 = null;
 
-                            if(!selectedPlaylists.isEmpty()) {
-                                try {
-                                    dao = new MediaPlayerDAO(context);
+                        if(!selectedPlaylists.isEmpty()) {
+                            try {
+                                dao1 = new MediaPlayerDAO(context);
 
-                                    //Add track to selected playlists
-                                    dao.addToPlaylists(selectedPlaylists, selectedTrack);
-                                } catch(Exception e) {
-                                    Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                                    //Utilities.reportCrash(e);
-                                } finally {
-                                    if(dao != null) {
-                                        dao.closeConnection();
-                                    }
+                                //Add track to selected playlists
+                                dao1.addToPlaylists(selectedPlaylists, selectedTrack);
+                            } catch(Exception e) {
+                                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                                //Utilities.reportCrash(e);
+                            } finally {
+                                if(dao1 != null) {
+                                    dao1.closeConnection();
                                 }
-
-                                //Updating playlist adapter
-                                updatePlaylistsAdapter();
-
-                                //Removing added playlists from playlistsInLibrary
-                                playlistsToDisplay.removeAll(selectedPlaylists);
                             }
+
+                            //Updating playlist adapter
+                            updatePlaylistsAdapter();
+
+                            //Removing added playlists from playlistsInLibrary
+                            playlistsToDisplay.removeAll(selectedPlaylists);
                         }
                     });
 
                     //Setting listener for 'Cancel' button
-                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            //Do nothing
-                        }
+                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, (dialog, id) -> {
+                        //Do nothing
                     });
                 } else {
                     builder.setMessage(MessageConstants.ERROR_NO_PLAYLIST);
-                    builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            //Do nothing
-                        }
+                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                        //Do nothing
                     });
                 }
             } else {
                 builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
                 builder.setMessage(MessageConstants.ERROR_NO_PLAYLIST_CREATED);
-                builder.setPositiveButton(MediaPlayerConstants.OK, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Do nothing
-                    }
+                builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    //Do nothing
                 });
             }
         } catch(Exception e) {

@@ -48,12 +48,9 @@ public class PlaylistsFragment extends Fragment {
         FloatingActionButton createPlaylistButton = (FloatingActionButton) playlistsView.findViewById(R.id.createPlaylistButton);
 
         // Click Listener for 'Create Playlist' button
-        createPlaylistButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment createPlaylistDialogFragment = new CreatePlaylistDialogFragment();
-                createPlaylistDialogFragment.show(getActivity().getSupportFragmentManager(), MediaPlayerConstants.TAG_CREATE_PLAYLIST);
-            }
+        createPlaylistButton.setOnClickListener(view -> {
+            DialogFragment createPlaylistDialogFragment = new CreatePlaylistDialogFragment();
+            createPlaylistDialogFragment.show(getActivity().getSupportFragmentManager(), MediaPlayerConstants.TAG_CREATE_PLAYLIST);
         });
     }
 }
