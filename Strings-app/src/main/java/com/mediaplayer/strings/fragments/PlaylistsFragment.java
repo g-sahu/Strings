@@ -11,11 +11,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
-import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
+
+import static android.support.v7.widget.RecyclerView.Adapter;
+import static com.mediaplayer.strings.R.id;
+import static com.mediaplayer.strings.R.id.recycler_view;
+import static com.mediaplayer.strings.R.layout.fragment_playlists;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.getPlaylistInfoList;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.TAG_CREATE_PLAYLIST;
 
 public class PlaylistsFragment extends Fragment {
     private View playlistsView;
@@ -32,10 +35,10 @@ public class PlaylistsFragment extends Fragment {
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        playlistsView = inflater.inflate(R.layout.fragment_playlists, container, false);
-        recyclerView = playlistsView.findViewById(R.id.recycler_view);
+        playlistsView = inflater.inflate(fragment_playlists, container, false);
+        recyclerView = playlistsView.findViewById(recycler_view);
 
-        RecyclerView.Adapter playlistsAdapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
+        Adapter playlistsAdapter = new PlaylistsAdapter(context, getPlaylistInfoList());
         recyclerView.setAdapter(playlistsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -45,12 +48,12 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton createPlaylistButton = playlistsView.findViewById(R.id.createPlaylistButton);
+        FloatingActionButton createPlaylistButton = playlistsView.findViewById(id.createPlaylistButton);
 
         // Click Listener for 'Create Playlist' button
         createPlaylistButton.setOnClickListener(view -> {
             DialogFragment createPlaylistDialogFragment = new CreatePlaylistDialogFragment();
-            createPlaylistDialogFragment.show(getActivity().getSupportFragmentManager(), MediaPlayerConstants.TAG_CREATE_PLAYLIST);
+            createPlaylistDialogFragment.show(getActivity().getSupportFragmentManager(), TAG_CREATE_PLAYLIST);
         });
     }
 }

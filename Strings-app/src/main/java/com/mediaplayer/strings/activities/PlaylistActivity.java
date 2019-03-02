@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
 import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
@@ -26,13 +25,25 @@ import com.mediaplayer.strings.dao.MediaPlayerDAO;
 import com.mediaplayer.strings.fragments.PlaylistsFragment;
 import com.mediaplayer.strings.fragments.SelectPlaylistDialogFragment;
 import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
-import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 
-import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static android.support.v7.widget.RecyclerView.Adapter;
+import static android.support.v7.widget.RecyclerView.VISIBLE;
+import static com.mediaplayer.strings.R.id;
+import static com.mediaplayer.strings.R.id.addToFavourites;
+import static com.mediaplayer.strings.R.id.playlistDetails;
+import static com.mediaplayer.strings.R.id.recycler_view;
+import static com.mediaplayer.strings.R.id.removeSong;
+import static com.mediaplayer.strings.R.layout.activity_playlist;
+import static com.mediaplayer.strings.activities.HomeActivity.getContext;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.*;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
+import static com.mediaplayer.strings.utilities.SQLConstants.FAV_SW_YES;
+import static com.mediaplayer.strings.utilities.SQLConstants.ONE;
+import static com.mediaplayer.strings.utilities.SQLConstants.PLAYLIST_ID_FAVOURITES;
+import static com.mediaplayer.strings.utilities.SQLConstants.PLAYLIST_INDEX_FAVOURITES;
+import static com.mediaplayer.strings.utilities.Utilities.milliSecondsToTimer;
 
 public class PlaylistActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -45,7 +56,7 @@ public class PlaylistActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playlist);
+        setContentView(activity_playlist);
 
         Intent intent;
         int playlistIndex;
@@ -54,17 +65,17 @@ public class PlaylistActivity extends AppCompatActivity {
         MediaPlayerDAO dao = null;
 
         try {
-            homeContext = HomeActivity.getContext();
+            homeContext = getContext();
             supportFragmentManager = getSupportFragmentManager();
 
-            playlistName = findViewById(R.id.playlistName);
-            playlistInfo = findViewById(R.id.playlistDetails);
-            emptyPlaylistMessage = findViewById(R.id.emptyPlaylistMessage);
+            playlistName = findViewById(id.playlistName);
+            playlistInfo = findViewById(playlistDetails);
+            emptyPlaylistMessage = findViewById(id.emptyPlaylistMessage);
 
             intent = getIntent();
-            playlistID = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_ID, 0);
-            playlistIndex = intent.getIntExtra(MediaPlayerConstants.KEY_PLAYLIST_INDEX, 0);
-            selectedPlaylist = MediaLibraryManager.getPlaylistByIndex(playlistIndex);
+            playlistID = intent.getIntExtra(KEY_PLAYLIST_ID, 0);
+            playlistIndex = intent.getIntExtra(KEY_PLAYLIST_INDEX, 0);
+            selectedPlaylist = getPlaylistByIndex(playlistIndex);
             playlistTitle = selectedPlaylist.getPlaylistName();
             infoText = getPlaylistDetails();
 
@@ -73,17 +84,17 @@ public class PlaylistActivity extends AppCompatActivity {
             //Fetching all tracks for the selected playlist from database
             ArrayList<Track> trackList = dao.getTracksForPlaylist(playlistID);
 
-            MediaLibraryManager.setSelectedPlaylist(trackList);
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+            setSelectedPlaylist(trackList);
+            sortTracklist(TAG_PLAYLIST_OTHER);
             trackList = MediaLibraryManager.getSelectedPlaylist();
             playlistName.setText(playlistTitle);
             playlistInfo.setText(infoText);
 
             if(trackList.isEmpty()) {
-                emptyPlaylistMessage.setVisibility(View.VISIBLE);
+                emptyPlaylistMessage.setVisibility(VISIBLE);
             } else {
-                RecyclerView.Adapter playlistAdapter = new SongsListAdapter(this, trackList);
-                recyclerView = findViewById(R.id.recycler_view);
+                Adapter playlistAdapter = new SongsListAdapter(this, trackList);
+                recyclerView = findViewById(recycler_view);
                 recyclerView.setAdapter(playlistAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
             }
@@ -102,21 +113,21 @@ public class PlaylistActivity extends AppCompatActivity {
         Menu menu = popup.getMenu();
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_song_options, menu);
-        MenuItem optionTwo = menu.findItem(R.id.addToFavourites);
-        MenuItem optionThree = menu.findItem(R.id.removeSong);
+        MenuItem optionTwo = menu.findItem(addToFavourites);
+        MenuItem optionThree = menu.findItem(removeSong);
         View parent = (View) view.getParent();
         int position = recyclerView.getChildLayoutPosition(parent);
-        selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
+        selectedTrack = getTrackByIndex(TAG_PLAYLIST_OTHER, position);
 
         //Checking if song is added to defualt playlist 'Favourites'
-        if (selectedTrack != null && selectedTrack.isFavSw() == SQLConstants.FAV_SW_YES) {
-            optionTwo.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_FAVOURITES);
+        if (selectedTrack != null && selectedTrack.isFavSw() == FAV_SW_YES) {
+            optionTwo.setTitle(TITLE_REMOVE_FROM_FAVOURITES);
         }
 
-        if(playlistID == SQLConstants.PLAYLIST_ID_FAVOURITES) {
+        if(playlistID == PLAYLIST_ID_FAVOURITES) {
             optionThree.setVisible(false);
         } else {
-            optionThree.setTitle(MediaPlayerConstants.TITLE_REMOVE_FROM_PLAYLIST);
+            optionThree.setTitle(TITLE_REMOVE_FROM_PLAYLIST);
         }
 
         popup.show();
@@ -127,14 +138,14 @@ public class PlaylistActivity extends AppCompatActivity {
         DialogFragment selectPlaylistDialogFragment = new SelectPlaylistDialogFragment();
         Bundle args = new Bundle();
 
-        args.putSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
+        args.putSerializable(KEY_SELECTED_TRACK, selectedTrack);
         selectPlaylistDialogFragment.setArguments(args);
-        selectPlaylistDialogFragment.show(supportFragmentManager, MediaPlayerConstants.TAG_ADD_TO_PLAYLIST);
+        selectPlaylistDialogFragment.show(supportFragmentManager, TAG_ADD_TO_PLAYLIST);
     }
 
     //Add or remove from favourites menu option
     public void addRemoveFavourites(MenuItem menuItem) {
-        if (menuItem.getTitle().equals(MediaPlayerConstants.TITLE_ADD_TO_FAVOURITES)) {
+        if (menuItem.getTitle().equals(TITLE_ADD_TO_FAVOURITES)) {
             addToFavourites();
         } else {
             removeFromFavourites();
@@ -147,7 +158,7 @@ public class PlaylistActivity extends AppCompatActivity {
         MediaPlayerDAO dao = null;
 
         try {
-            selectedPlaylists.add(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES));
+            selectedPlaylists.add(getPlaylistByIndex(PLAYLIST_INDEX_FAVOURITES));
             dao = new MediaPlayerDAO(this);
             dao.addToPlaylists(selectedPlaylists, selectedTrack);
 
@@ -169,14 +180,14 @@ public class PlaylistActivity extends AppCompatActivity {
 
         try {
             dao = new MediaPlayerDAO(this);
-            dao.removeFromPlaylist(MediaLibraryManager.getPlaylistByIndex(SQLConstants.PLAYLIST_INDEX_FAVOURITES), selectedTrack);
+            dao.removeFromPlaylist(getPlaylistByIndex(PLAYLIST_INDEX_FAVOURITES), selectedTrack);
 
             //Sorting the trackList for the selected playlist
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+            sortTracklist(TAG_PLAYLIST_OTHER);
 
             //Removing track from selected playlist if it is default playlist 'Favourites'
-            if(selectedPlaylist.getPlaylistID() == SQLConstants.PLAYLIST_ID_FAVOURITES) {
-                MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+            if(selectedPlaylist.getPlaylistID() == PLAYLIST_ID_FAVOURITES) {
+                removeTrack(TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
             }
 
             //Updating list view adapter
@@ -201,10 +212,10 @@ public class PlaylistActivity extends AppCompatActivity {
             dao.removeFromPlaylist(selectedPlaylist, selectedTrack);
 
             //Removing track from selectedPlaylist
-            MediaLibraryManager.removeTrack(MediaPlayerConstants.TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
+            removeTrack(TAG_PLAYLIST_OTHER, selectedTrack.getCurrentTrackIndex());
 
             //Sorting selectedPlaylist
-            MediaLibraryManager.sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_OTHER);
+            sortTracklist(TAG_PLAYLIST_OTHER);
 
             //Updating list view adapter
             updatePlaylistsAdapter();
@@ -228,15 +239,15 @@ public class PlaylistActivity extends AppCompatActivity {
     private void updatePlaylistsAdapter() {
         TextView playlistInfo, emptyPlaylistMessage;
 
-        if(MediaLibraryManager.isUserPlaylistEmpty()) {
-            emptyPlaylistMessage = findViewById(R.id.emptyPlaylistMessage);
-            emptyPlaylistMessage.setVisibility(View.VISIBLE);
+        if(isUserPlaylistEmpty()) {
+            emptyPlaylistMessage = findViewById(id.emptyPlaylistMessage);
+            emptyPlaylistMessage.setVisibility(VISIBLE);
         }
 
-        playlistInfo = findViewById(R.id.playlistDetails);
+        playlistInfo = findViewById(playlistDetails);
         playlistInfo.setText(getPlaylistDetails());
 
-        PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, MediaLibraryManager.getPlaylistInfoList());
+        PlaylistsAdapter adapter = new PlaylistsAdapter(homeContext, getPlaylistInfoList());
         RecyclerView listView = PlaylistsFragment.recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -244,14 +255,14 @@ public class PlaylistActivity extends AppCompatActivity {
 
     public void callMediaplayerActivity(View view) {
         int position = recyclerView.getChildLayoutPosition(view);
-        Track selectedTrack = MediaLibraryManager.getTrackByIndex(MediaPlayerConstants.TAG_PLAYLIST_OTHER, position);
+        Track selectedTrack = getTrackByIndex(TAG_PLAYLIST_OTHER, position);
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_TRACK, selectedTrack);
-        intent.putExtra(MediaPlayerConstants.KEY_SELECTED_PLAYLIST, MediaPlayerConstants.TAG_PLAYLIST_OTHER);
-        intent.putExtra(MediaPlayerConstants.KEY_PLAYLIST_TITLE, selectedPlaylist.getPlaylistName());
-        intent.putExtra(MediaPlayerConstants.KEY_TRACK_ORIGIN, MediaPlayerConstants.TAG_PLAYLIST_ACTIVITY);
-        intent.setAction(MediaPlayerConstants.PLAY);
+        intent.putExtra(KEY_SELECTED_TRACK, selectedTrack);
+        intent.putExtra(KEY_SELECTED_PLAYLIST, TAG_PLAYLIST_OTHER);
+        intent.putExtra(KEY_PLAYLIST_TITLE, selectedPlaylist.getPlaylistName());
+        intent.putExtra(KEY_TRACK_ORIGIN, TAG_PLAYLIST_ACTIVITY);
+        intent.setAction(PLAY);
 
         startActivity(intent);
     }
@@ -261,8 +272,8 @@ public class PlaylistActivity extends AppCompatActivity {
         int playlistSize;
 
         playlistSize = selectedPlaylist.getPlaylistSize();
-        text = (playlistSize == SQLConstants.ONE) ? " song,\t" : " songs,\t";
-        infoText = playlistSize + text + Utilities.milliSecondsToTimer(selectedPlaylist.getPlaylistDuration());
+        text = (playlistSize == ONE) ? " song,\t" : " songs,\t";
+        infoText = playlistSize + text + milliSecondsToTimer(selectedPlaylist.getPlaylistDuration());
 
         return infoText;
     }

@@ -7,12 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Track;
 
 import java.util.ArrayList;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static android.support.v7.widget.RecyclerView.ViewHolder;
+import static com.bumptech.glide.Glide.with;
+import static com.mediaplayer.strings.R.drawable.img_default_album_art_thumb;
+import static com.mediaplayer.strings.R.id;
+import static com.mediaplayer.strings.R.id.albumThumbnail;
+import static com.mediaplayer.strings.R.layout.item_track;
 
 public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Holder> {
     private ArrayList<Track> trackInfoList;
@@ -22,24 +27,24 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
     public SongsListAdapter(Context context, ArrayList<Track> trackInfoList) {
         this.trackInfoList = trackInfoList;
         this.context = context;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
-    public SongsListAdapter.Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowView = inflater.inflate(R.layout.item_track, parent, false);
-        return new SongsListAdapter.Holder(rowView);
+    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rowView = inflater.inflate(item_track, parent, false);
+        return new Holder(rowView);
     }
 
     @Override
-    public void onBindViewHolder(SongsListAdapter.Holder holder, int position) {
+    public void onBindViewHolder(Holder holder, int position) {
         Track track = trackInfoList.get(position);
         byte data[] = track.getAlbumArt();
 
         if(data.length != 0) {
-            Glide.with(context).load(data).into(holder.albumArt);
+            with(context).load(data).into(holder.albumArt);
         } else {
-            Glide.with(context).load(R.drawable.img_default_album_art_thumb).into(holder.albumArt);
+            with(context).load(img_default_album_art_thumb).into(holder.albumArt);
         }
 
         holder.trackTitle.setText(track.getTrackTitle());
@@ -56,15 +61,15 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
         return trackInfoList.size();
     }
 
-    class Holder extends RecyclerView.ViewHolder {
+    class Holder extends ViewHolder {
         ImageView albumArt;
         TextView trackTitle, artistName;
 
         Holder(View itemView) {
             super(itemView);
-            albumArt = itemView.findViewById(R.id.albumThumbnail);
-            trackTitle = itemView.findViewById(R.id.trackTitle);
-            artistName = itemView.findViewById(R.id.artistName);
+            albumArt = itemView.findViewById(albumThumbnail);
+            trackTitle = itemView.findViewById(id.trackTitle);
+            artistName = itemView.findViewById(id.artistName);
         }
     }
 }

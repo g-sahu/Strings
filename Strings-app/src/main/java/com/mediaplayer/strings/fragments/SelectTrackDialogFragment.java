@@ -2,11 +2,9 @@ package com.mediaplayer.strings.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import com.mediaplayer.strings.activities.HomeActivity;
@@ -14,18 +12,23 @@ import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
-import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
-import com.mediaplayer.strings.utilities.MessageConstants;
-import com.mediaplayer.strings.utilities.SQLConstants;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static android.support.v7.app.AlertDialog.Builder;
+import static com.mediaplayer.strings.fragments.PlaylistsFragment.recyclerView;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.getPlaylistInfoList;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.getTrackInfoList;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
+import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_TRACK;
+import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_TRACKS_ADDED;
+import static com.mediaplayer.strings.utilities.SQLConstants.ZERO;
+
 public class SelectTrackDialogFragment extends DialogFragment {
     private Context context;
     private ArrayList<Track> selectedTracks;
-    private ArrayList<Track> tracksInLibrary = MediaLibraryManager.getTrackInfoList();
+    private ArrayList<Track> tracksInLibrary = getTrackInfoList();
 
     @NonNull
     @Override
@@ -36,15 +39,15 @@ public class SelectTrackDialogFragment extends DialogFragment {
         String list[];
         Track track;
         int trackID;
-        AlertDialog.Builder builder = null;
+        Builder builder = null;
         MediaPlayerDAO dao = null;
         int trackInPlaylistSize, c = 0, listLength;
 
         try {
             context = getContext();
-            builder = new AlertDialog.Builder(getActivity());
+            builder = new Builder(getActivity());
             Bundle args = getArguments();
-            Playlist selectedPlaylist = (Playlist) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_PLAYLIST);
+            Playlist selectedPlaylist = (Playlist) args.getSerializable(KEY_SELECTED_PLAYLIST);
 
             //Checking if there are any tracks in the library
             if(tracksInLibrary != null && !tracksInLibrary.isEmpty()) {
@@ -67,7 +70,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                     track = tracksIterator.next();
                     trackID = track.getTrackID();
 
-                    if(trackInPlaylistSize == SQLConstants.ZERO || !tracksInPlaylist.contains(trackID)) {
+                    if(trackInPlaylistSize == ZERO || !tracksInPlaylist.contains(trackID)) {
                         tracksToDisplay.add(track);
                     }
                 }
@@ -77,7 +80,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                 listLength = list.length;
 
                 //Setting the title of the dialog window
-                builder.setTitle(MediaPlayerConstants.TITLE_SELECT_TRACKS);
+                builder.setTitle(TITLE_SELECT_TRACKS);
 
                 if(listLength != 0) {
                     tracksIterator = tracksToDisplay.iterator();
@@ -98,7 +101,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                         }
                     });
 
-                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    builder.setPositiveButton(OK, (dialog, id) -> {
                         MediaPlayerDAO dao1 = null;
 
                         if(!selectedTracks.isEmpty()) {
@@ -108,7 +111,7 @@ public class SelectTrackDialogFragment extends DialogFragment {
                                 //Add track to selected playlists
                                 dao1.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
                             } catch(Exception e) {
-                                Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+                                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
                                 //Utilities.reportCrash(e);
                             } finally {
                                 if(dao1 != null) {
@@ -124,24 +127,24 @@ public class SelectTrackDialogFragment extends DialogFragment {
                         }
                     });
 
-                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, (dialog, id) -> {
+                    builder.setNegativeButton(CANCEL, (dialog, id) -> {
                         //Do nothing
                     });
                 } else {
-                    builder.setMessage(MessageConstants.ERROR_NO_TRACK);
-                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    builder.setMessage(ERROR_NO_TRACK);
+                    builder.setPositiveButton(OK, (dialog, id) -> {
                         //Do nothing
                     });
                 }
             } else {
-                builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
-                builder.setMessage(MessageConstants.ERROR_NO_TRACKS_ADDED);
-                builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                builder.setTitle(TITLE_ERROR);
+                builder.setMessage(ERROR_NO_TRACKS_ADDED);
+                builder.setPositiveButton(OK, (dialog, id) -> {
                     //Do nothing
                 });
             }
         } catch(Exception e) {
-            Log.e(MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
+            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
         } finally {
             if(dao != null) {
@@ -153,8 +156,8 @@ public class SelectTrackDialogFragment extends DialogFragment {
     }
 
     private void updatePlaylistsAdapter() {
-        PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        RecyclerView listView = PlaylistsFragment.recyclerView;
+        PlaylistsAdapter adapter = new PlaylistsAdapter(context, getPlaylistInfoList());
+        RecyclerView listView = recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

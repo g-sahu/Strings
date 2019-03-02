@@ -2,29 +2,30 @@ package com.mediaplayer.strings.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
-import com.mediaplayer.strings.utilities.MediaLibraryManager;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
-import com.mediaplayer.strings.utilities.MessageConstants;
-import com.mediaplayer.strings.utilities.SQLConstants;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static android.support.v7.app.AlertDialog.Builder;
+import static com.mediaplayer.strings.fragments.PlaylistsFragment.recyclerView;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.getPlaylistInfoList;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
+import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_PLAYLIST;
+import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_PLAYLIST_CREATED;
+import static com.mediaplayer.strings.utilities.SQLConstants.PLAYLIST_ID_FAVOURITES;
+import static com.mediaplayer.strings.utilities.SQLConstants.ZERO;
 
 public class SelectPlaylistDialogFragment extends DialogFragment {
-    private ArrayList<Playlist> playlistsInLibrary = MediaLibraryManager.getPlaylistInfoList();
+    private ArrayList<Playlist> playlistsInLibrary = getPlaylistInfoList();
     private ArrayList<Playlist> selectedPlaylists;
     private Track selectedTrack;
     private Context context;
@@ -32,7 +33,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = null;
+        Builder builder = null;
         MediaPlayerDAO dao = null;
         ArrayList<Integer> addedToPlaylists;
         final ArrayList<Playlist> playlistsToDisplay;
@@ -43,9 +44,9 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
 
         try {
             context = getContext();
-            builder = new AlertDialog.Builder(getActivity());
+            builder = new Builder(getActivity());
             Bundle args = getArguments();
-            selectedTrack = (Track) args.getSerializable(MediaPlayerConstants.KEY_SELECTED_TRACK);
+            selectedTrack = (Track) args.getSerializable(KEY_SELECTED_TRACK);
 
             //Checking if playlist count > 1 i.e. the user has created any custom playlist
             if(playlistCount > 1) {
@@ -68,8 +69,8 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     playlist = playlistsIterator.next();
                     playlistID = playlist.getPlaylistID();
 
-                    if((playlistID != SQLConstants.PLAYLIST_ID_FAVOURITES) &&
-                       (addedToPlaylistsCount == SQLConstants.ZERO || !addedToPlaylists.contains(playlistID))) {
+                    if((playlistID != PLAYLIST_ID_FAVOURITES) &&
+                       (addedToPlaylistsCount == ZERO || !addedToPlaylists.contains(playlistID))) {
                         playlistsToDisplay.add(playlist);
                     }
                 }
@@ -79,7 +80,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                 listLength = list.length;
 
                 //Setting dialog box title
-                builder.setTitle(MediaPlayerConstants.TITLE_SELECT_PLAYLIST);
+                builder.setTitle(TITLE_SELECT_PLAYLIST);
 
                 if(listLength != 0) {
                     playlistsIterator = playlistsToDisplay.iterator();
@@ -102,7 +103,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     });
 
                     //Setting listener for 'OK' button
-                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    builder.setPositiveButton(OK, (dialog, id) -> {
                         MediaPlayerDAO dao1 = null;
 
                         if(!selectedPlaylists.isEmpty()) {
@@ -129,19 +130,19 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     });
 
                     //Setting listener for 'Cancel' button
-                    builder.setNegativeButton(MediaPlayerConstants.CANCEL, (dialog, id) -> {
+                    builder.setNegativeButton(CANCEL, (dialog, id) -> {
                         //Do nothing
                     });
                 } else {
-                    builder.setMessage(MessageConstants.ERROR_NO_PLAYLIST);
-                    builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                    builder.setMessage(ERROR_NO_PLAYLIST);
+                    builder.setPositiveButton(OK, (dialog, id) -> {
                         //Do nothing
                     });
                 }
             } else {
-                builder.setTitle(MediaPlayerConstants.TITLE_ERROR);
-                builder.setMessage(MessageConstants.ERROR_NO_PLAYLIST_CREATED);
-                builder.setPositiveButton(MediaPlayerConstants.OK, (dialog, id) -> {
+                builder.setTitle(TITLE_ERROR);
+                builder.setMessage(ERROR_NO_PLAYLIST_CREATED);
+                builder.setPositiveButton(OK, (dialog, id) -> {
                     //Do nothing
                 });
             }
@@ -158,8 +159,8 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
     }
 
     private void updatePlaylistsAdapter() {
-        PlaylistsAdapter adapter = new PlaylistsAdapter(context, MediaLibraryManager.getPlaylistInfoList());
-        RecyclerView listView = PlaylistsFragment.recyclerView;
+        PlaylistsAdapter adapter = new PlaylistsAdapter(context, getPlaylistInfoList());
+        RecyclerView listView = recyclerView;
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

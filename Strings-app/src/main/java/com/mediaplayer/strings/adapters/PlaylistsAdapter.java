@@ -6,13 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.beans.Playlist;
-import com.mediaplayer.strings.utilities.SQLConstants;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static android.support.v7.widget.RecyclerView.ViewHolder;
+import static com.mediaplayer.strings.R.id;
+import static com.mediaplayer.strings.R.layout.item_playlist;
+import static com.mediaplayer.strings.utilities.SQLConstants.ONE;
+import static com.mediaplayer.strings.utilities.Utilities.milliSecondsToTimer;
 
 public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.Holder> {
     private ArrayList<Playlist> playlistInfoList;
@@ -20,21 +23,21 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.Hold
 
     public PlaylistsAdapter(Context context, ArrayList<Playlist> playlistInfoList) {
         this.playlistInfoList = playlistInfoList;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
-    public PlaylistsAdapter.Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowView = inflater.inflate(R.layout.item_playlist, parent, false);
-        return new PlaylistsAdapter.Holder(rowView);
+    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rowView = inflater.inflate(item_playlist, parent, false);
+        return new Holder(rowView);
     }
 
     @Override
-    public void onBindViewHolder(PlaylistsAdapter.Holder holder, int position) {
+    public void onBindViewHolder(Holder holder, int position) {
         Playlist playlist = playlistInfoList.get(position);
         int playlistSize = playlist.getPlaylistSize();
-        String text = (playlistSize == SQLConstants.ONE) ? " song, " : " songs, ";
-        String infoText = playlistSize + text + Utilities.milliSecondsToTimer(playlist.getPlaylistDuration());
+        String text = (playlistSize == ONE) ? " song, " : " songs, ";
+        String infoText = playlistSize + text + milliSecondsToTimer(playlist.getPlaylistDuration());
 
         holder.playlistTitle.setText(playlistInfoList.get(position).getPlaylistName());
         holder.playlistInfo.setText(infoText);
@@ -50,13 +53,13 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.Hold
         return playlistInfoList.size();
     }
 
-    class Holder extends RecyclerView.ViewHolder {
+    class Holder extends ViewHolder {
         TextView playlistTitle, playlistInfo;
 
         Holder(View itemView) {
             super(itemView);
-            playlistTitle = itemView.findViewById(R.id.playlistTitle);
-            playlistInfo = itemView.findViewById(R.id.playlistInfo);
+            playlistTitle = itemView.findViewById(id.playlistTitle);
+            playlistInfo = itemView.findViewById(id.playlistInfo);
         }
     }
 }

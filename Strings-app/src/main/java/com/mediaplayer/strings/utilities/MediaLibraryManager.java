@@ -5,18 +5,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static android.provider.MediaStore.Audio.AudioColumns.*;
+import static android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+import static android.provider.MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+import static com.mediaplayer.strings.dao.MediaPlayerDAO.updateTrackIndices;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
+import static com.mediaplayer.strings.utilities.SQLConstants.*;
+import static java.lang.String.valueOf;
+import static java.util.Collections.sort;
 
 public class MediaLibraryManager {
     private static ArrayList<Track> trackInfoList;
@@ -45,8 +50,8 @@ public class MediaLibraryManager {
 
                     //Check if map is not null. If null, it means there has been no change to the songs library
                     if (map != null) {
-                        newTracksList = (ArrayList<Track>) map.get(MediaPlayerConstants.KEY_NEW_TRACKS_LIST);
-                        deletedTracksList = (ArrayList<String>) map.get(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST);
+                        newTracksList = (ArrayList<Track>) map.get(KEY_NEW_TRACKS_LIST);
+                        deletedTracksList = (ArrayList<String>) map.get(KEY_DELETED_TRACKS_LIST);
                         isChanged = true;
 
                         //Insert new tracks in db
@@ -66,12 +71,12 @@ public class MediaLibraryManager {
             trackInfoList = dao.getTracks();
 
             if(trackInfoList != null) {
-                sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+                sortTracklist(TAG_PLAYLIST_LIBRARY);
                 tracklistSize = trackInfoList.size();
 
                 if (map != null) {
                     //Updating track indices in db to keep in sync with trackInfoList
-                    MediaPlayerDAO.updateTrackIndices();
+                    updateTrackIndices();
                 }
             }
 
@@ -95,25 +100,17 @@ public class MediaLibraryManager {
      **/
     private static Cursor[] getAllTracksFromProvider(Context context) {
         Cursor cursors[] = new Cursor[2];
-        String[] projection = new String[] {
-                MediaStore.Audio.AudioColumns.TITLE,
-                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
-                MediaStore.Audio.AudioColumns.DURATION,
-                MediaStore.Audio.AudioColumns.SIZE,
-                MediaStore.Audio.AudioColumns.ALBUM,
-                MediaStore.Audio.AudioColumns.ARTIST,
-                MediaStore.MediaColumns.DATA,
-                };
+        String[] projection = new String[] { TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA };
 
-        String selection = MediaStore.Audio.AudioColumns.IS_MUSIC + " != 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.DURATION + " > 60000";
+        String selection = IS_MUSIC + " != 0 " + AND +
+                           IS_ALARM + " == 0 " + AND +
+                           IS_NOTIFICATION + " == 0 " + AND +
+                           IS_PODCAST + " == 0 " + AND +
+                           IS_RINGTONE + " == 0 " + AND +
+                           DURATION + " > 60000";
 
-        Uri internalUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        Uri externalUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri internalUri = INTERNAL_CONTENT_URI;
+        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
 
         cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
@@ -124,19 +121,17 @@ public class MediaLibraryManager {
 
     private static Cursor[] getFileNamesFromProvider(Context context) {
         Cursor cursors[] = new Cursor[2];
-        String[] projection = new String[] {
-                MediaStore.Audio.AudioColumns.DISPLAY_NAME
-        };
+        String[] projection = new String[] { DISPLAY_NAME };
 
-        String selection = MediaStore.Audio.AudioColumns.IS_MUSIC + " != 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_ALARM + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_NOTIFICATION + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_PODCAST + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.IS_RINGTONE + " == 0 " + SQLConstants.AND +
-                           MediaStore.Audio.AudioColumns.DURATION + " > 60000";
+        String selection = IS_MUSIC + " != 0 " + AND +
+                           IS_ALARM + " == 0 " + AND +
+                           IS_NOTIFICATION + " == 0 " + AND +
+                           IS_PODCAST + " == 0 " + AND +
+                           IS_RINGTONE + " == 0 " + AND +
+                           DURATION + " > 60000";
 
-        Uri internalUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        Uri externalUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri internalUri = INTERNAL_CONTENT_URI;
+        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
 
         cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
@@ -147,30 +142,22 @@ public class MediaLibraryManager {
 
     private static Cursor[] getNewTracksFromProvider(Context context, ArrayList<String> fileNamesList) {
         Cursor cursors[] = new Cursor[2];
-        String[] projection = new String[] {
-                MediaStore.Audio.AudioColumns.TITLE,
-                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
-                MediaStore.Audio.AudioColumns.DURATION,
-                MediaStore.Audio.AudioColumns.SIZE,
-                MediaStore.Audio.AudioColumns.ALBUM,
-                MediaStore.Audio.AudioColumns.ARTIST,
-                MediaStore.MediaColumns.DATA,
-                };
+        String[] projection = new String[] { TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA };
 
         Iterator<String> fileNamesIterator = fileNamesList.iterator();
         StringBuilder fileNames = new StringBuilder();
 
         while(fileNamesIterator.hasNext()) {
-            fileNames.append(SQLConstants.DOUBLE_QUOTE).append(fileNamesIterator.next()).append(SQLConstants.DOUBLE_QUOTE);
+            fileNames.append(DOUBLE_QUOTE).append(fileNamesIterator.next()).append(DOUBLE_QUOTE);
 
             if(fileNamesIterator.hasNext()) {
-                fileNames.append(SQLConstants.COMMA_SEP);
+                fileNames.append(COMMA_SEP);
             }
         }
 
-        String selection = MediaStore.Audio.AudioColumns.DISPLAY_NAME + " IN (" + fileNames + ")";
-        Uri internalUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        Uri externalUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = DISPLAY_NAME + " IN (" + fileNames + ")";
+        Uri internalUri = INTERNAL_CONTENT_URI;
+        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
 
         cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
@@ -193,7 +180,7 @@ public class MediaLibraryManager {
 
         if(trackInfoList != null) {
             tracklistSize = trackInfoList.size();
-            sortTracklist(MediaPlayerConstants.TAG_PLAYLIST_LIBRARY);
+            sortTracklist(TAG_PLAYLIST_LIBRARY);
         } else {
             tracklistSize = 0;
         }
@@ -211,14 +198,14 @@ public class MediaLibraryManager {
 
         try {
             for(Cursor tracksCursor : cursors) {
-                if(tracksCursor.getCount() > SQLConstants.ZERO) {
+                if(tracksCursor.getCount() > ZERO) {
                     tracksCursor.moveToFirst();
                     mmr = new MediaMetadataRetriever();
                     trackList = new ArrayList<>();
 
                     while(!tracksCursor.isAfterLast()) {
                         track = new Track();
-                        c = SQLConstants.ZERO;
+                        c = ZERO;
 
                         track.setTrackTitle(tracksCursor.getString(c++));
                         track.setFileName(tracksCursor.getString(c++));
@@ -232,10 +219,10 @@ public class MediaLibraryManager {
                         mmr.setDataSource(filePath);
                         data = mmr.getEmbeddedPicture();
 
-                        if(data != null && data.length > SQLConstants.ZERO) {
+                        if(data != null && data.length > ZERO) {
                             track.setAlbumArt(data);
                         } else {
-                            track.setAlbumArt(new byte[SQLConstants.ZERO]);
+                            track.setAlbumArt(new byte[ZERO]);
                         }
 
                         trackList.add(track);
@@ -266,8 +253,8 @@ public class MediaLibraryManager {
         int i = 0;
 
         switch(playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
-                Collections.sort(trackInfoList, new Track());
+            case TAG_PLAYLIST_LIBRARY:
+                sort(trackInfoList, new Track());
                 tracklistIterator = trackInfoList.iterator();
 
                 while(tracklistIterator.hasNext()) {
@@ -278,8 +265,8 @@ public class MediaLibraryManager {
 
                 break;
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
-                Collections.sort(selectedPlaylist, new Track());
+            case TAG_PLAYLIST_OTHER:
+                sort(selectedPlaylist, new Track());
                 tracklistIterator = selectedPlaylist.iterator();
 
                 while(tracklistIterator.hasNext()) {
@@ -297,10 +284,10 @@ public class MediaLibraryManager {
      */
     public static void sortPlaylists() {
         //Removing default playlist 'Favourites' from playlistInfoList to prevent it's index from changing
-        Playlist fav =  playlistInfoList.remove(SQLConstants.PLAYLIST_INDEX_FAVOURITES);
+        Playlist fav =  playlistInfoList.remove(PLAYLIST_INDEX_FAVOURITES);
 
-        Collections.sort(playlistInfoList, new Playlist());
-        playlistInfoList.add(SQLConstants.PLAYLIST_INDEX_FAVOURITES, fav);
+        sort(playlistInfoList, new Playlist());
+        playlistInfoList.add(PLAYLIST_INDEX_FAVOURITES, fav);
         Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
         Playlist playlist;
         int i = 0;
@@ -338,7 +325,7 @@ public class MediaLibraryManager {
         if(trackInfoList != null) {
             return trackInfoList.size();
         } else {
-            return SQLConstants.ZERO;
+            return ZERO;
         }
     }
 
@@ -346,16 +333,16 @@ public class MediaLibraryManager {
         if(playlistInfoList != null) {
             return playlistInfoList.size();
         } else {
-            return SQLConstants.ZERO;
+            return ZERO;
         }
     }
 
     public static Track getTrackByIndex(String playlistType, int index) {
         switch (playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
+            case TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(index);
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
+            case TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(index);
 
             default:
@@ -365,10 +352,10 @@ public class MediaLibraryManager {
 
     public static Track getFirstTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
+            case TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(0);
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
+            case TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(0);
 
             default:
@@ -378,10 +365,10 @@ public class MediaLibraryManager {
 
     public static Track getLastTrack(String playlistType) {
         switch(playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
+            case TAG_PLAYLIST_LIBRARY:
                 return trackInfoList.get(tracklistSize - 1);
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
+            case TAG_PLAYLIST_OTHER:
                 return selectedPlaylist.get(selectedPlaylist.size() - 1);
 
             default:
@@ -395,10 +382,10 @@ public class MediaLibraryManager {
 
     public static boolean isLastTrack(String playlistType, int index) {
         switch(playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
+            case TAG_PLAYLIST_LIBRARY:
                 return (index == (tracklistSize - 1));
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
+            case TAG_PLAYLIST_OTHER:
                 return (index == (selectedPlaylist.size() - 1));
 
             default:
@@ -412,11 +399,11 @@ public class MediaLibraryManager {
 
     public static void removeTrack(String playlistType, int index) {
         switch(playlistType) {
-            case MediaPlayerConstants.TAG_PLAYLIST_LIBRARY:
+            case TAG_PLAYLIST_LIBRARY:
                 trackInfoList.remove(index);
                 break;
 
-            case MediaPlayerConstants.TAG_PLAYLIST_OTHER:
+            case TAG_PLAYLIST_OTHER:
                 selectedPlaylist.remove(index);
                 break;
         }
@@ -455,11 +442,11 @@ public class MediaLibraryManager {
             //Creating a list of music file names from the cursors
             for (Cursor cursor : cursors) {
                 try {
-                    if (cursor.getCount() > SQLConstants.ZERO) {
+                    if (cursor.getCount() > ZERO) {
                         cursor.moveToFirst();
 
                         while (!cursor.isAfterLast()) {
-                            storageFileNamesList.add(cursor.getString(SQLConstants.ZERO));
+                            storageFileNamesList.add(cursor.getString(ZERO));
                             cursor.moveToNext();
                         }
                     }
@@ -498,15 +485,15 @@ public class MediaLibraryManager {
             if ((newTracksList != null && !newTracksList.isEmpty()) ||
                 (deletedFileNamesList != null && !deletedFileNamesList.isEmpty())) {
                 map = new HashMap<>();
-                map.put(MediaPlayerConstants.KEY_NEW_TRACKS_LIST, newTracksList);
-                map.put(MediaPlayerConstants.KEY_DELETED_TRACKS_LIST, deletedFileNamesList);
+                map.put(KEY_NEW_TRACKS_LIST, newTracksList);
+                map.put(KEY_DELETED_TRACKS_LIST, deletedFileNamesList);
 
                 if (newTracksList != null && !newTracksList.isEmpty()) {
-                    Log.d("New tracks", String.valueOf(newTracksList.size()));
+                    Log.d("New tracks", valueOf(newTracksList.size()));
                 }
 
                 if (deletedFileNamesList != null && !deletedFileNamesList.isEmpty()) {
-                    Log.d("Deleted tracks", String.valueOf(deletedFileNamesList.size()));
+                    Log.d("Deleted tracks", valueOf(deletedFileNamesList.size()));
                 }
             }
         } catch(Exception e) {

@@ -3,10 +3,12 @@ package com.mediaplayer.strings.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-
 import com.mediaplayer.strings.fragments.PlaylistsFragment;
 import com.mediaplayer.strings.fragments.SongsFragment;
-import com.mediaplayer.strings.utilities.MediaPlayerConstants;
+
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.PAGE_COUNT;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.TITLE_PLAYLISTS;
+import static com.mediaplayer.strings.utilities.MediaPlayerConstants.TITLE_SONGS;
 
 public class HomePagerAdapter extends FragmentPagerAdapter {
 
@@ -17,7 +19,7 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     // Returns total number of pages
     @Override
     public int getCount() {
-        return MediaPlayerConstants.PAGE_COUNT;
+        return PAGE_COUNT;
     }
 
     // Returns the fragment to display for that page
@@ -40,10 +42,10 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch(position) {
             case 0:
-                return MediaPlayerConstants.TITLE_SONGS;
+                return TITLE_SONGS;
 
             case 1:
-                return MediaPlayerConstants.TITLE_PLAYLISTS;
+                return TITLE_PLAYLISTS;
 
             default:
                 return null;

@@ -1,6 +1,5 @@
 package com.mediaplayer.strings.beans;
 
-
 import java.io.Serializable;
 import java.util.Comparator;
 

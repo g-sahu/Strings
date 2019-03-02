@@ -10,13 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.mediaplayer.strings.R;
 import com.mediaplayer.strings.adapters.SongsListAdapter;
 import com.mediaplayer.strings.beans.Track;
-import com.mediaplayer.strings.utilities.MediaLibraryManager;
 
 import java.util.ArrayList;
 
+import static android.support.v7.widget.RecyclerView.Adapter;
+import static android.support.v7.widget.RecyclerView.GONE;
+import static android.support.v7.widget.RecyclerView.VISIBLE;
+import static com.mediaplayer.strings.R.id;
+import static com.mediaplayer.strings.R.id.recycler_view;
+import static com.mediaplayer.strings.R.layout.fragment_songs;
+import static com.mediaplayer.strings.utilities.MediaLibraryManager.getTrackInfoList;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 
 public class SongsFragment extends Fragment {
@@ -34,17 +39,17 @@ public class SongsFragment extends Fragment {
         View view = null;
         TextView emptyLibraryMessage;
         ArrayList<Track> trackInfoList;
-        RecyclerView.Adapter songsListAdapter;
+        Adapter songsListAdapter;
 
         try {
-            view = inflater.inflate(R.layout.fragment_songs, container, false);
-            emptyLibraryMessage = view.findViewById(R.id.emptyLibraryMessage);
-            trackListView = view.findViewById(R.id.recycler_view);
-            trackInfoList = MediaLibraryManager.getTrackInfoList();
+            view = inflater.inflate(fragment_songs, container, false);
+            emptyLibraryMessage = view.findViewById(id.emptyLibraryMessage);
+            trackListView = view.findViewById(recycler_view);
+            trackInfoList = getTrackInfoList();
 
             if(trackInfoList == null || trackInfoList.isEmpty()) {
-                emptyLibraryMessage.setVisibility(View.VISIBLE);
-                trackListView.setVisibility(View.GONE);
+                emptyLibraryMessage.setVisibility(VISIBLE);
+                trackListView.setVisibility(GONE);
             } else {
                 songsListAdapter = new SongsListAdapter(context, trackInfoList);
                 trackListView.setAdapter(songsListAdapter);
