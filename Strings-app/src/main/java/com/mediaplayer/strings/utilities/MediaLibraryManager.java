@@ -307,58 +307,23 @@ public class MediaLibraryManager {
     }
 
     public static int getTrackInfoListSize() {
-        if(trackInfoList != null) {
-            return trackInfoList.size();
-        } else {
-            return ZERO;
-        }
+        return (trackInfoList != null) ? trackInfoList.size() : ZERO;
     }
 
     public static int getPlaylistInfoListSize() {
-        if(playlistInfoList != null) {
-            return playlistInfoList.size();
-        } else {
-            return ZERO;
-        }
+        return (playlistInfoList != null) ? playlistInfoList.size() : ZERO;
     }
 
     public static Track getTrackByIndex(String playlistType, int index) {
-        switch (playlistType) {
-            case TAG_PLAYLIST_LIBRARY:
-                return trackInfoList.get(index);
-
-            case TAG_PLAYLIST_OTHER:
-                return selectedPlaylist.get(index);
-
-            default:
-                return null;
-        }
+        return playlistType.equals(TAG_PLAYLIST_LIBRARY) ? trackInfoList.get(index) : selectedPlaylist.get(index);
     }
 
     public static Track getFirstTrack(String playlistType) {
-        switch(playlistType) {
-            case TAG_PLAYLIST_LIBRARY:
-                return trackInfoList.get(0);
-
-            case TAG_PLAYLIST_OTHER:
-                return selectedPlaylist.get(0);
-
-            default:
-                return null;
-        }
+        return playlistType.equals(TAG_PLAYLIST_LIBRARY) ? trackInfoList.get(0) : selectedPlaylist.get(0);
     }
 
     public static Track getLastTrack(String playlistType) {
-        switch(playlistType) {
-            case TAG_PLAYLIST_LIBRARY:
-                return trackInfoList.get(tracklistSize - 1);
-
-            case TAG_PLAYLIST_OTHER:
-                return selectedPlaylist.get(selectedPlaylist.size() - 1);
-
-            default:
-                return null;
-        }
+        return playlistType.equals(TAG_PLAYLIST_LIBRARY) ? trackInfoList.get(tracklistSize - 1) : selectedPlaylist.get(selectedPlaylist.size() - 1);
     }
 
     public static boolean isFirstTrack(int index) {
@@ -366,16 +331,7 @@ public class MediaLibraryManager {
     }
 
     public static boolean isLastTrack(String playlistType, int index) {
-        switch(playlistType) {
-            case TAG_PLAYLIST_LIBRARY:
-                return (index == (tracklistSize - 1));
-
-            case TAG_PLAYLIST_OTHER:
-                return (index == (selectedPlaylist.size() - 1));
-
-            default:
-                return false;
-        }
+        return playlistType.equals(TAG_PLAYLIST_LIBRARY) ? index == (tracklistSize - 1) : index == (selectedPlaylist.size() - 1);
     }
 
     public static void removePlaylist(int index) {
