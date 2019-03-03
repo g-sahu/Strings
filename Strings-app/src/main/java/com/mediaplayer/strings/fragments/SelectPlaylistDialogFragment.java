@@ -13,7 +13,6 @@ import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static android.support.v7.app.AlertDialog.Builder;
 import static com.mediaplayer.strings.fragments.PlaylistsFragment.recyclerView;
@@ -23,6 +22,7 @@ import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_PLAYLI
 import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_PLAYLIST_CREATED;
 import static com.mediaplayer.strings.utilities.SQLConstants.PLAYLIST_ID_FAVOURITES;
 import static com.mediaplayer.strings.utilities.SQLConstants.ZERO;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 
 public class SelectPlaylistDialogFragment extends DialogFragment {
     private ArrayList<Playlist> playlistsInLibrary = getPlaylistInfoList();
@@ -33,56 +33,37 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Builder builder = null;
-        MediaPlayerDAO dao = null;
-        ArrayList<Integer> addedToPlaylists;
-        final ArrayList<Playlist> playlistsToDisplay;
-        Iterator<Playlist> playlistsIterator;
-        String list[];
-        Playlist playlist;
-        int playlistID, playlistCount = playlistsInLibrary.size(), addedToPlaylistsCount, c = 0, listLength;
+        Builder builder = new Builder(getActivity());
+        MediaPlayerDAO dao = new MediaPlayerDAO(context);
 
         try {
             context = getContext();
-            builder = new Builder(getActivity());
             Bundle args = getArguments();
             selectedTrack = (Track) args.getSerializable(KEY_SELECTED_TRACK);
 
-            //Checking if playlist count > 1 i.e. the user has created any custom playlist
-            if(playlistCount > 1) {
-                dao = new MediaPlayerDAO(context);
-
-                //Getting the playlists to which the track is already added
-                addedToPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
-                addedToPlaylistsCount = addedToPlaylists != null ? addedToPlaylists.size() : ZERO;
-
-                playlistsToDisplay = new ArrayList<>();
-                playlistsIterator = playlistsInLibrary.iterator();
+            //Checking if the user has created any custom playlist
+            if(playlistsInLibrary.size() > 1) {
+                ArrayList<Integer> addedToPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
+                int addedToPlaylistsCount = addedToPlaylists != null ? addedToPlaylists.size() : ZERO;
+                final ArrayList<Playlist> playlistsToDisplay = new ArrayList<>();
 
                 //Iterating playlists in library to remove playlists to which track is already added
-                while(playlistsIterator.hasNext()) {
-                    playlist = playlistsIterator.next();
-                    playlistID = playlist.getPlaylistID();
-
-                    if((playlistID != PLAYLIST_ID_FAVOURITES) &&
-                       (addedToPlaylistsCount == ZERO || !addedToPlaylists.contains(playlistID))) {
+                for (Playlist playlist : playlistsInLibrary) {
+                    if((playlist.getPlaylistID() != PLAYLIST_ID_FAVOURITES) &&
+                       (addedToPlaylistsCount == ZERO || !addedToPlaylists.contains(playlist.getPlaylistID()))) {
                         playlistsToDisplay.add(playlist);
                     }
                 }
 
                 selectedPlaylists = new ArrayList<>();
-                list = new String[playlistsToDisplay.size()];
-                listLength = list.length;
+                String[] list = new String[playlistsToDisplay.size()];
+                int listLength = list.length;
+                int c = 0;
 
-                //Setting dialog box title
                 builder.setTitle(TITLE_SELECT_PLAYLIST);
 
                 if(listLength != 0) {
-                    playlistsIterator = playlistsToDisplay.iterator();
-
-                    //Adding playlists to multichoice items list in dialog
-                    while(playlistsIterator.hasNext()) {
-                        playlist = playlistsIterator.next();
+                    for (Playlist playlist : playlistsToDisplay) {
                         list[c++] = playlist.getPlaylistName();
                     }
 
@@ -99,55 +80,28 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
 
                     //Setting listener for 'OK' button
                     builder.setPositiveButton(OK, (dialog, id) -> {
-                        MediaPlayerDAO dao1 = null;
-
-                        if(!selectedPlaylists.isEmpty()) {
-                            try {
-                                dao1 = new MediaPlayerDAO(context);
-
-                                //Add track to selected playlists
-                                dao1.addToPlaylists(selectedPlaylists, selectedTrack);
-                            } catch(Exception e) {
-                                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                                //Utilities.reportCrash(e);
-                            } finally {
-                                if(dao1 != null) {
-                                    dao1.closeConnection();
-                                }
-                            }
-
-                            //Updating playlist adapter
+                        if(isNotNullOrEmpty(selectedPlaylists)) {
+                            dao.addToPlaylists(selectedPlaylists, selectedTrack);
                             updatePlaylistsAdapter();
-
-                            //Removing added playlists from playlistsInLibrary
                             playlistsToDisplay.removeAll(selectedPlaylists);
                         }
                     });
 
-                    //Setting listener for 'Cancel' button
-                    builder.setNegativeButton(CANCEL, (dialog, id) -> {
-                        //Do nothing
-                    });
+                    builder.setNegativeButton(CANCEL, (dialog, id) -> {});
                 } else {
                     builder.setMessage(ERROR_NO_PLAYLIST);
-                    builder.setPositiveButton(OK, (dialog, id) -> {
-                        //Do nothing
-                    });
+                    builder.setPositiveButton(OK, (dialog, id) -> {});
                 }
             } else {
                 builder.setTitle(TITLE_ERROR);
                 builder.setMessage(ERROR_NO_PLAYLIST_CREATED);
-                builder.setPositiveButton(OK, (dialog, id) -> {
-                    //Do nothing
-                });
+                builder.setPositiveButton(OK, (dialog, id) -> {});
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
         } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
+            dao.closeConnection();
         }
 
         return builder.create();
