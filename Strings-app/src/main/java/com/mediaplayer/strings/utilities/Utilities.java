@@ -1,7 +1,12 @@
 package com.mediaplayer.strings.utilities;
 
+import android.database.Cursor;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
+
+import static com.mediaplayer.strings.utilities.SQLConstants.ZERO;
 
 public class Utilities {
     /**
@@ -86,4 +91,12 @@ public class Utilities {
         FirebaseCrash.logcat(Log.ERROR, MediaPlayerConstants.LOG_TAG_EXCEPTION, e.getMessage());
         FirebaseCrash.report(e);
     }*/
+
+    public static boolean isNotNullOrEmpty(Collection collection) {
+        return (collection != null && !collection.isEmpty());
+    }
+
+    public static boolean isNotNullOrEmpty(Cursor cursor) {
+        return (cursor != null && cursor.getCount() > ZERO);
+    }
 }

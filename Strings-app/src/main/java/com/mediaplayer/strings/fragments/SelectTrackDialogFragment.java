@@ -24,6 +24,7 @@ import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
 import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_TRACK;
 import static com.mediaplayer.strings.utilities.MessageConstants.ERROR_NO_TRACKS_ADDED;
 import static com.mediaplayer.strings.utilities.SQLConstants.ZERO;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 
 public class SelectTrackDialogFragment extends DialogFragment {
     private Context context;
@@ -50,15 +51,10 @@ public class SelectTrackDialogFragment extends DialogFragment {
             Playlist selectedPlaylist = (Playlist) args.getSerializable(KEY_SELECTED_PLAYLIST);
 
             //Checking if there are any tracks in the library
-            if(tracksInLibrary != null && !tracksInLibrary.isEmpty()) {
+            if(isNotNullOrEmpty(tracksInLibrary)) {
                 dao = new MediaPlayerDAO(context);
                 tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
-
-                if(tracksInPlaylist != null && !tracksInPlaylist.isEmpty()) {
-                    trackInPlaylistSize = tracksInPlaylist.size();
-                } else {
-                    trackInPlaylistSize = 0;
-                }
+                trackInPlaylistSize = isNotNullOrEmpty(tracksInPlaylist) ? tracksInPlaylist.size() : ZERO;
 
                 //Creating list of tracks to display in multiselect dialog
                 tracksToDisplay = new ArrayList<>();

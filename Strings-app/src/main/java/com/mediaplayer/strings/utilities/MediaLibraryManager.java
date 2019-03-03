@@ -20,6 +20,7 @@ import static android.provider.MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 import static com.mediaplayer.strings.dao.MediaPlayerDAO.updateTrackIndices;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.*;
 import static com.mediaplayer.strings.utilities.SQLConstants.*;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 import static java.lang.String.valueOf;
 import static java.util.Collections.sort;
 
@@ -55,12 +56,12 @@ public class MediaLibraryManager {
                         isChanged = true;
 
                         //Insert new tracks in db
-                        if (newTracksList != null && !newTracksList.isEmpty()) {
+                        if (isNotNullOrEmpty(newTracksList)) {
                             dao.addTracksToLibrary(newTracksList);
                         }
 
                         //Delete deleted tracks from db
-                        if (deletedTracksList != null && !deletedTracksList.isEmpty()) {
+                        if (isNotNullOrEmpty(deletedTracksList)) {
                             dao.deleteTracksFromLibrary(deletedTracksList);
                         }
                     }
@@ -400,8 +401,10 @@ public class MediaLibraryManager {
             }
 
             //Creating list of file names of new and deleted tracks
-            if (!storageFileNamesList.isEmpty()) {
-                if (libraryFileNamesList != null && !libraryFileNamesList.isEmpty()) {
+            if (storageFileNamesList.isEmpty()) {
+                deletedFileNamesList = libraryFileNamesList;
+            } else {
+                if (isNotNullOrEmpty(libraryFileNamesList)) {
                     //Getting all newly added tracks
                     newFileNamesList = new ArrayList<>(storageFileNamesList);
                     newFileNamesList.removeAll(libraryFileNamesList);
@@ -419,21 +422,18 @@ public class MediaLibraryManager {
                     cursors = getNewTracksFromProvider(context, newFileNamesList);
                     newTracksList = createTrackListFromCursor(cursors);
                 }
-            } else {
-                deletedFileNamesList = libraryFileNamesList;
             }
 
-            if ((newTracksList != null && !newTracksList.isEmpty()) ||
-                (deletedFileNamesList != null && !deletedFileNamesList.isEmpty())) {
+            if (isNotNullOrEmpty(newTracksList) || isNotNullOrEmpty(deletedFileNamesList)) {
                 map = new HashMap<>();
                 map.put(KEY_NEW_TRACKS_LIST, newTracksList);
                 map.put(KEY_DELETED_TRACKS_LIST, deletedFileNamesList);
 
-                if (newTracksList != null && !newTracksList.isEmpty()) {
+                if (isNotNullOrEmpty(newTracksList)) {
                     Log.d("New tracks", valueOf(newTracksList.size()));
                 }
 
-                if (deletedFileNamesList != null && !deletedFileNamesList.isEmpty()) {
+                if (isNotNullOrEmpty(deletedFileNamesList)) {
                     Log.d("Deleted tracks", valueOf(deletedFileNamesList.size()));
                 }
             }

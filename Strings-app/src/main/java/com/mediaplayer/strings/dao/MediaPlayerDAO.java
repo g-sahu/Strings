@@ -32,6 +32,7 @@ import static com.mediaplayer.strings.utilities.MediaPlayerConstants.TAG_PLAYLIS
 import static com.mediaplayer.strings.utilities.MessageConstants.*;
 import static com.mediaplayer.strings.utilities.SQLConstants.*;
 import static com.mediaplayer.strings.utilities.Utilities.getCurrentDate;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 import static java.lang.String.valueOf;
 
 public class MediaPlayerDAO {
@@ -531,7 +532,7 @@ public class MediaPlayerDAO {
         Log.d(LOG_TAG_SQL, SQL_SELECT_PLAYLISTS_FOR_TRACK);
 
         try (Cursor cursor = db.rawQuery(SQL_SELECT_TRACK_IDS_FOR_PLAYLIST, args);) {
-            if(cursor != null && cursor.getCount() > 0) {
+            if(isNotNullOrEmpty(cursor)) {
                 trackList = new ArrayList<>();
                 cursor.moveToFirst();
 
@@ -621,7 +622,7 @@ public class MediaPlayerDAO {
         Log.d(LOG_TAG_SQL, SQL_SELECT_PLAYLISTS_FOR_TRACK);
 
         try (Cursor cursor = db.rawQuery(SQL_SELECT_PLAYLISTS_FOR_TRACK, args);) {
-            if(cursor != null && cursor.getCount() > 0) {
+            if(isNotNullOrEmpty(cursor)) {
                 playlist = new ArrayList<>();
                 cursor.moveToFirst();
 
@@ -645,7 +646,7 @@ public class MediaPlayerDAO {
         Log.d(LOG_TAG_SQL, SQL_SELECT_FILE_NAMES);
 
         try (Cursor tracksCursor = db.rawQuery(SQL_SELECT_FILE_NAMES, null);) {
-            if(tracksCursor != null && tracksCursor.getCount() > 0) {
+            if(isNotNullOrEmpty(tracksCursor)) {
                 fileNamesList = new ArrayList<>();
                 tracksCursor.moveToFirst();
 

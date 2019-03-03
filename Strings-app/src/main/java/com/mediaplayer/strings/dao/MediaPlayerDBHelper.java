@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import com.mediaplayer.strings.beans.Track;
-import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
 
@@ -15,6 +14,8 @@ import static com.mediaplayer.strings.dao.MediaPlayerContract.DATABASE_VERSION;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.populateTrackInfoList;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 import static com.mediaplayer.strings.utilities.SQLConstants.*;
+import static com.mediaplayer.strings.utilities.Utilities.getCurrentDate;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 import static java.lang.String.valueOf;
 
 class MediaPlayerDBHelper extends SQLiteOpenHelper {
@@ -54,7 +55,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
             insertStmt.bindString(2, PLAYLIST_TITLE_FAVOURITES);
             insertStmt.bindLong(3, ZERO);
             insertStmt.bindLong(4, ZERO);
-            insertStmt.bindString(5, Utilities.getCurrentDate());
+            insertStmt.bindString(5, getCurrentDate());
             Log.d(LOG_TAG_SQL, insertStmt.toString());
             insertStmt.execute();
         }
@@ -63,9 +64,8 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
     private void populateTracks(SQLiteDatabase db, ArrayList<Track> trackList) {
         int c, tracksInserted = 0;
 
-        if(trackList != null && !trackList.isEmpty()) {
+        if(isNotNullOrEmpty(trackList)) {
             try (SQLiteStatement insertStmt = db.compileStatement(SQL_INSERT_TRACK)) {
-
                 for (Track track : trackList) {
                     c = ONE;
                     insertStmt.bindString(c++, track.getTrackTitle());
@@ -78,7 +78,7 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                     insertStmt.bindBlob(c++, track.getAlbumArt());
                     insertStmt.bindString(c++, track.getTrackLocation());
                     insertStmt.bindLong(c++, track.isFavSw());
-                    insertStmt.bindString(c, Utilities.getCurrentDate());
+                    insertStmt.bindString(c, getCurrentDate());
                     Log.d(LOG_TAG_SQL, insertStmt.toString());
                     insertStmt.executeInsert();
                     ++tracksInserted;

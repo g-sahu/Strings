@@ -23,6 +23,7 @@ import static com.mediaplayer.strings.R.id.recycler_view;
 import static com.mediaplayer.strings.R.layout.fragment_songs;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.getTrackInfoList;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
+import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 
 public class SongsFragment extends Fragment {
     private Context context;
@@ -47,13 +48,13 @@ public class SongsFragment extends Fragment {
             trackListView = view.findViewById(recycler_view);
             trackInfoList = getTrackInfoList();
 
-            if(trackInfoList == null || trackInfoList.isEmpty()) {
-                emptyLibraryMessage.setVisibility(VISIBLE);
-                trackListView.setVisibility(GONE);
-            } else {
+            if (isNotNullOrEmpty(trackInfoList)) {
                 songsListAdapter = new SongsListAdapter(context, trackInfoList);
                 trackListView.setAdapter(songsListAdapter);
                 trackListView.setLayoutManager(new LinearLayoutManager(context));
+            } else {
+                emptyLibraryMessage.setVisibility(VISIBLE);
+                trackListView.setVisibility(GONE);
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
