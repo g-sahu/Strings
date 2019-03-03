@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.Log;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
@@ -98,43 +99,31 @@ public class MediaLibraryManager {
      * and store the details in a Cursor
      **/
     private static Cursor[] getAllTracksFromProvider(Context context) {
-        Cursor cursors[] = new Cursor[2];
         String[] projection = new String[] { TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA };
-
         String selection = IS_MUSIC + " != 0 " + AND +
                            IS_ALARM + " == 0 " + AND +
                            IS_NOTIFICATION + " == 0 " + AND +
                            IS_PODCAST + " == 0 " + AND +
                            IS_RINGTONE + " == 0 " + AND +
                            DURATION + " > 60000";
-
-        ContentResolver contentResolver = context.getContentResolver();
-        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
-        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
-        return cursors;
+        Uri[] uris = {INTERNAL_CONTENT_URI, EXTERNAL_CONTENT_URI};
+        return getContentFromProvider(context, uris, projection, selection, null, null);
     }
 
     private static Cursor[] getFileNamesFromProvider(Context context) {
-        Cursor cursors[] = new Cursor[2];
         String[] projection = new String[] { DISPLAY_NAME };
-
         String selection = IS_MUSIC + " != 0 " + AND +
                            IS_ALARM + " == 0 " + AND +
                            IS_NOTIFICATION + " == 0 " + AND +
                            IS_PODCAST + " == 0 " + AND +
                            IS_RINGTONE + " == 0 " + AND +
                            DURATION + " > 60000";
-
-        ContentResolver contentResolver = context.getContentResolver();
-        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
-        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
-        return cursors;
+        Uri[] uris = {INTERNAL_CONTENT_URI, EXTERNAL_CONTENT_URI};
+        return getContentFromProvider(context, uris, projection, selection, null, null);
     }
 
     private static Cursor[] getNewTracksFromProvider(Context context, ArrayList<String> fileNamesList) {
-        Cursor cursors[] = new Cursor[2];
-        String[] projection = new String[] { TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA };
-
+        String[] projection = new String[] {TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA};
         Iterator<String> fileNamesIterator = fileNamesList.iterator();
         StringBuilder fileNames = new StringBuilder();
 
@@ -147,9 +136,18 @@ public class MediaLibraryManager {
         }
 
         String selection = DISPLAY_NAME + " IN (" + fileNames + ")";
+        Uri[] uris = {INTERNAL_CONTENT_URI, EXTERNAL_CONTENT_URI};
+        return getContentFromProvider(context, uris, projection, selection, null, null);
+    }
+
+    private static Cursor[] getContentFromProvider(Context context, Uri[] uris, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Cursor cursors[] = new Cursor[uris.length];
         ContentResolver contentResolver = context.getContentResolver();
-        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
-        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
+
+        for (int i=0; i<uris.length; i++) {
+            cursors[i] = contentResolver.query(uris[i], projection, selection, selectionArgs, sortOrder);
+        }
+
         return cursors;
     }
 
