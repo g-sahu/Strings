@@ -100,11 +100,11 @@ public class MediaLibraryManager {
      **/
     private static Cursor[] getAllTracksFromProvider(Context context) {
         String[] projection = new String[] { TITLE, DISPLAY_NAME, DURATION, SIZE, ALBUM, ARTIST, DATA };
-        String selection = IS_MUSIC + " != 0 " + AND +
-                           IS_ALARM + " == 0 " + AND +
-                           IS_NOTIFICATION + " == 0 " + AND +
-                           IS_PODCAST + " == 0 " + AND +
-                           IS_RINGTONE + " == 0 " + AND +
+        String selection = IS_MUSIC + NOT_EQUALS_ZERO + AND +
+                           IS_ALARM + EQUALS_ZERO + AND +
+                           IS_NOTIFICATION + EQUALS_ZERO + AND +
+                           IS_PODCAST + EQUALS_ZERO + AND +
+                           IS_RINGTONE + EQUALS_ZERO + AND +
                            DURATION + " > 60000";
         Uri[] uris = {INTERNAL_CONTENT_URI, EXTERNAL_CONTENT_URI};
         return getContentFromProvider(context, uris, projection, selection, null, null);
@@ -112,11 +112,11 @@ public class MediaLibraryManager {
 
     private static Cursor[] getFileNamesFromProvider(Context context) {
         String[] projection = new String[] { DISPLAY_NAME };
-        String selection = IS_MUSIC + " != 0 " + AND +
-                           IS_ALARM + " == 0 " + AND +
-                           IS_NOTIFICATION + " == 0 " + AND +
-                           IS_PODCAST + " == 0 " + AND +
-                           IS_RINGTONE + " == 0 " + AND +
+        String selection = IS_MUSIC + NOT_EQUALS_ZERO + AND +
+                           IS_ALARM + EQUALS_ZERO + AND +
+                           IS_NOTIFICATION + EQUALS_ZERO + AND +
+                           IS_PODCAST + EQUALS_ZERO + AND +
+                           IS_RINGTONE + EQUALS_ZERO + AND +
                            DURATION + " > 60000";
         Uri[] uris = {INTERNAL_CONTENT_URI, EXTERNAL_CONTENT_URI};
         return getContentFromProvider(context, uris, projection, selection, null, null);

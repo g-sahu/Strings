@@ -66,4 +66,6 @@ public class MediaPlayerConstants {
     public static final String FLAG_LIBRARY_CHANGED = "FLAG_LIBRARY_CHANGED";
     public static final String ACTION_INIT_COMPLETE = "com.mediaplayer.strings.action.INIT_COMPLETE";
     public static final String VERSION = "version";
+    static final String NOT_EQUALS_ZERO = " != 0 ";
+    static final String EQUALS_ZERO = " == 0 ";
 }
