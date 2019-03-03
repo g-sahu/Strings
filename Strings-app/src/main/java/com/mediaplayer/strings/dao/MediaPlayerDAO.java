@@ -114,11 +114,7 @@ public class MediaPlayerDAO {
             }
 
             //Setting success toast message
-            if(selectedPlaylists.contains(getPlaylistByIndex(PLAYLIST_INDEX_FAVOURITES))) {
-                toastText = ADDED_TO_FAVOURITES;
-            } else {
-                toastText = ADDED_TO_PLAYLISTS;
-            }
+            toastText = selectedPlaylists.contains(getPlaylistByIndex(PLAYLIST_INDEX_FAVOURITES)) ? ADDED_TO_FAVOURITES : ADDED_TO_PLAYLISTS;
         } catch(SQLiteConstraintException sqle) {
             Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
             //Utilities.reportCrash(sqle);
@@ -366,9 +362,7 @@ public class MediaPlayerDAO {
             insertStmt = db.compileStatement(SQL_INSERT_PLAYLIST_DETAIL);
 
             //Checking if selected playlist is default playlist 'Favourites'
-            if(playlistID == PLAYLIST_ID_FAVOURITES) {
-                updateStmt = db.compileStatement(SQL_UPDATE_TRACK_FAV_SW);
-            }
+            updateStmt = (playlistID == PLAYLIST_ID_FAVOURITES) ? db.compileStatement(SQL_UPDATE_TRACK_FAV_SW) : null;
 
             for(Track track: selectedTracks) {
                 trackID = track.getTrackID();
@@ -585,7 +579,7 @@ public class MediaPlayerDAO {
         Log.d(LOG_TAG_SQL, SQL_SELECT_TRACKS);
         Cursor tracksCursor = db.rawQuery(SQL_SELECT_TRACKS, null);
 
-        if(tracksCursor.getCount() > 0) {
+        if(isNotNullOrEmpty(tracksCursor)) {
             tracksCursor.moveToFirst();
             trackInfoList = new ArrayList<>();
 

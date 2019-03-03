@@ -54,12 +54,7 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
 
                 //Getting the playlists to which the track is already added
                 addedToPlaylists = dao.getPlaylistsForTrack(selectedTrack.getTrackID());
-
-                if(addedToPlaylists != null) {
-                    addedToPlaylistsCount = addedToPlaylists.size();
-                } else {
-                    addedToPlaylistsCount = 0;
-                }
+                addedToPlaylistsCount = addedToPlaylists != null ? addedToPlaylists.size() : ZERO;
 
                 playlistsToDisplay = new ArrayList<>();
                 playlistsIterator = playlistsInLibrary.iterator();

@@ -24,23 +24,13 @@ public class Utilities {
         int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
 
         // Add hours if there
-        if(hours > 0){
-            finalTimerString = hours + ":";
-        }
+        finalTimerString = (hours > 0) ? hours + ":" : finalTimerString;
 
         // Prepending 0 to minutes if it is one digit
-        if(minutes < 10){
-            minutesString = "0" + minutes;
-        } else {
-            minutesString = "" + minutes;
-        }
+        minutesString = (minutes < 10) ? "0" + minutes : "" + minutes;
 
         // Prepending 0 to seconds if it is one digit
-        if(seconds < 10){
-            secondsString = "0" + seconds;
-        } else {
-            secondsString = "" + seconds;
-        }
+        secondsString = (seconds < 10) ? "0" + seconds : "" + seconds;
 
         finalTimerString = finalTimerString + minutesString + ":" + secondsString;
 
@@ -56,11 +46,7 @@ public class Utilities {
     public static int getProgressPercentage(long currentDuration, long totalDuration){
         long currentSeconds = (int) (currentDuration / 1000);
         long totalSeconds = (int) (totalDuration / 1000);
-
-        // calculating percentage
         Double percentage = (((double) currentSeconds)/totalSeconds) * 100;
-
-        // return percentage
         return percentage.intValue();
     }
 
@@ -74,15 +60,12 @@ public class Utilities {
         int currentDuration;
         totalDuration = totalDuration / 1000;
         currentDuration = (int) ((((double)progress) / 100) * totalDuration);
-
-        // return current duration in milliseconds
         return currentDuration * 1000;
     }
 
     public static String getCurrentDate() {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat(SQLConstants.DD_MM_YYYY);
-
         return df.format(c.getTime());
     }
 
