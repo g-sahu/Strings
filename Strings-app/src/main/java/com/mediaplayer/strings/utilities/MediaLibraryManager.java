@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.util.Log;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
@@ -109,13 +108,9 @@ public class MediaLibraryManager {
                            IS_RINGTONE + " == 0 " + AND +
                            DURATION + " > 60000";
 
-        Uri internalUri = INTERNAL_CONTENT_URI;
-        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
-
-        cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
-        cursors[1] = contentResolver.query(externalUri, projection, selection, null, null);
-
+        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
+        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
         return cursors;
     }
 
@@ -130,13 +125,9 @@ public class MediaLibraryManager {
                            IS_RINGTONE + " == 0 " + AND +
                            DURATION + " > 60000";
 
-        Uri internalUri = INTERNAL_CONTENT_URI;
-        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
-
-        cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
-        cursors[1] = contentResolver.query(externalUri, projection, selection, null, null);
-
+        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
+        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
         return cursors;
     }
 
@@ -156,13 +147,9 @@ public class MediaLibraryManager {
         }
 
         String selection = DISPLAY_NAME + " IN (" + fileNames + ")";
-        Uri internalUri = INTERNAL_CONTENT_URI;
-        Uri externalUri = EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = context.getContentResolver();
-
-        cursors[0] = contentResolver.query(internalUri, projection, selection, null, null);
-        cursors[1] = contentResolver.query(externalUri, projection, selection, null, null);
-
+        cursors[0] = contentResolver.query(INTERNAL_CONTENT_URI, projection, selection, null, null);
+        cursors[1] = contentResolver.query(EXTERNAL_CONTENT_URI, projection, selection, null, null);
         return cursors;
     }
 
@@ -284,7 +271,7 @@ public class MediaLibraryManager {
      */
     public static void sortPlaylists() {
         //Removing default playlist 'Favourites' from playlistInfoList to prevent it's index from changing
-        Playlist fav =  playlistInfoList.remove(PLAYLIST_INDEX_FAVOURITES);
+        Playlist fav = playlistInfoList.remove(PLAYLIST_INDEX_FAVOURITES);
 
         sort(playlistInfoList, new Playlist());
         playlistInfoList.add(PLAYLIST_INDEX_FAVOURITES, fav);
