@@ -234,17 +234,13 @@ public class MediaLibraryManager {
      * Method to sort list of tracks in Media library
      */
     public static void sortTracklist(String playlistType) {
-        Iterator<Track> tracklistIterator;
-        Track track;
         int i = 0;
 
         switch(playlistType) {
             case TAG_PLAYLIST_LIBRARY:
                 sort(trackInfoList, new Track());
-                tracklistIterator = trackInfoList.iterator();
 
-                while(tracklistIterator.hasNext()) {
-                    track = tracklistIterator.next();
+                for (Track track : trackInfoList) {
                     track.setTrackIndex(i);
                     i++;
                 }
@@ -253,11 +249,9 @@ public class MediaLibraryManager {
 
             case TAG_PLAYLIST_OTHER:
                 sort(selectedPlaylist, new Track());
-                tracklistIterator = selectedPlaylist.iterator();
 
-                while(tracklistIterator.hasNext()) {
-                    track = tracklistIterator.next();
-                    track.setCurrentTrackIndex(i);
+                for (Track track : selectedPlaylist) {
+                    track.setTrackIndex(i);
                     i++;
                 }
 
@@ -271,15 +265,11 @@ public class MediaLibraryManager {
     public static void sortPlaylists() {
         //Removing default playlist 'Favourites' from playlistInfoList to prevent it's index from changing
         Playlist fav = playlistInfoList.remove(PLAYLIST_INDEX_FAVOURITES);
-
         sort(playlistInfoList, new Playlist());
         playlistInfoList.add(PLAYLIST_INDEX_FAVOURITES, fav);
-        Iterator<Playlist> playlistIterator = playlistInfoList.iterator();
-        Playlist playlist;
         int i = 0;
 
-        while(playlistIterator.hasNext()) {
-            playlist = playlistIterator.next();
+        for (Playlist playlist : playlistInfoList) {
             playlist.setPlaylistIndex(i);
             i++;
         }
