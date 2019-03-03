@@ -7,16 +7,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import com.mediaplayer.strings.activities.HomeActivity;
 import com.mediaplayer.strings.adapters.PlaylistsAdapter;
 import com.mediaplayer.strings.beans.Playlist;
 import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.dao.MediaPlayerDAO;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static android.support.v7.app.AlertDialog.Builder;
+import static com.mediaplayer.strings.activities.HomeActivity.getSelectedPlaylist;
 import static com.mediaplayer.strings.fragments.PlaylistsFragment.recyclerView;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.getPlaylistInfoList;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.getTrackInfoList;
@@ -34,118 +33,73 @@ public class SelectTrackDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        ArrayList<Integer> tracksInPlaylist;
-        final ArrayList<Track> tracksToDisplay;
-        Iterator<Track> tracksIterator;
-        String list[];
-        Track track;
-        int trackID;
-        Builder builder = null;
-        MediaPlayerDAO dao = null;
-        int trackInPlaylistSize, c = 0, listLength;
+        Builder builder = new Builder(getActivity());
+        final MediaPlayerDAO dao = new MediaPlayerDAO(context);
+        context = getContext();
 
         try {
-            context = getContext();
-            builder = new Builder(getActivity());
             Bundle args = getArguments();
             Playlist selectedPlaylist = (Playlist) args.getSerializable(KEY_SELECTED_PLAYLIST);
 
             //Checking if there are any tracks in the library
             if(isNotNullOrEmpty(tracksInLibrary)) {
-                dao = new MediaPlayerDAO(context);
-                tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
-                trackInPlaylistSize = isNotNullOrEmpty(tracksInPlaylist) ? tracksInPlaylist.size() : ZERO;
-
-                //Creating list of tracks to display in multiselect dialog
-                tracksToDisplay = new ArrayList<>();
+                ArrayList<Integer> tracksInPlaylist = dao.getTrackIDsForPlaylist(selectedPlaylist.getPlaylistID());
+                int trackInPlaylistSize = isNotNullOrEmpty(tracksInPlaylist) ? tracksInPlaylist.size() : ZERO;
+                ArrayList<Track> tracksToDisplay = new ArrayList<>();
 
                 //Iterating tracks in library to remove tracks already added to playlist
-                tracksIterator = tracksInLibrary.iterator();
-
-                while(tracksIterator.hasNext()) {
-                    track = tracksIterator.next();
-                    trackID = track.getTrackID();
-
-                    if(trackInPlaylistSize == ZERO || !tracksInPlaylist.contains(trackID)) {
+                for (Track track: tracksInLibrary) {
+                    if(trackInPlaylistSize == ZERO || !tracksInPlaylist.contains(track.getTrackID())) {
                         tracksToDisplay.add(track);
                     }
                 }
 
                 selectedTracks = new ArrayList<>();
-                list = new String[tracksToDisplay.size()];
-                listLength = list.length;
+                String[] list = new String[tracksToDisplay.size()];
+                int listLength = list.length;
+                int c = 0;
 
-                //Setting the title of the dialog window
                 builder.setTitle(TITLE_SELECT_TRACKS);
 
                 if(listLength != 0) {
-                    tracksIterator = tracksToDisplay.iterator();
-
                     //Adding tracks to multichoice items list in dialog
-                    while(tracksIterator.hasNext()) {
-                        track = tracksIterator.next();
+                    for (Track track: tracksToDisplay) {
                         list[c++] = track.getTrackTitle();
                     }
 
                     builder.setMultiChoiceItems(list, null, (dialog, which, isChecked) -> {
-                        Track track1 = tracksToDisplay.get(which);
+                        Track track = tracksToDisplay.get(which);
 
                         if(isChecked) {
-                            selectedTracks.add(track1);
-                        } else if (selectedTracks.contains(track1)) {
-                            selectedTracks.remove(track1);
+                            selectedTracks.add(track);
+                        } else if (selectedTracks.contains(track)) {
+                            selectedTracks.remove(track);
                         }
                     });
 
                     builder.setPositiveButton(OK, (dialog, id) -> {
-                        MediaPlayerDAO dao1 = null;
-
                         if(!selectedTracks.isEmpty()) {
-                            try {
-                                dao1 = new MediaPlayerDAO(getContext());
-
-                                //Add track to selected playlists
-                                dao1.addTracks(selectedTracks, HomeActivity.getSelectedPlaylist());
-                            } catch(Exception e) {
-                                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                                //Utilities.reportCrash(e);
-                            } finally {
-                                if(dao1 != null) {
-                                    dao1.closeConnection();
-                                }
-                            }
-
-                            //Updating list view adapter
+                            dao.addTracks(selectedTracks, getSelectedPlaylist());
                             updatePlaylistsAdapter();
-
-                            //Removing added tracks from tracksInLibrary
                             tracksToDisplay.removeAll(selectedTracks);
                         }
                     });
 
-                    builder.setNegativeButton(CANCEL, (dialog, id) -> {
-                        //Do nothing
-                    });
+                    builder.setNegativeButton(CANCEL, (dialog, id) -> {});
                 } else {
                     builder.setMessage(ERROR_NO_TRACK);
-                    builder.setPositiveButton(OK, (dialog, id) -> {
-                        //Do nothing
-                    });
+                    builder.setPositiveButton(OK, (dialog, id) -> {});
                 }
             } else {
                 builder.setTitle(TITLE_ERROR);
                 builder.setMessage(ERROR_NO_TRACKS_ADDED);
-                builder.setPositiveButton(OK, (dialog, id) -> {
-                    //Do nothing
-                });
+                builder.setPositiveButton(OK, (dialog, id) -> {});
             }
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
         } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
+            dao.closeConnection();
         }
 
         return builder.create();
