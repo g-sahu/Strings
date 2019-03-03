@@ -1,7 +1,6 @@
 package com.mediaplayer.strings.dao;
 
 import android.content.Context;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
@@ -10,12 +9,10 @@ import com.mediaplayer.strings.beans.Track;
 import com.mediaplayer.strings.utilities.Utilities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static com.mediaplayer.strings.dao.MediaPlayerContract.DATABASE_NAME;
 import static com.mediaplayer.strings.dao.MediaPlayerContract.DATABASE_VERSION;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.populateTrackInfoList;
-import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_EXCEPTION;
 import static com.mediaplayer.strings.utilities.MediaPlayerConstants.LOG_TAG_SQL;
 import static com.mediaplayer.strings.utilities.SQLConstants.*;
 import static java.lang.String.valueOf;
@@ -30,46 +27,47 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        SQLiteStatement insertStmt = null;
-        ArrayList<Track> trackList;
-        Iterator<Track> trackIterator;
-        Track track;
-        int c, tracksInserted = 0;
+        createSchema(db);
+        createFavouritesPlaylist(db);
+        populateTracks(db, populateTrackInfoList(context));
+    }
 
-        try {
-            Log.d(LOG_TAG_SQL, SQL_CREATE_TRACKS);
-            db.execSQL(SQL_CREATE_TRACKS);
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onCreate(db);
+    }
 
-            Log.d(LOG_TAG_SQL, SQL_CREATE_PLAYLISTS);
-            db.execSQL(SQL_CREATE_PLAYLISTS);
+    private void createSchema(SQLiteDatabase db) {
+        Log.d(LOG_TAG_SQL, SQL_CREATE_TRACKS);
+        db.execSQL(SQL_CREATE_TRACKS);
 
-            Log.d(LOG_TAG_SQL, SQL_CREATE_PLAYLIST_DETAIL);
-            db.execSQL(SQL_CREATE_PLAYLIST_DETAIL);
+        Log.d(LOG_TAG_SQL, SQL_CREATE_PLAYLISTS);
+        db.execSQL(SQL_CREATE_PLAYLISTS);
 
-            //Creating default playlist 'Favourites'
-            insertStmt = db.compileStatement(SQL_INSERT_PLAYLIST);
+        Log.d(LOG_TAG_SQL, SQL_CREATE_PLAYLIST_DETAIL);
+        db.execSQL(SQL_CREATE_PLAYLIST_DETAIL);
+    }
 
+    private void createFavouritesPlaylist(SQLiteDatabase db) {
+        try (SQLiteStatement insertStmt = db.compileStatement(SQL_INSERT_PLAYLIST)) {
             insertStmt.bindLong(1, PLAYLIST_INDEX_FAVOURITES);
             insertStmt.bindString(2, PLAYLIST_TITLE_FAVOURITES);
             insertStmt.bindLong(3, ZERO);
             insertStmt.bindLong(4, ZERO);
             insertStmt.bindString(5, Utilities.getCurrentDate());
-
             Log.d(LOG_TAG_SQL, insertStmt.toString());
             insertStmt.execute();
+        }
+    }
 
-            //Fetching tracks from storage
-            trackList = populateTrackInfoList(context);
+    private void populateTracks(SQLiteDatabase db, ArrayList<Track> trackList) {
+        int c, tracksInserted = 0;
 
-            //Inserting tracks in table 'Tracks'
-            if(trackList != null && !trackList.isEmpty()) {
-                insertStmt = db.compileStatement(SQL_INSERT_TRACK);
-                trackIterator = trackList.iterator();
+        if(trackList != null && !trackList.isEmpty()) {
+            try (SQLiteStatement insertStmt = db.compileStatement(SQL_INSERT_TRACK)) {
 
-                while(trackIterator.hasNext()) {
-                    track = trackIterator.next();
+                for (Track track : trackList) {
                     c = ONE;
-
                     insertStmt.bindString(c++, track.getTrackTitle());
                     insertStmt.bindLong(c++, track.getTrackIndex());
                     insertStmt.bindString(c++, track.getFileName());
@@ -81,32 +79,13 @@ class MediaPlayerDBHelper extends SQLiteOpenHelper {
                     insertStmt.bindString(c++, track.getTrackLocation());
                     insertStmt.bindLong(c++, track.isFavSw());
                     insertStmt.bindString(c, Utilities.getCurrentDate());
-
                     Log.d(LOG_TAG_SQL, insertStmt.toString());
-
-                    try {
-                        insertStmt.executeInsert();
-                        ++tracksInserted;
-                    } catch(SQLException sqle) {
-                        Log.e(LOG_TAG_EXCEPTION, sqle.getMessage());
-                        //Utilities.reportCrash(sqle);
-                    }
+                    insertStmt.executeInsert();
+                    ++tracksInserted;
                 }
+            }
 
-                Log.d("Tracks added to library", valueOf(tracksInserted));
-            }
-        } catch(Exception e) {
-            Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-            //Utilities.reportCrash(e);
-        } finally {
-            if(insertStmt != null) {
-                insertStmt.close();
-            }
+            Log.d("Tracks added to library", valueOf(tracksInserted));
         }
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onCreate(db);
     }
 }
