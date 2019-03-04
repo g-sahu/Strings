@@ -42,6 +42,7 @@ import static com.mediaplayer.strings.R.id.addToFavourites;
 import static com.mediaplayer.strings.R.id.tab_layout;
 import static com.mediaplayer.strings.R.id.view_pager;
 import static com.mediaplayer.strings.R.layout.activity_home;
+import static com.mediaplayer.strings.dao.MediaPlayerDAO.UpdateTracksTask;
 import static com.mediaplayer.strings.fragments.PlaylistsFragment.recyclerView;
 import static com.mediaplayer.strings.fragments.SongsFragment.trackListView;
 import static com.mediaplayer.strings.utilities.MediaLibraryManager.getPlaylistByIndex;
@@ -138,43 +139,26 @@ public class HomeActivity extends AppCompatActivity {
 
     //Add to favourites menu option
     private void addToFavourites() {
-        MediaPlayerDAO dao = null;
         ArrayList<Playlist> selectedPlaylists = new ArrayList<>();
 
-        try {
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(this)) {
             selectedPlaylists.add(favouritesPlaylist);
-            dao = new MediaPlayerDAO(this);
             dao.addToPlaylists(selectedPlaylists, selectedTrack);
-
-            //Updating list view adapter
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
         }
     }
 
     //Remove from favourites menu option
     private void removeFromFavourites() {
-        MediaPlayerDAO dao = null;
-
-        try {
-            dao = new MediaPlayerDAO(this);
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(this)) {
             dao.removeFromPlaylist(favouritesPlaylist, selectedTrack);
-
-            //Updating list view adapter
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
         }
     }
 
@@ -184,7 +168,7 @@ public class HomeActivity extends AppCompatActivity {
 
         try {
             dao = new MediaPlayerDAO(this);
-            MediaPlayerDAO.UpdateTracksTask task = new MediaPlayerDAO.UpdateTracksTask(this);
+            UpdateTracksTask task = new UpdateTracksTask(this);
             task.execute(selectedTrack);
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
@@ -221,7 +205,6 @@ public class HomeActivity extends AppCompatActivity {
     public void addTracksToPlaylist(MenuItem menuItem) {
         DialogFragment selectTrackDialogFragment = new SelectTrackDialogFragment();
         Bundle args = new Bundle();
-
         args.putSerializable(KEY_SELECTED_PLAYLIST, selectedPlaylist);
         selectTrackDialogFragment.setArguments(args);
         selectTrackDialogFragment.show(supportFragmentManager, TAG_ADD_TRACKS);
@@ -231,33 +214,21 @@ public class HomeActivity extends AppCompatActivity {
     public void renamePlaylist(MenuItem menuItem) {
         DialogFragment newFragment = new CreatePlaylistDialogFragment();
         Bundle args = new Bundle();
-
         args.putString(KEY_PLAYLIST_TITLE, selectedPlaylist.getPlaylistName());
         args.putInt(KEY_PLAYLIST_INDEX, selectedPlaylist.getPlaylistIndex());
         newFragment.setArguments(args);
         newFragment.show(getSupportFragmentManager(), TAG_RENAME_PLAYLIST);
-
-        //Updating list view adapter
         updatePlaylistsAdapter();
     }
 
     //Delete playlist menu option
     public void deletePlaylist(MenuItem menuItem) {
-        MediaPlayerDAO dao = null;
-
-        try {
-            dao = new MediaPlayerDAO(this);
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(this)) {
             dao.deletePlaylist(selectedPlaylist);
-
-            //Updating list view adapter
             updatePlaylistsAdapter();
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
         }
     }
 
@@ -311,7 +282,6 @@ public class HomeActivity extends AppCompatActivity {
         } catch(ActivityNotFoundException e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-
             makeText(this, ERROR_404, LENGTH_LONG).show();
         }
     }
@@ -339,10 +309,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         Intent intent = new Intent(this, MediaPlayerService.class);
         stopService(intent);
-
         Log.d(LOG_TAG, "HomeActivity destroyed");
     }
 }

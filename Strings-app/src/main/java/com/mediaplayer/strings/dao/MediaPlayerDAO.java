@@ -35,7 +35,7 @@ import static com.mediaplayer.strings.utilities.Utilities.getCurrentDate;
 import static com.mediaplayer.strings.utilities.Utilities.isNotNullOrEmpty;
 import static java.lang.String.valueOf;
 
-public class MediaPlayerDAO {
+public class MediaPlayerDAO implements AutoCloseable {
     private static SQLiteDatabase db;
     private MediaPlayerDBHelper mDbHelper;
     private Context context;
@@ -46,8 +46,8 @@ public class MediaPlayerDAO {
         db = mDbHelper.getWritableDatabase();
     }
 
-    //Closes SQLite database connection
-    public void closeConnection() {
+    @Override
+    public void close() {
         if(mDbHelper != null) {
             mDbHelper.close();
         }

@@ -53,47 +53,33 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                 playlistDialog = builder.create();
 
                 playlistDialog.setOnShowListener(dialog -> {
-                    final AlertDialog alertDialog = (AlertDialog) dialog;
+                    AlertDialog alertDialog = (AlertDialog) dialog;
                     Button positiveButton = alertDialog.getButton(BUTTON_POSITIVE);
 
                     //Setting on-click listener for positive button
-                    positiveButton.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            //Retreiving playlist name entered by the user
-                            EditText playlistTitleTextBox = dialogView.findViewById(playlistTitle);
-                            String playlistName = playlistTitleTextBox.getText().toString();
+                    positiveButton.setOnClickListener(v -> {
+                        //Retreiving playlist name entered by the user
+                        EditText playlistTitleTextBox = dialogView.findViewById(playlistTitle);
+                        String playlistName = playlistTitleTextBox.getText().toString();
 
-                            //Validating playlist title
-                            if(isPlaylistTitleValid(playlistTitleTextBox)) {
-                                //Setting the values for newly created playlist
-                                Playlist playlist = new Playlist();
-                                playlist.setPlaylistName(playlistName);
-                                playlist.setPlaylistSize(ZERO);
-                                playlist.setPlaylistDuration(ZERO);
+                        //Validating playlist title
+                        if(isPlaylistTitleValid(playlistTitleTextBox)) {
+                            //Setting the values for newly created playlist
+                            Playlist playlist = new Playlist();
+                            playlist.setPlaylistName(playlistName);
+                            playlist.setPlaylistSize(ZERO);
+                            playlist.setPlaylistDuration(ZERO);
 
-                                try {
-                                    dao = new MediaPlayerDAO(context);
-
-                                    //Creating playlist
-                                    dao.createPlaylist(playlist);
-                                } catch(Exception e) {
-                                    Log.e(LOG_TAG_EXCEPTION, e.getMessage());
-                                    //Utilities.reportCrash(e);
-                                } finally {
-                                    if(dao != null) {
-                                        dao.closeConnection();
-                                    }
-                                }
-
-                                //Sorting the playlists
-                                sortPlaylists();
-
-                                //Updating list view adapter
-                                updatePlaylistsAdapter();
-
-                                //Dismissing the dialog window
-                                alertDialog.dismiss();
+                            try (MediaPlayerDAO dao = new MediaPlayerDAO(context)) {
+                                dao.createPlaylist(playlist);
+                            } catch(Exception e) {
+                                Log.e(LOG_TAG_EXCEPTION, e.getMessage());
+                                //Utilities.reportCrash(e);
                             }
+
+                            sortPlaylists();
+                            updatePlaylistsAdapter();
+                            alertDialog.dismiss();
                         }
                     });
                 });
@@ -114,12 +100,11 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                 playlistDialog = builder.create();
 
                 playlistDialog.setOnShowListener(dialog -> {
-                    final AlertDialog alertDialog = (AlertDialog) dialog;
+                    AlertDialog alertDialog = (AlertDialog) dialog;
                     Button positiveButton = alertDialog.getButton(BUTTON_POSITIVE);
 
                     //Setting on-click listener for positive button
                     positiveButton.setOnClickListener(v -> {
-                        //Retreiving playlist name entered by the user
                         String newPlaylistTitle = playlistTitleTextBox.getText().toString();
 
                         //Validating playlist title and checking if it is not the same as the old one
@@ -130,8 +115,6 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
                             //Updating playlistInfoList with new playlist values
                             updatePlaylistInfoList(oldPlaylistIndex, playlist);
-
-                            //Sort playlistInfoList to update the indices of the playlists
                             sortPlaylists();
 
                             //Getting upated playlistIndex of the renamed playlist
@@ -139,24 +122,14 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
                             int newPlaylistIndex = playlist.getPlaylistIndex();
                             playlist.setPlaylistIndex(newPlaylistIndex);
 
-                            try {
-                                dao = new MediaPlayerDAO(context);
-
-                                //Updating table 'Playlist' with new values of playlist_title and playlist_index
+                            try (MediaPlayerDAO dao = new MediaPlayerDAO(context)) {
                                 dao.renamePlaylist(playlist);
                             } catch(Exception e) {
                                 Log.e(LOG_TAG_EXCEPTION, e.getMessage());
                                 //Utilities.reportCrash(e);
-                            } finally {
-                                if(dao != null) {
-                                    dao.closeConnection();
-                                }
                             }
 
-                            //Updating list view adapter
                             updatePlaylistsAdapter();
-
-                            //Dismissing the dialog window
                             alertDialog.dismiss();
                         }
                     });
@@ -173,24 +146,16 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
     private boolean isPlaylistTitleValid(EditText playlistTitleTextBox) {
         String newPlaylistTitle = playlistTitleTextBox.getText().toString();
 
-        //Checking if playlist title is not empty string
         if(newPlaylistTitle.isEmpty()) {
             playlistTitleTextBox.setError(ERROR_PLAYLIST_TITLE_BLANK);
             return false;
-        }
-
-        //Checking if playlist title is not the same as default playlist 'Favourites'
-        else if(newPlaylistTitle.equalsIgnoreCase(PLAYLIST_TITLE_FAVOURITES)) {
+        } else if(newPlaylistTitle.equalsIgnoreCase(PLAYLIST_TITLE_FAVOURITES)) {
             playlistTitleTextBox.setError(ERROR_PLAYLIST_TITLE_FAVOURITES);
             return false;
-        }
-
-        //Checking if playlist title is not the same as an existing playlist
-        else if(getPlaylistByTitle(newPlaylistTitle) != null) {
+        } else if(getPlaylistByTitle(newPlaylistTitle) != null) {
             playlistTitleTextBox.setError(ERROR_PLAYLIST_TITLE);
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }

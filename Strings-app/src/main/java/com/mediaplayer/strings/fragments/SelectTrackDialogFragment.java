@@ -34,10 +34,9 @@ public class SelectTrackDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Builder builder = new Builder(getActivity());
-        final MediaPlayerDAO dao = new MediaPlayerDAO(context);
         context = getContext();
 
-        try {
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(context)) {
             Bundle args = getArguments();
             Playlist selectedPlaylist = (Playlist) args.getSerializable(KEY_SELECTED_PLAYLIST);
 
@@ -78,10 +77,12 @@ public class SelectTrackDialogFragment extends DialogFragment {
                     });
 
                     builder.setPositiveButton(OK, (dialog, id) -> {
-                        if(!selectedTracks.isEmpty()) {
-                            dao.addTracks(selectedTracks, getSelectedPlaylist());
-                            updatePlaylistsAdapter();
-                            tracksToDisplay.removeAll(selectedTracks);
+                        if(isNotNullOrEmpty(selectedTracks)) {
+                            try (MediaPlayerDAO dao1 = new MediaPlayerDAO(context)) {
+                                dao1.addTracks(selectedTracks, getSelectedPlaylist());
+                                updatePlaylistsAdapter();
+                                tracksToDisplay.removeAll(selectedTracks);
+                            }
                         }
                     });
 
@@ -98,8 +99,6 @@ public class SelectTrackDialogFragment extends DialogFragment {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            dao.closeConnection();
         }
 
         return builder.create();

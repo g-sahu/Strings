@@ -34,10 +34,9 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Builder builder = new Builder(getActivity());
-        MediaPlayerDAO dao = new MediaPlayerDAO(context);
+        context = getContext();
 
-        try {
-            context = getContext();
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(context)) {
             Bundle args = getArguments();
             selectedTrack = (Track) args.getSerializable(KEY_SELECTED_TRACK);
 
@@ -81,9 +80,11 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
                     //Setting listener for 'OK' button
                     builder.setPositiveButton(OK, (dialog, id) -> {
                         if(isNotNullOrEmpty(selectedPlaylists)) {
-                            dao.addToPlaylists(selectedPlaylists, selectedTrack);
-                            updatePlaylistsAdapter();
-                            playlistsToDisplay.removeAll(selectedPlaylists);
+                            try (MediaPlayerDAO dao1 = new MediaPlayerDAO(context)) {
+                                dao1.addToPlaylists(selectedPlaylists, selectedTrack);
+                                updatePlaylistsAdapter();
+                                playlistsToDisplay.removeAll(selectedPlaylists);
+                            }
                         }
                     });
 
@@ -100,8 +101,6 @@ public class SelectPlaylistDialogFragment extends DialogFragment {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            dao.closeConnection();
         }
 
         return builder.create();

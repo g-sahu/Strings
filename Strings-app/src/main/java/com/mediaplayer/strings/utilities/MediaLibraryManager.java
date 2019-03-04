@@ -32,18 +32,13 @@ public class MediaLibraryManager {
 
     public static boolean init(Context context) {
         HashMap<String, ArrayList<?>> map = null;
-        ArrayList<Track> newTracksList;
-        ArrayList<String> fileNamesList, deletedTracksList;
-        MediaPlayerDAO dao = null;
         boolean isChanged = false;
 
-        try {
-            dao = new MediaPlayerDAO(context);
-
+        try (MediaPlayerDAO dao = new MediaPlayerDAO(context)) {
             //Checking if this is not the first time tracks are populated
             if(trackInfoList == null) {
                 //Get all filenames from db and store in an ArrayList
-                fileNamesList = dao.getFileNamesFromLibrary();
+                ArrayList<String> fileNamesList = dao.getFileNamesFromLibrary();
 
                 if(fileNamesList != null) {
                     //Get all mp3 files from storage
@@ -51,8 +46,8 @@ public class MediaLibraryManager {
 
                     //Check if map is not null. If null, it means there has been no change to the songs library
                     if (map != null) {
-                        newTracksList = (ArrayList<Track>) map.get(KEY_NEW_TRACKS_LIST);
-                        deletedTracksList = (ArrayList<String>) map.get(KEY_DELETED_TRACKS_LIST);
+                        ArrayList<Track> newTracksList = (ArrayList<Track>) map.get(KEY_NEW_TRACKS_LIST);
+                        ArrayList<String> deletedTracksList = (ArrayList<String>) map.get(KEY_DELETED_TRACKS_LIST);
                         isChanged = true;
 
                         //Insert new tracks in db
@@ -71,12 +66,12 @@ public class MediaLibraryManager {
             //Getting list of all tracks from db
             trackInfoList = dao.getTracks();
 
-            if(trackInfoList != null) {
+            if(isNotNullOrEmpty(trackInfoList)) {
                 sortTracklist(TAG_PLAYLIST_LIBRARY);
                 tracklistSize = trackInfoList.size();
 
+                //Updating track indices in db to keep in sync with trackInfoList
                 if (map != null) {
-                    //Updating track indices in db to keep in sync with trackInfoList
                     updateTrackIndices();
                 }
             }
@@ -87,11 +82,8 @@ public class MediaLibraryManager {
         } catch(Exception e) {
             Log.e(LOG_TAG_EXCEPTION, e.getMessage());
             //Utilities.reportCrash(e);
-        } finally {
-            if(dao != null) {
-                dao.closeConnection();
-            }
         }
+
         return isChanged;
     }
 
@@ -160,11 +152,9 @@ public class MediaLibraryManager {
     public static ArrayList<Track> populateTrackInfoList(Context context) {
         //Fetching metadata of all tracks from MediaStore content provider
         Cursor cursors[] = getAllTracksFromProvider(context);
-
-        //Creating track list from cursors
         trackInfoList = createTrackListFromCursor(cursors);
 
-        if(trackInfoList != null) {
+        if(isNotNullOrEmpty(trackInfoList)) {
             tracklistSize = trackInfoList.size();
             sortTracklist(TAG_PLAYLIST_LIBRARY);
         } else {
@@ -204,13 +194,9 @@ public class MediaLibraryManager {
 
                         mmr.setDataSource(filePath);
                         data = mmr.getEmbeddedPicture();
+                        data = (data != null && data.length > ZERO) ? data : new byte[ZERO];
 
-                        if(data != null && data.length > ZERO) {
-                            track.setAlbumArt(data);
-                        } else {
-                            track.setAlbumArt(new byte[ZERO]);
-                        }
-
+                        track.setAlbumArt(data);
                         trackList.add(track);
                         tracksCursor.moveToNext();
                     }
@@ -251,7 +237,7 @@ public class MediaLibraryManager {
                 sort(selectedPlaylist, new Track());
 
                 for (Track track : selectedPlaylist) {
-                    track.setTrackIndex(i);
+                    track.setCurrentTrackIndex(i);
                     i++;
                 }
 
