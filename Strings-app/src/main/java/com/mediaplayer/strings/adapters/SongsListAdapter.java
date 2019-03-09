@@ -1,6 +1,7 @@
 package com.mediaplayer.strings.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +31,14 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Hold
         inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
     }
 
-    @Override
-    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override @NonNull
+    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View rowView = inflater.inflate(item_track, parent, false);
         return new Holder(rowView);
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, int position) {
         Track track = trackInfoList.get(position);
         byte data[] = track.getAlbumArt();
 
